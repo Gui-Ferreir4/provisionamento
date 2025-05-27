@@ -1,13 +1,11 @@
 import streamlit as st
 from datetime import datetime, timedelta
 import pandas as pd
-import numpy as np
 
 def is_weekday(date):
-    return date.weekday() < 5  # 0=segunda ... 4=sexta
+    return date.weekday() < 5  # Segunda a sexta
 
 def prev_working_day(date, offset=1):
-    # Retorna a data anterior deslocada por 'offset' dias úteis
     days_subtracted = 0
     current_date = date
     while days_subtracted < offset:
@@ -16,25 +14,35 @@ def prev_working_day(date, offset=1):
             days_subtracted += 1
     return current_date
 
-st.title("Cadastro de Tarefas - Fase 2")
+st.title("Cadastro de Tarefas - Com Subtarefas Selecionáveis")
 
 with st.form("form_tarefa"):
     nome_tarefa = st.text_input("Nome da tarefa", max_chars=50)
     deadline = st.date_input("Data de entrega final (HTML)", value=datetime.today())
     descricao = st.text_area("Descrição (opcional)")
+    
+    st.markdown("**Subtarefas a criar:**")
+    criar_texto = st.checkbox("Texto (D-2 útil)", value=True)
+    criar_layout = st.checkbox("Layout (D-1 útil)", value=True)
+    criar_html = st.checkbox("HTML (D)", value=True)
+    
     submitted = st.form_submit_button("Cadastrar")
 
 if submitted:
-    # Gerar subtarefas com prazos
-    texto_data = prev_working_day(deadline, 2)
-    layout_data = prev_working_day(deadline, 1)
-    html_data = deadline
+    subtarefas_list = []
+    
+    if criar_texto:
+        texto_data = prev_working_day(deadline, 2)
+        subtarefas_list.append({"Tipo": "Texto", "Prazo": texto_data, "Status": "Pendente", "Tarefa": nome_tarefa})
+    if criar_layout:
+        layout_data = prev_working_day(deadline, 1)
+        subtarefas_list.append({"Tipo": "Layout", "Prazo": layout_data, "Status": "Pendente", "Tarefa": nome_tarefa})
+    if criar_html:
+        subtarefas_list.append({"Tipo": "HTML", "Prazo": deadline, "Status": "Pendente", "Tarefa": nome_tarefa})
 
-    subtarefas = pd.DataFrame([
-        {"Tipo": "Texto", "Prazo": texto_data, "Status": "Pendente", "Tarefa": nome_tarefa},
-        {"Tipo": "Layout", "Prazo": layout_data, "Status": "Pendente", "Tarefa": nome_tarefa},
-        {"Tipo": "HTML", "Prazo": html_data, "Status": "Pendente", "Tarefa": nome_tarefa}
-    ])
-
-    st.success(f"Tarefa '{nome_tarefa}' cadastrada com sucesso!")
-    st.dataframe(subtarefas)
+    if not subtarefas_list:
+        st.error("Selecione ao menos uma subtarefa para criar.")
+    else:
+        subtarefas = pd.DataFrame(subtarefas_list)
+        st.success(f"Tarefa '{nome_tarefa}' cadastrada com {len(subtarefas)} subtarefa(s).")
+        st.dataframe(subtarefas)
