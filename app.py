@@ -1,45 +1,64 @@
-import streamlit as st
 import pandas as pd
-from pathlib import Path
-from filelock import FileLock
+import streamlit as st
+from datetime import datetime
+from pandas.tseries.offsets import BDay
 
-# Caminho para o arquivo CSV e Lock
-CSV_PATH = Path("dados.csv")
-LOCK_PATH = Path("dados.csv.lock")
+# Caminho do CSV temporário
+CSV_PATH = "dados.csv"
 
-# Função para carregar tarefas
+# Inicializa o DataFrame
 def carregar_dados():
-    if CSV_PATH.exists():
+    try:
         return pd.read_csv(CSV_PATH, sep=";")
-    else:
-        return pd.DataFrame(columns=["ID", "Tarefa", "Status"])
+    except FileNotFoundError:
+        return pd.DataFrame(columns=["ID_Tarefa", "Nome_Tarefa", "Tipo_Subtarefa", "Prazo", "Status"])
 
-# Função para salvar tarefas
+# Salva os dados no CSV
 def salvar_dados(df):
     df.to_csv(CSV_PATH, index=False, sep=";")
 
-# Interface principal
-st.set_page_config(page_title="Provisionamento de Tarefas", layout="wide")
-st.title("📋 Provisionamento de Tarefas")
+# Gera subtarefas com base na data de entrega
+def gerar_subtarefas(id_tarefa, nome_tarefa, data_entrega):
+    subtarefas = ["Texto", "Layout", "HTML"]
+    dias_offset = [-2, -1, 0]  # Dias úteis regressivos
+    linhas = []
 
-# Área de cadastro
-with st.form("form_tarefa"):
-    st.subheader("Adicionar nova tarefa")
-    tarefa = st.text_input("Descrição da tarefa")
-    status = st.selectbox("Status", ["Pendente", "Concluído"])
-    submitted = st.form_submit_button("Salvar")
+    for tipo, offset in zip(subtarefas, dias_offset):
+        prazo = (data_entrega + BDay(offset)).date()
+        linhas.append({
+            "ID_Tarefa": id_tarefa,
+            "Nome_Tarefa": nome_tarefa,
+            "Tipo_Subtarefa": tipo,
+            "Prazo": prazo.strftime("%Y-%m-%d"),
+            "Status": "Pendente"
+        })
 
-    if submitted and tarefa:
-        with FileLock(LOCK_PATH):
-            df = carregar_dados()
-            novo_id = df["ID"].max() + 1 if not df.empty else 1
-            nova_linha = pd.DataFrame([{"ID": novo_id, "Tarefa": tarefa, "Status": status}])
-            df = pd.concat([df, nova_linha], ignore_index=True)
-            salvar_dados(df)
-            st.success("Tarefa cadastrada com sucesso!")
+    return pd.DataFrame(linhas)
 
-# Visualização das tarefas
-st.subheader("📌 Tarefas cadastradas")
-with FileLock(LOCK_PATH):
-    df = carregar_dados()
-st.dataframe(df, use_container_width=True)
+# Interface Streamlit
+st.title("📋 Cadastro de Tarefa com Subtarefas Automáticas")
+
+# Carrega dados existentes
+df = carregar_dados()
+
+# Formulário
+with st.form("nova_tarefa"):
+    nome_tarefa = st.text_input("Nome da Tarefa")
+    data_entrega = st.date_input("Data de Entrega Final (HTML)")
+    enviar = st.form_submit_button("Cadastrar")
+
+    if enviar and nome_tarefa and data_entrega:
+        id_tarefa = df["ID_Tarefa"].max() + 1 if not df.empty else 1
+        novas_subtarefas = gerar_subtarefas(id_tarefa, nome_tarefa, pd.to_datetime(data_entrega))
+        df = pd.concat([df, novas_subtarefas], ignore_index=True)
+        salvar_dados(df)
+        st.success(f"Tarefa '{nome_tarefa}' cadastrada com 3 subtarefas.")
+
+# Exibição dos dados
+st.subheader("📄 Subtarefas Cadastradas")
+if df.empty:
+    st.info("Nenhuma tarefa cadastrada ainda.")
+else:
+    df["Prazo"] = pd.to_datetime(df["Prazo"])
+    df = df.sort_values(by=["Prazo", "ID_Tarefa", "Tipo_Subtarefa"])
+    st.dataframe(df, use_container_width=True)
