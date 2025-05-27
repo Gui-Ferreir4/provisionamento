@@ -1,28 +1,45 @@
 import streamlit as st
-from datetime import date, datetime
-from tarefa_utils import gerar_tarefas, filtrar_tarefas, inicializar_estado
+import pandas as pd
+from pathlib import Path
+from filelock import FileLock
 
-# Inicializa variáveis na sessão
-inicializar_estado()
+# Caminho para o arquivo CSV e Lock
+CSV_PATH = Path("dados.csv")
+LOCK_PATH = Path("dados.csv.lock")
 
-st.title("📌 Provisionamento de Demandas de Criação")
+# Função para carregar tarefas
+def carregar_dados():
+    if CSV_PATH.exists():
+        return pd.read_csv(CSV_PATH)
+    else:
+        return pd.DataFrame(columns=["ID", "Tarefa", "Status"])
 
-# Entrada de dados
-col1, col2, col3, col4 = st.columns([2, 2, 2, 2])
-with col1:
-    ano = st.number_input("Ano", min_value=2024, max_value=2030, value=date.today().year)
-with col2:
-    mes = st.selectbox("Mês", options=list(range(1, 13)), format_func=lambda m: date(2023, m, 1).strftime("%B").capitalize())
-with col3:
-    demandas = st.number_input("Peças/Mês", min_value=1, max_value=100, value=1)
-with col4:
-    if st.button("📥 Aplicar"):
-        gerar_tarefas(ano, mes, demandas)
+# Função para salvar tarefas
+def salvar_dados(df):
+    df.to_csv(CSV_PATH, index=False)
 
-# Visualização em tabela
-tarefas = filtrar_tarefas(st.session_state.tarefas, ano, mes)
-if tarefas:
-    st.subheader("📋 Tarefas Geradas")
-    st.dataframe(tarefas)
-else:
-    st.info("Nenhuma tarefa encontrada para este período.")
+# Interface principal
+st.set_page_config(page_title="Provisionamento de Tarefas", layout="wide")
+st.title("📋 Provisionamento de Tarefas")
+
+# Área de cadastro
+with st.form("form_tarefa"):
+    st.subheader("Adicionar nova tarefa")
+    tarefa = st.text_input("Descrição da tarefa")
+    status = st.selectbox("Status", ["Pendente", "Concluído"])
+    submitted = st.form_submit_button("Salvar")
+
+    if submitted and tarefa:
+        with FileLock(LOCK_PATH):
+            df = carregar_dados()
+            novo_id = df["ID"].max() + 1 if not df.empty else 1
+            nova_linha = pd.DataFrame([{"ID": novo_id, "Tarefa": tarefa, "Status": status}])
+            df = pd.concat([df, nova_linha], ignore_index=True)
+            salvar_dados(df)
+            st.success("Tarefa cadastrada com sucesso!")
+
+# Visualização das tarefas
+st.subheader("📌 Tarefas cadastradas")
+with FileLock(LOCK_PATH):
+    df = carregar_dados()
+st.dataframe(df, use_container_width=True)
