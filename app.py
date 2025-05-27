@@ -1,32 +1,38 @@
 import streamlit as st
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+import calendar
 import pandas as pd
 
-# Funções para cálculo de dias úteis
-def is_weekday(date):
-    return date.weekday() < 5  # Segunda a sexta
+# Função para saber se é dia útil (seg a sex)
+def is_weekday(d):
+    return d.weekday() < 5
 
-def prev_working_day(date, offset=1):
-    days_subtracted = 0
-    current_date = date
-    while days_subtracted < offset:
-        current_date -= timedelta(days=1)
-        if is_weekday(current_date):
-            days_subtracted += 1
-    return current_date
+# Função para listar dias úteis de um mês/ano
+def working_days(year, month):
+    c = calendar.Calendar()
+    days = [d for d in c.itermonthdates(year, month) if d.month == month and is_weekday(d)]
+    return days
 
-# Iniciar ou recuperar lista de subtarefas no estado da sessão
+# Função para calcular dia útil anterior (offset)
+def prev_working_day(d, offset=1):
+    count = 0
+    current = d
+    while count < offset:
+        current -= timedelta(days=1)
+        if is_weekday(current):
+            count += 1
+    return current
+
+# Inicializar dataframe de subtarefas no estado da sessão
 if "subtarefas" not in st.session_state:
     st.session_state.subtarefas = pd.DataFrame(columns=["Tarefa", "Descricao", "Tipo", "Prazo", "Status"])
 
-st.title("Cadastro e Visualização Kanban de Subtarefas")
+st.title("Cadastro de Tarefas com Subtarefas e Kanban Calendário")
 
 with st.form("form_tarefa"):
     nome_tarefa = st.text_input("Nome da tarefa", max_chars=50)
     deadline = st.date_input("Data de entrega final (HTML)", value=datetime.today())
     descricao = st.text_area("Descrição (opcional)")
-    
-    st.markdown("**Selecione as subtarefas a criar:**")
     criar_texto = st.checkbox("Texto (D-2 útil)", value=True)
     criar_layout = st.checkbox("Layout (D-1 útil)", value=True)
     criar_html = st.checkbox("HTML (D)", value=True)
@@ -72,27 +78,34 @@ if submitted:
             st.session_state.subtarefas = pd.concat([st.session_state.subtarefas, df_novas], ignore_index=True)
             st.success(f"Tarefa '{nome_tarefa}' cadastrada com {len(df_novas)} subtarefa(s).")
 
-# Exibir Kanban simples
-st.markdown("---")
-st.header("Visualização Kanban")
+# Exibir Kanban em formato calendário (colunas para cada dia útil do mês do deadline mais recente)
 
-# Filtrar subtarefas por status
-df = st.session_state.subtarefas.copy()
+if not st.session_state.subtarefas.empty:
+    # Pegar mês e ano do deadline mais recente cadastrado para exibir o calendário
+    latest_deadline = st.session_state.subtarefas["Prazo"].max()
+    year = latest_deadline.year
+    month = latest_deadline.month
+    
+    dias_uteis = working_days(year, month)
 
-kanban_cols = ["Pendente", "Em andamento", "Concluído"]
-cols = st.columns(len(kanban_cols))
+    st.header(f"Kanban Calendário - {month}/{year}")
 
-for idx, status in enumerate(kanban_cols):
-    with cols[idx]:
-        st.subheader(status)
-        tarefas_status = df[df["Status"] == status]
-        if tarefas_status.empty:
-            st.write("_Nenhuma tarefa aqui_")
-        else:
-            for _, row in tarefas_status.iterrows():
-                st.markdown(f"""
-                **{row['Tipo']}**  
-                Tarefa: {row['Tarefa']}  
-                Prazo: {row['Prazo'].strftime('%d/%m/%Y')}  
-                Descrição: {row['Descricao'] if row['Descricao'] else '-'}  
-                """)
+    cols = st.columns(len(dias_uteis))
+
+    for idx, dia in enumerate(dias_uteis):
+        with cols[idx]:
+            st.markdown(f"### {dia.strftime('%d/%m')}")
+            # Filtrar subtarefas do dia
+            tarefas_dia = st.session_state.subtarefas[st.session_state.subtarefas["Prazo"] == dia]
+            if tarefas_dia.empty:
+                st.write("_Nenhuma subtarefa_")
+            else:
+                for _, row in tarefas_dia.iterrows():
+                    st.markdown(f"""
+                    **{row['Tipo']}**  
+                    Tarefa: {row['Tarefa']}  
+                    Status: {row['Status']}  
+                    Descrição: {row['Descricao'] if row['Descricao'] else '-'}
+                    """)
+else:
+    st.info("Nenhuma subtarefa cadastrada para exibir no Kanban.")
