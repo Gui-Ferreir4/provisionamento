@@ -16,7 +16,7 @@ def carregar_dados():
 
 # Função para salvar tarefas
 def salvar_dados(df):
-    df.to_csv(CSV_PATH, index=False)
+    df.to_csv(CSV_PATH, index=False, sep=";")
 
 # Interface principal
 st.set_page_config(page_title="Provisionamento de Tarefas", layout="wide")
