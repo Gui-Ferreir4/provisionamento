@@ -107,25 +107,11 @@ if st.sidebar.button("Cadastrar"):
 
 st.title("Provisionamento Criação")
 
-col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns(2)
 with col1:
     ano_selec = st.number_input("Ano", min_value=2025, max_value=2030, value=datetime.now().year)
 with col2:
     mes_selec = st.selectbox("Mês", options=list(range(1, 13)), format_func=lambda x: calendar.month_name[x], index=datetime.now().month-1)
-with col3:
-    qtd_pecas = st.number_input("Número de peças", min_value=1, max_value=100, value=1)
-
-if st.button("Gerar Peças Automáticas"):
-    dias_uteis = dias_uteis_no_mes(ano_selec, mes_selec)
-    dias_validos = dias_uteis[2:-2] if len(dias_uteis) > 4 else dias_uteis
-    for i in range(qtd_pecas):
-        nome_auto = f"Peça {i + 1}"
-        deadline_auto = dias_validos[min(i, len(dias_validos) - 1)]
-        subtarefas = ['texto', 'layout', 'html']
-        novas = criar_subtarefas(nome_auto, "", deadline_auto, subtarefas)
-        st.session_state['tarefas'].extend(novas)
-    salvar_tarefas()
-    st.success(f"{qtd_pecas} peças criadas automaticamente.")
 
 # --- BOTOES DE VISUALIZAÇÃO ---
 
