@@ -1,64 +1,40 @@
-import pandas as pd
 import streamlit as st
-from datetime import datetime
-from pandas.tseries.offsets import BDay
+from datetime import datetime, timedelta
+import pandas as pd
+import numpy as np
 
-# Caminho do CSV temporário
-CSV_PATH = "dados.csv"
+def is_weekday(date):
+    return date.weekday() < 5  # 0=segunda ... 4=sexta
 
-# Inicializa o DataFrame
-def carregar_dados():
-    try:
-        return pd.read_csv(CSV_PATH, sep=";")
-    except FileNotFoundError:
-        return pd.DataFrame(columns=["ID_Tarefa", "Nome_Tarefa", "Tipo_Subtarefa", "Prazo", "Status"])
+def prev_working_day(date, offset=1):
+    # Retorna a data anterior deslocada por 'offset' dias úteis
+    days_subtracted = 0
+    current_date = date
+    while days_subtracted < offset:
+        current_date -= timedelta(days=1)
+        if is_weekday(current_date):
+            days_subtracted += 1
+    return current_date
 
-# Salva os dados no CSV
-def salvar_dados(df):
-    df.to_csv(CSV_PATH, index=False, sep=";")
+st.title("Cadastro de Tarefas - Fase 2")
 
-# Gera subtarefas com base na data de entrega
-def gerar_subtarefas(id_tarefa, nome_tarefa, data_entrega):
-    subtarefas = ["Texto", "Layout", "HTML"]
-    dias_offset = [-2, -1, 0]  # Dias úteis regressivos
-    linhas = []
+with st.form("form_tarefa"):
+    nome_tarefa = st.text_input("Nome da tarefa", max_chars=50)
+    deadline = st.date_input("Data de entrega final (HTML)", value=datetime.today())
+    descricao = st.text_area("Descrição (opcional)")
+    submitted = st.form_submit_button("Cadastrar")
 
-    for tipo, offset in zip(subtarefas, dias_offset):
-        prazo = (data_entrega + BDay(offset)).date()
-        linhas.append({
-            "ID_Tarefa": id_tarefa,
-            "Nome_Tarefa": nome_tarefa,
-            "Tipo_Subtarefa": tipo,
-            "Prazo": prazo.strftime("%Y-%m-%d"),
-            "Status": "Pendente"
-        })
+if submitted:
+    # Gerar subtarefas com prazos
+    texto_data = prev_working_day(deadline, 2)
+    layout_data = prev_working_day(deadline, 1)
+    html_data = deadline
 
-    return pd.DataFrame(linhas)
+    subtarefas = pd.DataFrame([
+        {"Tipo": "Texto", "Prazo": texto_data, "Status": "Pendente", "Tarefa": nome_tarefa},
+        {"Tipo": "Layout", "Prazo": layout_data, "Status": "Pendente", "Tarefa": nome_tarefa},
+        {"Tipo": "HTML", "Prazo": html_data, "Status": "Pendente", "Tarefa": nome_tarefa}
+    ])
 
-# Interface Streamlit
-st.title("📋 Cadastro de Tarefa com Subtarefas Automáticas")
-
-# Carrega dados existentes
-df = carregar_dados()
-
-# Formulário
-with st.form("nova_tarefa"):
-    nome_tarefa = st.text_input("Nome da Tarefa")
-    data_entrega = st.date_input("Data de Entrega Final (HTML)")
-    enviar = st.form_submit_button("Cadastrar")
-
-    if enviar and nome_tarefa and data_entrega:
-        id_tarefa = df["ID_Tarefa"].max() + 1 if not df.empty else 1
-        novas_subtarefas = gerar_subtarefas(id_tarefa, nome_tarefa, pd.to_datetime(data_entrega))
-        df = pd.concat([df, novas_subtarefas], ignore_index=True)
-        salvar_dados(df)
-        st.success(f"Tarefa '{nome_tarefa}' cadastrada com 3 subtarefas.")
-
-# Exibição dos dados
-st.subheader("📄 Subtarefas Cadastradas")
-if df.empty:
-    st.info("Nenhuma tarefa cadastrada ainda.")
-else:
-    df["Prazo"] = pd.to_datetime(df["Prazo"])
-    df = df.sort_values(by=["Prazo", "ID_Tarefa", "Tipo_Subtarefa"])
-    st.dataframe(df, use_container_width=True)
+    st.success(f"Tarefa '{nome_tarefa}' cadastrada com sucesso!")
+    st.dataframe(subtarefas)
