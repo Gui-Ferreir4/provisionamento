@@ -10,7 +10,7 @@ LOCK_PATH = Path("dados.csv.lock")
 # Função para carregar tarefas
 def carregar_dados():
     if CSV_PATH.exists():
-        return pd.read_csv(CSV_PATH)
+        return pd.read_csv(CSV_PATH, sep=";")
     else:
         return pd.DataFrame(columns=["ID", "Tarefa", "Status"])
 
