@@ -1,182 +1,145 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime, timedelta
-import calendar
 import json
-import os
+import base64
+import requests
+from datetime import datetime
 
-# --- CONFIG ---
-DATA_FILE = "tarefas.json"  # arquivo local para salvar as tarefas
+# ===============================
+# 🔧 Configurações iniciais
+# ===============================
 
-st.set_page_config(layout="wide", page_title="Provisionamento Criação")
+st.set_page_config(page_title="Provisionador de Tarefas", layout="wide")
+st.title("🗂️ Provisionador de Tarefas e Subtarefas")
 
-# --- FUNÇÕES AUXILIARES ---
+# ===============================
+# 🔧 Configurações do GitHub
+# ===============================
 
-def dias_uteis_no_mes(ano, mes):
-    total_dias = calendar.monthrange(ano, mes)[1]
-    dias_uteis = []
-    for dia in range(1, total_dias + 1):
-        dt = datetime(ano, mes, dia)
-        if dt.weekday() < 5:
-            dias_uteis.append(dt)
-    return dias_uteis
+Gui-Ferreir4 = "Gui-Ferreir4"
+provisionamento = "provisionamento"
+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 = "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"
+BRANCH = "main"
 
-def criar_subtarefas(nome, descricao, deadline, subtarefas_selecionadas):
-    dias = dias_uteis_no_mes(deadline.year, deadline.month)
-    while deadline.weekday() >= 5:
-        deadline -= timedelta(days=1)
-    try:
-        idx = dias.index(deadline)
-    except ValueError:
-        idx = len(dias) - 1
-    tarefas = []
-    if 'texto' in subtarefas_selecionadas and idx - 2 >= 0:
-        tarefas.append({'id': st.session_state['next_id'], 'tipo': 'Texto', 'data': dias[idx - 2].strftime("%Y-%m-%d"), 'titulo': f'{nome} - Texto', 'descricao': descricao, 'concluido': False})
-        st.session_state['next_id'] += 1
-    if 'layout' in subtarefas_selecionadas and idx - 1 >= 0:
-        tarefas.append({'id': st.session_state['next_id'], 'tipo': 'Layout', 'data': dias[idx - 1].strftime("%Y-%m-%d"), 'titulo': f'{nome} - Layout', 'descricao': descricao, 'concluido': False})
-        st.session_state['next_id'] += 1
-    if 'html' in subtarefas_selecionadas:
-        tarefas.append({'id': st.session_state['next_id'], 'tipo': 'HTML', 'data': dias[idx].strftime("%Y-%m-%d"), 'titulo': f'{nome} - HTML', 'descricao': descricao, 'concluido': False})
-        st.session_state['next_id'] += 1
-    return tarefas
+# ===============================
+# 🔧 Funções utilitárias GitHub
+# ===============================
 
-def salvar_tarefas():
-    with open(DATA_FILE, "w") as f:
-        json.dump(st.session_state['tarefas'], f, indent=2)
+def github_file_url(ano, mes):
+    return f"data/tarefas_{ano}_{mes}.json"
 
-def carregar_tarefas():
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r") as f:
-            dados = json.load(f)
-        return dados
-    return []
+def carregar_json_github(ano, mes):
+    url = f"https://api.github.com/repos/{Gui-Ferreir4}/{provisionamento}/contents/{github_file_url(ano, mes)}"
+    headers = {"Authorization": f"token {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}"}
+    response = requests.get(url, headers=headers)
 
-def atualizar_tarefa(edited):
-    for idx, t in enumerate(st.session_state['tarefas']):
-        if t['id'] == edited['id']:
-            st.session_state['tarefas'][idx] = edited
-            salvar_tarefas()
-            st.success("Tarefa atualizada!")
-            break
-
-def deletar_tarefa(tarefa_id):
-    st.session_state['tarefas'] = [t for t in st.session_state['tarefas'] if t['id'] != tarefa_id]
-    salvar_tarefas()
-    st.success("Tarefa deletada!")
-
-# --- INICIALIZAÇÃO DO STATE ---
-
-if 'tarefas' not in st.session_state:
-    st.session_state['tarefas'] = carregar_tarefas()
-
-if 'next_id' not in st.session_state:
-    max_id = max([t['id'] for t in st.session_state['tarefas']], default=0)
-    st.session_state['next_id'] = max_id + 1
-
-if 'view' not in st.session_state:
-    st.session_state['view'] = "kanban"  # ou "tabela"
-
-# --- SIDEBAR: CADASTRO ---
-
-st.sidebar.header("Cadastrar Tarefa")
-nome = st.sidebar.text_input("Nome da tarefa")
-deadline = st.sidebar.date_input("Deadline (subtarefa HTML)", datetime.now())
-descricao = st.sidebar.text_area("Descrição (opcional)")
-texto_chk = st.sidebar.checkbox("Texto", True)
-layout_chk = st.sidebar.checkbox("Layout", True)
-html_chk = st.sidebar.checkbox("HTML", True)
-
-if st.sidebar.button("Cadastrar"):
-    if not nome:
-        st.sidebar.error("Nome é obrigatório")
+    if response.status_code == 200:
+        content = base64.b64decode(response.json()["content"])
+        data = json.loads(content)
+        sha = response.json()["sha"]
+        return data, sha
     else:
-        selecionadas = []
-        if texto_chk: selecionadas.append('texto')
-        if layout_chk: selecionadas.append('layout')
-        if html_chk: selecionadas.append('html')
-        if len(selecionadas) == 0:
-            st.sidebar.error("Selecione pelo menos uma subtarefa")
-        else:
-            novas = criar_subtarefas(nome, descricao, deadline, selecionadas)
-            st.session_state['tarefas'].extend(novas)
-            salvar_tarefas()
-            st.sidebar.success(f"Tarefa '{nome}' cadastrada com {len(novas)} subtarefas.")
+        return [], None  # Arquivo ainda não existe
 
-# --- FILTROS PRINCIPAIS ---
+def salvar_json_github(ano, mes, data, sha=None):
+    url = f"https://api.github.com/repos/{Gui-Ferreir4}/{provisionamento}/contents/{github_file_url(ano, mes)}"
+    headers = {"Authorization": f"token {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}"}
 
-st.title("Provisionamento Criação")
+    conteudo = json.dumps(data, ensure_ascii=False, indent=4)
+    b64_content = base64.b64encode(conteudo.encode()).decode()
 
-col1, col2 = st.columns(2)
-with col1:
-    ano_selec = st.number_input("Ano", min_value=2025, max_value=2030, value=datetime.now().year)
-with col2:
-    mes_selec = st.selectbox("Mês", options=list(range(1, 13)), format_func=lambda x: calendar.month_name[x], index=datetime.now().month-1)
+    payload = {
+        "message": f"Atualizando tarefas {ano}/{mes}",
+        "content": b64_content,
+        "branch": BRANCH
+    }
+    if sha:
+        payload["sha"] = sha
 
-# --- BOTOES DE VISUALIZAÇÃO ---
+    response = requests.put(url, headers=headers, json=payload)
 
-col_a, col_b = st.columns(2)
-with col_a:
-    if st.button("Visualizar Kanban"):
-        st.session_state['view'] = "kanban"
-with col_b:
-    if st.button("Visualizar Tabela"):
-        st.session_state['view'] = "tabela"
+    if response.status_code in [200, 201]:
+        st.success("✅ Dados salvos no GitHub com sucesso!")
+    else:
+        st.error(f"❌ Erro ao salvar no GitHub: {response.json()}")
 
-# --- VISUALIZAÇÃO ---
+# ===============================
+# 🔧 Provisionamento (Ano e Mês)
+# ===============================
 
-tarefas_df = pd.DataFrame(st.session_state['tarefas'])
-if not tarefas_df.empty:
-    tarefas_df['data_dt'] = pd.to_datetime(tarefas_df['data'])
-    tarefas_df = tarefas_df[(tarefas_df['data_dt'].dt.year == ano_selec) & (tarefas_df['data_dt'].dt.month == mes_selec)]
+st.sidebar.header("📅 Provisionamento")
+ano = st.sidebar.selectbox("Ano", [2023, 2024, 2025], index=1)
+mes = st.sidebar.selectbox("Mês", list(range(1, 13)), format_func=lambda x: f"{x:02}")
+
+dados, sha = carregar_json_github(ano, mes)
+
+# ===============================
+# 🔧 Dados base (lista de tarefas)
+# ===============================
+
+if not dados:
+    dados = []
+
+df = pd.DataFrame(dados)
+
+# ===============================
+# 🔧 Cadastro de nova tarefa
+# ===============================
+
+st.subheader("➕ Cadastro de Tarefa e Subtarefa")
+
+with st.form("form_tarefa"):
+    col1, col2 = st.columns(2)
+    with col1:
+        id_tarefa = st.text_input("ID Tarefa")
+        titulo_tarefa = st.text_input("Título da Tarefa")
+    with col2:
+        id_subtarefa = st.text_input("ID Subtarefa")
+        titulo_subtarefa = st.text_input("Título da Subtarefa")
+
+    tipo_subtarefa = st.selectbox("Tipo da Subtarefa", ["Análise", "Desenvolvimento", "Revisão", "Publicação"])
+    descricao = st.text_area("Descrição da Subtarefa")
+    data_cadastro = datetime.today().strftime('%Y-%m-%d')
+    data_entrega = st.date_input("Data de Entrega")
+
+    submitted = st.form_submit_button("💾 Cadastrar")
+
+    if submitted:
+        nova_tarefa = {
+            "ID Tarefa": id_tarefa,
+            "Título Tarefa": titulo_tarefa,
+            "ID Subtarefa": id_subtarefa,
+            "Título Subtarefa": titulo_subtarefa,
+            "Tipo Subtarefa": tipo_subtarefa,
+            "Descrição": descricao,
+            "Data Cadastro": data_cadastro,
+            "Data Entrega": str(data_entrega)
+        }
+
+        dados.append(nova_tarefa)
+        salvar_json_github(ano, mes, dados, sha)
+        st.experimental_rerun()
+
+# ===============================
+# 🔧 Edição das tarefas
+# ===============================
+
+st.subheader(f"📄 Tarefas cadastradas para {mes:02}/{ano}")
+
+if dados:
+    df = pd.DataFrame(dados)
+
+    edited_df = st.data_editor(
+        df,
+        num_rows="dynamic",
+        use_container_width=True,
+        key="editor_tarefas"
+    )
+
+    if st.button("💾 Salvar alterações na tabela"):
+        dados_atualizados = edited_df.to_dict(orient="records")
+        salvar_json_github(ano, mes, dados_atualizados, sha)
+        st.success("✅ Alterações salvas no GitHub com sucesso!")
+        st.experimental_rerun()
 else:
-    tarefas_df = pd.DataFrame()
-
-if st.session_state['view'] == "kanban":
-    st.subheader("Kanban / Calendário")
-
-    dias_uteis = dias_uteis_no_mes(ano_selec, mes_selec)
-
-    if tarefas_df.empty:
-        st.info("Nenhuma tarefa para o período selecionado.")
-    else:
-        # Mostrar dias úteis com tarefas agrupadas
-        for dia in dias_uteis:
-            dia_str = dia.strftime("%Y-%m-%d")
-            st.markdown(f"### {dia.strftime('%a, %d/%m/%Y')}")
-            tarefas_dia = tarefas_df[tarefas_df['data'] == dia_str]
-            if tarefas_dia.empty:
-                st.markdown("_Nenhuma tarefa_")
-            else:
-                for _, t in tarefas_dia.iterrows():
-                    cor = {"Texto": "primary", "Layout": "warning", "HTML": "success"}.get(t['tipo'], "secondary")
-                    status = "✔️" if t['concluido'] else "❌"
-                    st.markdown(f"- <span class='badge bg-{cor}'>{t['tipo']}</span> **{t['titulo']}** {status}", unsafe_allow_html=True)
-
-elif st.session_state['view'] == "tabela":
-    st.subheader("Tabela de Tarefas")
-
-    if tarefas_df.empty:
-        st.info("Nenhuma tarefa para o período selecionado.")
-    else:
-        # Função para editar e deletar (simplificada)
-        for idx, tarefa in tarefas_df.iterrows():
-            with st.expander(f"{tarefa['titulo']} ({tarefa['tipo']}) - {tarefa['data']}"):
-                novo_titulo = st.text_input("Título", tarefa['titulo'], key=f"titulo_{tarefa['id']}")
-                nova_desc = st.text_area("Descrição", tarefa.get('descricao', ''), key=f"desc_{tarefa['id']}")
-                concluido = st.checkbox("Concluído", tarefa['concluido'], key=f"done_{tarefa['id']}")
-                col_e, col_d = st.columns([1, 4])
-                with col_e:
-                    if st.button("Salvar", key=f"salvar_{tarefa['id']}"):
-                        edit = tarefa.to_dict()
-                        edit['titulo'] = novo_titulo
-                        edit['descricao'] = nova_desc
-                        edit['concluido'] = concluido
-                        atualizar_tarefa(edit)
-                with col_d:
-                    if st.button("Deletar", key=f"del_{tarefa['id']}"):
-                        deletar_tarefa(tarefa['id'])
-                        st.experimental_rerun()
-
-else:
-    st.info("Selecione uma visualização no menu acima.")
+    st.info("Nenhuma tarefa cadastrada para este período.")
