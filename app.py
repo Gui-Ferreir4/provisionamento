@@ -4,7 +4,7 @@ import json
 import base64
 import requests
 import os
-from datetime import datetime
+from datetime import datetime, date
 from dateutil import parser
 
 # ===============================
@@ -121,8 +121,8 @@ with col3:
 
 data_entrega = st.sidebar.date_input("Data de Entrega")
 
-# 🔥 Validação da Data de Entrega
-data_minima = datetime(data_entrega.year, data_entrega.month, 3)
+# 🔥 Definir data mínima como dia 3 do mês da entrega
+data_minima = date(data_entrega.year, data_entrega.month, 3)
 if data_entrega < data_minima:
     st.sidebar.warning("⚠️ A Data de Entrega não pode ser anterior ao dia 3 do mês.")
 
