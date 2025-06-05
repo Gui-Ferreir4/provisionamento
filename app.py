@@ -3,9 +3,7 @@ import pandas as pd
 import json
 import base64
 import requests
-import os
-from datetime import datetime, date
-from dateutil import parser
+from datetime import datetime, date, timedelta
 
 # ===============================
 # 🔧 Configurações do GitHub
@@ -30,7 +28,6 @@ def listar_arquivos_json():
         jsons = [a["name"] for a in arquivos if a["name"].endswith(".json")]
         return sorted(jsons)
     else:
-        st.error("❌ Erro ao listar arquivos do GitHub")
         return []
 
 def github_file_url(ano, mes):
@@ -70,11 +67,34 @@ def salvar_json_github(ano, mes, data, sha=None):
         st.error(f"❌ Erro ao salvar no GitHub: {response.json()}")
 
 # ===============================
-# 🔧 Obter lista de períodos existentes
+# 🔧 Gerenciamento de Datas
 # ===============================
 
-arquivos_json = listar_arquivos_json()
+def contar_subtarefas_por_data(lista_dados):
+    contador = {}
+    for item in lista_dados:
+        data = item["Data Entrega"]
+        tipo = item["Tipo Subtarefa"]
+        chave = (data, tipo)
+        contador[chave] = contador.get(chave, 0) + 1
+    return contador
 
+def encontrar_data_disponivel(data_base, tipo, dados_mes):
+    contador = contar_subtarefas_por_data(dados_mes)
+    data_check = data_base
+    while True:
+        chave = (str(data_check), tipo)
+        if contador.get(chave, 0) < 5:
+            return data_check
+        data_check -= timedelta(days=1)
+
+# ===============================
+# 🔧 Seleção de Período
+# ===============================
+
+st.subheader("🗂️ Selecione o período (Ano/Mês)")
+
+arquivos_json = listar_arquivos_json()
 if arquivos_json:
     periodos = sorted(list(set(
         (a.replace("tarefas_", "").replace(".json", "")) for a in arquivos_json
@@ -83,24 +103,23 @@ else:
     periodos = []
 
 periodo_selecionado = st.selectbox(
-    "🗂️ Selecione o período (Ano/Mês)",
+    "Período",
     periodos,
     format_func=lambda x: f"{x[:4]}/{x[5:]}"
 )
 
 ano, mes = periodo_selecionado.split("_")
-
 dados, sha = carregar_json_github(ano, mes)
 if not dados:
     dados = []
 
 # ===============================
-# 🔧 Cadastro de Nova Tarefa (Sidebar)
+# 🔧 Cadastro de Tarefa (Sidebar)
 # ===============================
 
 st.sidebar.header("➕ Cadastro de Nova Tarefa")
 
-# 🔢 Gerar ID numérico incremental da tarefa principal
+# 🔢 Gerar ID numérico incremental
 if dados:
     ids_existentes = [int(item["ID Tarefa"]) for item in dados if item["ID Tarefa"].isdigit()]
     novo_id_tarefa = max(ids_existentes) + 1 if ids_existentes else 1
@@ -111,17 +130,13 @@ titulo_tarefa = st.sidebar.text_input("Título da Tarefa")
 descricao_tarefa = st.sidebar.text_area("Descrição da Tarefa")
 
 st.sidebar.markdown("**Selecione as Subtarefas:**")
-col1, col2, col3 = st.sidebar.columns(3)
-with col1:
-    cria_texto = st.checkbox("📝 Texto (D-2)", value=True)
-with col2:
-    cria_layout = st.checkbox("🎨 Layout (D-1)", value=True)
-with col3:
-    cria_html = st.checkbox("💻 HTML (D)", value=True)
+cria_texto = st.sidebar.checkbox("📝 Texto", value=True)
+cria_layout = st.sidebar.checkbox("🎨 Layout", value=True)
+cria_html = st.sidebar.checkbox("💻 HTML", value=True)
 
 data_entrega = st.sidebar.date_input("Data de Entrega")
 
-# 🔥 Definir data mínima como dia 3 do mês da entrega
+# 🔥 Validação de data mínima
 data_minima = date(data_entrega.year, data_entrega.month, 3)
 if data_entrega < data_minima:
     st.sidebar.warning("⚠️ A Data de Entrega não pode ser anterior ao dia 3 do mês.")
@@ -132,7 +147,7 @@ if st.sidebar.button("💾 Cadastrar Tarefa"):
     elif data_entrega < data_minima:
         st.sidebar.error("❌ A Data de Entrega não pode ser anterior ao dia 3.")
     else:
-        # 🔥 Definir o período de cadastro conforme a data de entrega
+        # 🔥 Definir período conforme a data de entrega
         ano_entrega = data_entrega.year
         mes_entrega = f"{data_entrega.month:02}"
 
@@ -142,43 +157,51 @@ if st.sidebar.button("💾 Cadastrar Tarefa"):
 
         subtarefas = []
 
-        if cria_texto:
+        tipos_subtarefas = []
+        if cria_texto: tipos_subtarefas.append("Texto")
+        if cria_layout: tipos_subtarefas.append("Layout")
+        if cria_html: tipos_subtarefas.append("HTML")
+
+        # 🔥 Ordem: Texto > Layout > HTML
+        tipos_subtarefas.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
+
+        # 🔧 Definir datas conforme a ordem e restrições
+        datas_subtarefas = {}
+        dias_ajuste = len(tipos_subtarefas) - 1
+        for idx, tipo in enumerate(tipos_subtarefas):
+            if len(tipos_subtarefas) == 1:
+                data_base = data_entrega
+            else:
+                data_base = data_entrega - timedelta(days=dias_ajuste - idx)
+
+            data_final = encontrar_data_disponivel(data_base, tipo, dados_entrega)
+            datas_subtarefas[tipo] = data_final
+
+        # 🔥 Gerar subtarefas
+        for tipo in tipos_subtarefas:
+            id_sub = str(["Texto", "Layout", "HTML"].index(tipo) + 1)
             subtarefas.append({
                 "ID Tarefa": str(novo_id_tarefa),
                 "Título Tarefa": titulo_tarefa,
-                "ID Subtarefa": "ID1",
-                "Título Subtarefa": f"Texto_{titulo_tarefa}",
-                "Tipo Subtarefa": "Texto (D-2)",
+                "Subtarefa": id_sub,
+                "Título Subtarefa": f"{tipo}_{titulo_tarefa}",
+                "Tipo Subtarefa": tipo,
                 "Descrição": descricao_tarefa,
                 "Data Cadastro": datetime.today().strftime('%Y-%m-%d'),
-                "Data Entrega": str(data_entrega)
-            })
-        if cria_layout:
-            subtarefas.append({
-                "ID Tarefa": str(novo_id_tarefa),
-                "Título Tarefa": titulo_tarefa,
-                "ID Subtarefa": "ID2",
-                "Título Subtarefa": f"Layout_{titulo_tarefa}",
-                "Tipo Subtarefa": "Layout (D-1)",
-                "Descrição": descricao_tarefa,
-                "Data Cadastro": datetime.today().strftime('%Y-%m-%d'),
-                "Data Entrega": str(data_entrega)
-            })
-        if cria_html:
-            subtarefas.append({
-                "ID Tarefa": str(novo_id_tarefa),
-                "Título Tarefa": titulo_tarefa,
-                "ID Subtarefa": "ID3",
-                "Título Subtarefa": f"HTML_{titulo_tarefa}",
-                "Tipo Subtarefa": "HTML (D)",
-                "Descrição": descricao_tarefa,
-                "Data Cadastro": datetime.today().strftime('%Y-%m-%d'),
-                "Data Entrega": str(data_entrega)
+                "Data Entrega": str(datas_subtarefas[tipo])
             })
 
         dados_entrega.extend(subtarefas)
         salvar_json_github(ano_entrega, mes_entrega, dados_entrega, sha_entrega)
+
         st.sidebar.success(f"✅ Tarefa '{titulo_tarefa}' cadastrada com sucesso!")
+
+        # 🔄 Atualizar a lista de períodos após cadastro
+        arquivos_json = listar_arquivos_json()
+        periodos = sorted(list(set(
+            (a.replace("tarefas_", "").replace(".json", "")) for a in arquivos_json
+        )))
+        st.experimental_rerun()
 
 # ===============================
 # 🔧 Edição das tarefas
