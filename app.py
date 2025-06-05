@@ -16,9 +16,9 @@ st.title("🗂️ Provisionador de Tarefas e Subtarefas")
 # 🔧 Configurações do GitHub
 # ===============================
 
-Gui-Ferreir4 = "Gui-Ferreir4"
-provisionamento = "provisionamento"
-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 = "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"
+GITHUB_USER = "Gui-Ferreir4"
+GITHUB_REPO = "provisionamento"
+GITHUB_TOKEN = "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"
 BRANCH = "main"
 
 # ===============================
