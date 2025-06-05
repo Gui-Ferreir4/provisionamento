@@ -6,13 +6,6 @@ import requests
 from datetime import datetime
 
 # ===============================
-# 🔧 Configurações iniciais
-# ===============================
-
-st.set_page_config(page_title="Provisionador de Tarefas", layout="wide")
-st.title("🗂️ Provisionador de Tarefas e Subtarefas")
-
-# ===============================
 # 🔧 Configurações do GitHub
 # ===============================
 
@@ -20,6 +13,13 @@ GITHUB_USER = "Gui-Ferreir4"
 GITHUB_REPO = "provisionamento"
 GITHUB_TOKEN = "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"
 BRANCH = "main"
+
+# ===============================
+# 🔧 Configurações do App
+# ===============================
+
+st.set_page_config(page_title="Provisionador de Tarefas", layout="wide")
+st.title("🗂️ Provisionador de Tarefas e Subtarefas")
 
 # ===============================
 # 🔧 Funções utilitárias GitHub
@@ -39,7 +39,7 @@ def carregar_json_github(ano, mes):
         sha = response.json()["sha"]
         return data, sha
     else:
-        return [], None  # Arquivo ainda não existe
+        return [], None  # Arquivo não existe ainda
 
 def salvar_json_github(ano, mes, data, sha=None):
     url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{github_file_url(ano, mes)}"
@@ -73,51 +73,79 @@ mes = st.sidebar.selectbox("Mês", list(range(1, 13)), format_func=lambda x: f"{
 
 dados, sha = carregar_json_github(ano, mes)
 
-# ===============================
-# 🔧 Dados base (lista de tarefas)
-# ===============================
-
 if not dados:
     dados = []
-
-df = pd.DataFrame(dados)
 
 # ===============================
 # 🔧 Cadastro de nova tarefa
 # ===============================
 
-st.subheader("➕ Cadastro de Tarefa e Subtarefa")
+st.subheader("➕ Cadastro de Nova Tarefa")
 
-with st.form("form_tarefa"):
-    col1, col2 = st.columns(2)
-    with col1:
-        id_tarefa = st.text_input("ID Tarefa")
-        titulo_tarefa = st.text_input("Título da Tarefa")
-    with col2:
-        id_subtarefa = st.text_input("ID Subtarefa")
-        titulo_subtarefa = st.text_input("Título da Subtarefa")
+# 🔢 Gerar ID numérico incremental da tarefa principal
+if dados:
+    ids_existentes = [int(item["ID Tarefa"]) for item in dados if item["ID Tarefa"].isdigit()]
+    novo_id_tarefa = max(ids_existentes) + 1 if ids_existentes else 1
+else:
+    novo_id_tarefa = 1
 
-    tipo_subtarefa = st.selectbox("Tipo da Subtarefa", ["Análise", "Desenvolvimento", "Revisão", "Publicação"])
-    descricao = st.text_area("Descrição da Subtarefa")
-    data_cadastro = datetime.today().strftime('%Y-%m-%d')
-    data_entrega = st.date_input("Data de Entrega")
+titulo_tarefa = st.text_input("Título da Tarefa")
 
-    submitted = st.form_submit_button("💾 Cadastrar")
+st.markdown("**Selecione as Subtarefas que deseja criar:**")
+col1, col2, col3 = st.columns(3)
+with col1:
+    cria_texto = st.checkbox("📝 Texto (D-2)", value=True)
+with col2:
+    cria_layout = st.checkbox("🎨 Layout (D-1)", value=True)
+with col3:
+    cria_html = st.checkbox("💻 HTML (D)", value=True)
 
-    if submitted:
-        nova_tarefa = {
-            "ID Tarefa": id_tarefa,
+data_cadastro = datetime.today().strftime('%Y-%m-%d')
+data_entrega = st.date_input("Data de Entrega")
+
+if st.button("💾 Cadastrar Tarefa"):
+    subtarefas = []
+
+    if cria_texto:
+        subtarefas.append({
+            "ID Tarefa": str(novo_id_tarefa),
             "Título Tarefa": titulo_tarefa,
-            "ID Subtarefa": id_subtarefa,
-            "Título Subtarefa": titulo_subtarefa,
-            "Tipo Subtarefa": tipo_subtarefa,
-            "Descrição": descricao,
+            "ID Subtarefa": "ID1",
+            "Título Subtarefa": f"Texto_{titulo_tarefa}",
+            "Tipo Subtarefa": "Texto (D-2)",
+            "Descrição": "",
             "Data Cadastro": data_cadastro,
             "Data Entrega": str(data_entrega)
-        }
+        })
+    if cria_layout:
+        subtarefas.append({
+            "ID Tarefa": str(novo_id_tarefa),
+            "Título Tarefa": titulo_tarefa,
+            "ID Subtarefa": "ID2",
+            "Título Subtarefa": f"Layout_{titulo_tarefa}",
+            "Tipo Subtarefa": "Layout (D-1)",
+            "Descrição": "",
+            "Data Cadastro": data_cadastro,
+            "Data Entrega": str(data_entrega)
+        })
+    if cria_html:
+        subtarefas.append({
+            "ID Tarefa": str(novo_id_tarefa),
+            "Título Tarefa": titulo_tarefa,
+            "ID Subtarefa": "ID3",
+            "Título Subtarefa": f"HTML_{titulo_tarefa}",
+            "Tipo Subtarefa": "HTML (D)",
+            "Descrição": "",
+            "Data Cadastro": data_cadastro,
+            "Data Entrega": str(data_entrega)
+        })
 
-        dados.append(nova_tarefa)
+    if not subtarefas:
+        st.warning("⚠️ Selecione pelo menos uma subtarefa para cadastrar.")
+    else:
+        dados.extend(subtarefas)
         salvar_json_github(ano, mes, dados, sha)
+        st.success(f"✅ Tarefa '{titulo_tarefa}' e {len(subtarefas)} subtarefa(s) cadastradas com sucesso!")
         st.experimental_rerun()
 
 # ===============================
@@ -142,4 +170,4 @@ if dados:
         st.success("✅ Alterações salvas no GitHub com sucesso!")
         st.experimental_rerun()
 else:
-    st.info("Nenhuma tarefa cadastrada para este período.")
+    st.info("ℹ️ Nenhuma tarefa cadastrada para este período.")
