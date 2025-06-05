@@ -77,6 +77,13 @@ if not dados:
     dados = []
 
 # ===============================
+# 🔧 Controle de estado para cadastro
+# ===============================
+
+if "cadastro_feito" not in st.session_state:
+    st.session_state.cadastro_feito = False
+
+# ===============================
 # 🔧 Cadastro de nova tarefa
 # ===============================
 
@@ -89,64 +96,67 @@ if dados:
 else:
     novo_id_tarefa = 1
 
-titulo_tarefa = st.text_input("Título da Tarefa")
+if not st.session_state.cadastro_feito:
+    titulo_tarefa = st.text_input("Título da Tarefa")
 
-st.markdown("**Selecione as Subtarefas que deseja criar:**")
-col1, col2, col3 = st.columns(3)
-with col1:
-    cria_texto = st.checkbox("📝 Texto (D-2)", value=True)
-with col2:
-    cria_layout = st.checkbox("🎨 Layout (D-1)", value=True)
-with col3:
-    cria_html = st.checkbox("💻 HTML (D)", value=True)
+    st.markdown("**Selecione as Subtarefas que deseja criar:**")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        cria_texto = st.checkbox("📝 Texto (D-2)", value=True)
+    with col2:
+        cria_layout = st.checkbox("🎨 Layout (D-1)", value=True)
+    with col3:
+        cria_html = st.checkbox("💻 HTML (D)", value=True)
 
-data_cadastro = datetime.today().strftime('%Y-%m-%d')
-data_entrega = st.date_input("Data de Entrega")
+    data_cadastro = datetime.today().strftime('%Y-%m-%d')
+    data_entrega = st.date_input("Data de Entrega")
 
-if st.button("💾 Cadastrar Tarefa"):
-    subtarefas = []
+    if st.button("💾 Cadastrar Tarefa"):
+        subtarefas = []
 
-    if cria_texto:
-        subtarefas.append({
-            "ID Tarefa": str(novo_id_tarefa),
-            "Título Tarefa": titulo_tarefa,
-            "ID Subtarefa": "ID1",
-            "Título Subtarefa": f"Texto_{titulo_tarefa}",
-            "Tipo Subtarefa": "Texto (D-2)",
-            "Descrição": "",
-            "Data Cadastro": data_cadastro,
-            "Data Entrega": str(data_entrega)
-        })
-    if cria_layout:
-        subtarefas.append({
-            "ID Tarefa": str(novo_id_tarefa),
-            "Título Tarefa": titulo_tarefa,
-            "ID Subtarefa": "ID2",
-            "Título Subtarefa": f"Layout_{titulo_tarefa}",
-            "Tipo Subtarefa": "Layout (D-1)",
-            "Descrição": "",
-            "Data Cadastro": data_cadastro,
-            "Data Entrega": str(data_entrega)
-        })
-    if cria_html:
-        subtarefas.append({
-            "ID Tarefa": str(novo_id_tarefa),
-            "Título Tarefa": titulo_tarefa,
-            "ID Subtarefa": "ID3",
-            "Título Subtarefa": f"HTML_{titulo_tarefa}",
-            "Tipo Subtarefa": "HTML (D)",
-            "Descrição": "",
-            "Data Cadastro": data_cadastro,
-            "Data Entrega": str(data_entrega)
-        })
+        if cria_texto:
+            subtarefas.append({
+                "ID Tarefa": str(novo_id_tarefa),
+                "Título Tarefa": titulo_tarefa,
+                "ID Subtarefa": "ID1",
+                "Título Subtarefa": f"Texto_{titulo_tarefa}",
+                "Tipo Subtarefa": "Texto (D-2)",
+                "Descrição": "",
+                "Data Cadastro": data_cadastro,
+                "Data Entrega": str(data_entrega)
+            })
+        if cria_layout:
+            subtarefas.append({
+                "ID Tarefa": str(novo_id_tarefa),
+                "Título Tarefa": titulo_tarefa,
+                "ID Subtarefa": "ID2",
+                "Título Subtarefa": f"Layout_{titulo_tarefa}",
+                "Tipo Subtarefa": "Layout (D-1)",
+                "Descrição": "",
+                "Data Cadastro": data_cadastro,
+                "Data Entrega": str(data_entrega)
+            })
+        if cria_html:
+            subtarefas.append({
+                "ID Tarefa": str(novo_id_tarefa),
+                "Título Tarefa": titulo_tarefa,
+                "ID Subtarefa": "ID3",
+                "Título Subtarefa": f"HTML_{titulo_tarefa}",
+                "Tipo Subtarefa": "HTML (D)",
+                "Descrição": "",
+                "Data Cadastro": data_cadastro,
+                "Data Entrega": str(data_entrega)
+            })
 
-    if not subtarefas:
-        st.warning("⚠️ Selecione pelo menos uma subtarefa para cadastrar.")
-    else:
-        dados.extend(subtarefas)
-        salvar_json_github(ano, mes, dados, sha)
-        st.success(f"✅ Tarefa '{titulo_tarefa}' e {len(subtarefas)} subtarefa(s) cadastradas com sucesso!")
-        st.experimental_rerun()
+        if not subtarefas:
+            st.warning("⚠️ Selecione pelo menos uma subtarefa para cadastrar.")
+        else:
+            dados.extend(subtarefas)
+            salvar_json_github(ano, mes, dados, sha)
+            st.success(f"✅ Tarefa '{titulo_tarefa}' e {len(subtarefas)} subtarefa(s) cadastradas com sucesso!")
+            st.session_state.cadastro_feito = True
+else:
+    st.info("ℹ️ Tarefa cadastrada. Se quiser cadastrar outra, recarregue a página ou altere diretamente na tabela abaixo.")
 
 # ===============================
 # 🔧 Edição das tarefas
@@ -168,6 +178,5 @@ if dados:
         dados_atualizados = edited_df.to_dict(orient="records")
         salvar_json_github(ano, mes, dados_atualizados, sha)
         st.success("✅ Alterações salvas no GitHub com sucesso!")
-        st.experimental_rerun()
 else:
     st.info("ℹ️ Nenhuma tarefa cadastrada para este período.")
