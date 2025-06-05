@@ -3,7 +3,9 @@ import pandas as pd
 import json
 import base64
 import requests
+import os
 from datetime import datetime
+from dateutil import parser
 
 # ===============================
 # 🔧 Configurações do GitHub
@@ -15,15 +17,21 @@ GITHUB_TOKEN = st.secrets["github"]["token"]
 BRANCH = st.secrets["github"]["branch"]
 
 # ===============================
-# 🔧 Configurações do App
-# ===============================
-
-st.set_page_config(page_title="Provisionador de Tarefas", layout="wide")
-st.title("🗂️ Provisionador de Tarefas e Subtarefas")
-
-# ===============================
 # 🔧 Funções utilitárias GitHub
 # ===============================
+
+def listar_arquivos_json():
+    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/data"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        arquivos = response.json()
+        jsons = [a["name"] for a in arquivos if a["name"].endswith(".json")]
+        return sorted(jsons)
+    else:
+        st.error("❌ Erro ao listar arquivos do GitHub")
+        return []
 
 def github_file_url(ano, mes):
     return f"data/tarefas_{ano}_{mes}.json"
@@ -39,7 +47,7 @@ def carregar_json_github(ano, mes):
         sha = response.json()["sha"]
         return data, sha
     else:
-        return [], None  # Arquivo não existe ainda
+        return [], None
 
 def salvar_json_github(ano, mes, data, sha=None):
     url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{github_file_url(ano, mes)}"
@@ -58,36 +66,39 @@ def salvar_json_github(ano, mes, data, sha=None):
 
     response = requests.put(url, headers=headers, json=payload)
 
-    if response.status_code in [200, 201]:
-        st.success("✅ Dados salvos no GitHub com sucesso!")
-    else:
+    if response.status_code not in [200, 201]:
         st.error(f"❌ Erro ao salvar no GitHub: {response.json()}")
 
 # ===============================
-# 🔧 Provisionamento (Ano e Mês)
+# 🔧 Obter lista de períodos existentes
 # ===============================
 
-st.sidebar.header("📅 Provisionamento")
-ano = st.sidebar.selectbox("Ano", [2023, 2024, 2025], index=1)
-mes = st.sidebar.selectbox("Mês", list(range(1, 13)), format_func=lambda x: f"{x:02}")
+arquivos_json = listar_arquivos_json()
+
+if arquivos_json:
+    periodos = sorted(list(set(
+        (a.replace("tarefas_", "").replace(".json", "")) for a in arquivos_json
+    )))
+else:
+    periodos = []
+
+periodo_selecionado = st.selectbox(
+    "🗂️ Selecione o período (Ano/Mês)",
+    periodos,
+    format_func=lambda x: f"{x[:4]}/{x[5:]}"
+)
+
+ano, mes = periodo_selecionado.split("_")
 
 dados, sha = carregar_json_github(ano, mes)
-
 if not dados:
     dados = []
 
 # ===============================
-# 🔧 Controle de estado para cadastro
+# 🔧 Cadastro de Nova Tarefa (Sidebar)
 # ===============================
 
-if "cadastro_feito" not in st.session_state:
-    st.session_state.cadastro_feito = False
-
-# ===============================
-# 🔧 Cadastro de nova tarefa
-# ===============================
-
-st.subheader("➕ Cadastro de Nova Tarefa")
+st.sidebar.header("➕ Cadastro de Nova Tarefa")
 
 # 🔢 Gerar ID numérico incremental da tarefa principal
 if dados:
@@ -96,22 +107,39 @@ if dados:
 else:
     novo_id_tarefa = 1
 
-if not st.session_state.cadastro_feito:
-    titulo_tarefa = st.text_input("Título da Tarefa")
+titulo_tarefa = st.sidebar.text_input("Título da Tarefa")
+descricao_tarefa = st.sidebar.text_area("Descrição da Tarefa")
 
-    st.markdown("**Selecione as Subtarefas que deseja criar:**")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        cria_texto = st.checkbox("📝 Texto (D-2)", value=True)
-    with col2:
-        cria_layout = st.checkbox("🎨 Layout (D-1)", value=True)
-    with col3:
-        cria_html = st.checkbox("💻 HTML (D)", value=True)
+st.sidebar.markdown("**Selecione as Subtarefas:**")
+col1, col2, col3 = st.sidebar.columns(3)
+with col1:
+    cria_texto = st.checkbox("📝 Texto (D-2)", value=True)
+with col2:
+    cria_layout = st.checkbox("🎨 Layout (D-1)", value=True)
+with col3:
+    cria_html = st.checkbox("💻 HTML (D)", value=True)
 
-    data_cadastro = datetime.today().strftime('%Y-%m-%d')
-    data_entrega = st.date_input("Data de Entrega")
+data_entrega = st.sidebar.date_input("Data de Entrega")
 
-    if st.button("💾 Cadastrar Tarefa"):
+# 🔥 Validação da Data de Entrega
+data_minima = datetime(data_entrega.year, data_entrega.month, 3)
+if data_entrega < data_minima:
+    st.sidebar.warning("⚠️ A Data de Entrega não pode ser anterior ao dia 3 do mês.")
+
+if st.sidebar.button("💾 Cadastrar Tarefa"):
+    if not (cria_texto or cria_layout or cria_html):
+        st.sidebar.warning("⚠️ Selecione pelo menos uma subtarefa.")
+    elif data_entrega < data_minima:
+        st.sidebar.error("❌ A Data de Entrega não pode ser anterior ao dia 3.")
+    else:
+        # 🔥 Definir o período de cadastro conforme a data de entrega
+        ano_entrega = data_entrega.year
+        mes_entrega = f"{data_entrega.month:02}"
+
+        dados_entrega, sha_entrega = carregar_json_github(ano_entrega, mes_entrega)
+        if not dados_entrega:
+            dados_entrega = []
+
         subtarefas = []
 
         if cria_texto:
@@ -121,8 +149,8 @@ if not st.session_state.cadastro_feito:
                 "ID Subtarefa": "ID1",
                 "Título Subtarefa": f"Texto_{titulo_tarefa}",
                 "Tipo Subtarefa": "Texto (D-2)",
-                "Descrição": "",
-                "Data Cadastro": data_cadastro,
+                "Descrição": descricao_tarefa,
+                "Data Cadastro": datetime.today().strftime('%Y-%m-%d'),
                 "Data Entrega": str(data_entrega)
             })
         if cria_layout:
@@ -132,8 +160,8 @@ if not st.session_state.cadastro_feito:
                 "ID Subtarefa": "ID2",
                 "Título Subtarefa": f"Layout_{titulo_tarefa}",
                 "Tipo Subtarefa": "Layout (D-1)",
-                "Descrição": "",
-                "Data Cadastro": data_cadastro,
+                "Descrição": descricao_tarefa,
+                "Data Cadastro": datetime.today().strftime('%Y-%m-%d'),
                 "Data Entrega": str(data_entrega)
             })
         if cria_html:
@@ -143,26 +171,20 @@ if not st.session_state.cadastro_feito:
                 "ID Subtarefa": "ID3",
                 "Título Subtarefa": f"HTML_{titulo_tarefa}",
                 "Tipo Subtarefa": "HTML (D)",
-                "Descrição": "",
-                "Data Cadastro": data_cadastro,
+                "Descrição": descricao_tarefa,
+                "Data Cadastro": datetime.today().strftime('%Y-%m-%d'),
                 "Data Entrega": str(data_entrega)
             })
 
-        if not subtarefas:
-            st.warning("⚠️ Selecione pelo menos uma subtarefa para cadastrar.")
-        else:
-            dados.extend(subtarefas)
-            salvar_json_github(ano, mes, dados, sha)
-            st.success(f"✅ Tarefa '{titulo_tarefa}' e {len(subtarefas)} subtarefa(s) cadastradas com sucesso!")
-            st.session_state.cadastro_feito = True
-else:
-    st.info("ℹ️ Tarefa cadastrada. Se quiser cadastrar outra, recarregue a página ou altere diretamente na tabela abaixo.")
+        dados_entrega.extend(subtarefas)
+        salvar_json_github(ano_entrega, mes_entrega, dados_entrega, sha_entrega)
+        st.sidebar.success(f"✅ Tarefa '{titulo_tarefa}' cadastrada com sucesso!")
 
 # ===============================
 # 🔧 Edição das tarefas
 # ===============================
 
-st.subheader(f"📄 Tarefas cadastradas para {mes:02}/{ano}")
+st.subheader(f"📄 Tarefas cadastradas para {ano}/{mes}")
 
 if dados:
     df = pd.DataFrame(dados)
