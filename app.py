@@ -29,8 +29,8 @@ def github_file_url(ano, mes):
     return f"data/tarefas_{ano}_{mes}.json"
 
 def carregar_json_github(ano, mes):
-    url = f"https://api.github.com/repos/{Gui-Ferreir4}/{provisionamento}/contents/{github_file_url(ano, mes)}"
-    headers = {"Authorization": f"token {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}"}
+    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{github_file_url(ano, mes)}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
     response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
@@ -42,8 +42,8 @@ def carregar_json_github(ano, mes):
         return [], None  # Arquivo ainda não existe
 
 def salvar_json_github(ano, mes, data, sha=None):
-    url = f"https://api.github.com/repos/{Gui-Ferreir4}/{provisionamento}/contents/{github_file_url(ano, mes)}"
-    headers = {"Authorization": f"token {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}"}
+    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{github_file_url(ano, mes)}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
 
     conteudo = json.dumps(data, ensure_ascii=False, indent=4)
     b64_content = base64.b64encode(conteudo.encode()).decode()
