@@ -1,0 +1,32 @@
+[
+    {
+        "ID Tarefa": "1",
+        "Título Tarefa": "Teste_01",
+        "ID Subtarefa": "ID1",
+        "Título Subtarefa": "Texto_Teste_01",
+        "Tipo Subtarefa": "Texto (D-2)",
+        "Descrição": "",
+        "Data Cadastro": "2025-06-05",
+        "Data Entrega": "2025-06-05"
+    },
+    {
+        "ID Tarefa": "1",
+        "Título Tarefa": "Teste_01",
+        "ID Subtarefa": "ID2",
+        "Título Subtarefa": "Layout_Teste_01",
+        "Tipo Subtarefa": "Layout (D-1)",
+        "Descrição": "",
+        "Data Cadastro": "2025-06-05",
+        "Data Entrega": "2025-06-05"
+    },
+    {
+        "ID Tarefa": "1",
+        "Título Tarefa": "Teste_01",
+        "ID Subtarefa": "ID3",
+        "Título Subtarefa": "HTML_Teste_01",
+        "Tipo Subtarefa": "HTML (D)",
+        "Descrição": "",
+        "Data Cadastro": "2025-06-05",
+        "Data Entrega": "2025-06-05"
+    }
+]
