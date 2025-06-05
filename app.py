@@ -111,9 +111,9 @@ titulo_tarefa = st.sidebar.text_input("Título da Tarefa")
 descricao_tarefa = st.sidebar.text_area("Descrição da Tarefa")
 
 st.sidebar.markdown("**Selecione as Subtarefas:**")
-cria_texto = st.checkbox("📝 Texto (D-2)", value=True)
-cria_layout = st.checkbox("🎨 Layout (D-1)", value=True)
-cria_html = st.checkbox("💻 HTML (D)", value=True)
+    cria_texto = st.checkbox("📝 Texto (D-2)", value=True)
+    cria_layout = st.checkbox("🎨 Layout (D-1)", value=True)
+    cria_html = st.checkbox("💻 HTML (D)", value=True)
 
 data_entrega = st.sidebar.date_input("Data de Entrega")
 
