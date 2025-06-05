@@ -9,10 +9,10 @@ from datetime import datetime
 # 🔧 Configurações do GitHub
 # ===============================
 
-GITHUB_USER = "Gui-Ferreir4"
-GITHUB_REPO = "provisionamento"
-GITHUB_TOKEN = "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"
-BRANCH = "main"
+GITHUB_USER = st.secrets["github"]["user"]
+GITHUB_REPO = st.secrets["github"]["repo"]
+GITHUB_TOKEN = st.secrets["github"]["token"]
+BRANCH = st.secrets["github"]["branch"]
 
 # ===============================
 # 🔧 Configurações do App
