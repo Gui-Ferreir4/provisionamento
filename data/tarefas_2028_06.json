@@ -58,5 +58,35 @@
         "Descrição": "Falar com os aniversariantes do mês.",
         "Data Cadastro": "2025-06-05",
         "Data Entrega": "2028-06-15"
+    },
+    {
+        "ID Tarefa": "18",
+        "Título Tarefa": "Jornada Bolo COO",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Jornada Bolo COO",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "Falar com os aniversariantes do mês.",
+        "Data Cadastro": "2025-06-05",
+        "Data Entrega": "2028-06-13"
+    },
+    {
+        "ID Tarefa": "18",
+        "Título Tarefa": "Jornada Bolo COO",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Jornada Bolo COO",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "Falar com os aniversariantes do mês.",
+        "Data Cadastro": "2025-06-05",
+        "Data Entrega": "2028-06-14"
+    },
+    {
+        "ID Tarefa": "18",
+        "Título Tarefa": "Jornada Bolo COO",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Jornada Bolo COO",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "Falar com os aniversariantes do mês.",
+        "Data Cadastro": "2025-06-05",
+        "Data Entrega": "2028-06-15"
     }
 ]
