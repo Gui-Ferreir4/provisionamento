@@ -89,25 +89,36 @@ def encontrar_data_disponivel(data_base, tipo, dados_mes):
         data_check -= timedelta(days=1)
 
 # ===============================
-# 🔧 Seleção de Período
+# 🔧 Seleção de Período + Refresh
 # ===============================
 
 st.subheader("🗂️ Selecione o período (Ano/Mês)")
 
-arquivos_json = listar_arquivos_json()
-if arquivos_json:
-    periodos = sorted(list(set(
+if "periodos_disponiveis" not in st.session_state:
+    arquivos_json = listar_arquivos_json()
+    st.session_state.periodos_disponiveis = sorted(list(set(
         (a.replace("tarefas_", "").replace(".json", "")) for a in arquivos_json
     )))
-else:
-    periodos = []
 
-periodo_selecionado = st.selectbox(
-    "Período",
-    periodos,
-    format_func=lambda x: f"{x[:4]}/{x[5:]}"
-)
+col1, col2 = st.columns([4, 1])
 
+with col1:
+    periodo_selecionado = st.selectbox(
+        "Período",
+        st.session_state.periodos_disponiveis,
+        format_func=lambda x: f"{x[:4]}/{x[5:]}",
+        key="periodo_select"
+    )
+
+with col2:
+    if st.button("🔄 Atualizar"):
+        arquivos_json = listar_arquivos_json()
+        st.session_state.periodos_disponiveis = sorted(list(set(
+            (a.replace("tarefas_", "").replace(".json", "")) for a in arquivos_json
+        )))
+        st.success("🔄 Períodos atualizados com sucesso!")
+
+# Carrega os dados do período selecionado
 ano, mes = periodo_selecionado.split("_")
 dados, sha = carregar_json_github(ano, mes)
 if not dados:
@@ -165,7 +176,7 @@ if st.sidebar.button("💾 Cadastrar Tarefa"):
         # 🔥 Ordem: Texto > Layout > HTML
         tipos_subtarefas.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
 
-        # 🔧 Definir datas conforme a ordem e restrições
+        # 🔧 Definir datas conforme ordem e restrições
         datas_subtarefas = {}
         dias_ajuste = len(tipos_subtarefas) - 1
         for idx, tipo in enumerate(tipos_subtarefas):
@@ -195,13 +206,6 @@ if st.sidebar.button("💾 Cadastrar Tarefa"):
         salvar_json_github(ano_entrega, mes_entrega, dados_entrega, sha_entrega)
 
         st.sidebar.success(f"✅ Tarefa '{titulo_tarefa}' cadastrada com sucesso!")
-
-        # 🔄 Atualizar a lista de períodos após cadastro
-        arquivos_json = listar_arquivos_json()
-        periodos = sorted(list(set(
-            (a.replace("tarefas_", "").replace(".json", "")) for a in arquivos_json
-        )))
-        st.experimental_rerun()
 
 # ===============================
 # 🔧 Edição das tarefas
