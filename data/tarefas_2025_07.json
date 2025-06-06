@@ -28,5 +28,25 @@
         "Descrição": "Desc A",
         "Data Cadastro": "2025-06-06",
         "Data Entrega": "2025-07-04"
+    },
+    {
+        "ID Tarefa": "21",
+        "Título Tarefa": "Teste A",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Teste A",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "Desc A",
+        "Data Cadastro": "2025-06-06",
+        "Data Entrega": "2025-07-03"
+    },
+    {
+        "ID Tarefa": "21",
+        "Título Tarefa": "Teste A",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Teste A",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "Desc A",
+        "Data Cadastro": "2025-06-06",
+        "Data Entrega": "2025-07-04"
     }
 ]
