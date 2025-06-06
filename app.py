@@ -60,6 +60,7 @@ def salvar_arquivo_github(ano, mes, data):
 
     try:
         arquivo = repo.get_contents(path, ref=BRANCH)
+        st.write(f"🔁 Atualizando arquivo existente: `{path}` (sha: {arquivo.sha})")
         repo.update_file(
             path=path,
             message=f"Atualizando tarefas {ano}/{mes}",
@@ -68,8 +69,9 @@ def salvar_arquivo_github(ano, mes, data):
             branch=BRANCH
         )
         return True
-    except Exception:
+    except Exception as e1:
         try:
+            st.write(f"🆕 Criando novo arquivo: `{path}`")
             repo.create_file(
                 path=path,
                 message=f"Criando tarefas {ano}/{mes}",
@@ -77,8 +79,9 @@ def salvar_arquivo_github(ano, mes, data):
                 branch=BRANCH
             )
             return True
-        except Exception as erro:
-            st.error(f"❌ Erro ao salvar: {erro}")
+        except Exception as e2:
+            st.error("❌ Erro ao salvar no GitHub:")
+            st.error(e2)
             return False
 
 def contar_subtarefas_por_data(lista):
@@ -206,7 +209,6 @@ with aba[2]:
     else:
         periodo_edicao = st.selectbox("📁 Período para edição", periodos, format_func=lambda x: f"{x[:4]}/{x[5:]}")
         ano_e, mes_e = periodo_edicao.split("_")
-        dados_edicao, _ = carregar_json_github(ano_e, mes_e)
 
         with st.form("form_buscar_edicao"):
             col1, col2, col3, col4 = st.columns([1, 3, 3, 1])
@@ -215,7 +217,9 @@ with aba[2]:
                 buscar = st.form_submit_button("🔍 Carregar Tarefa")
 
         if buscar and id_editar:
-            tarefas_encontradas = [t for t in dados_edicao if t["ID Tarefa"] == id_editar]
+            dados_atuais, _ = carregar_json_github(ano_e, mes_e)
+            tarefas_encontradas = [t for t in dados_atuais if t["ID Tarefa"] == id_editar]
+
             if not tarefas_encontradas:
                 st.warning("❌ Tarefa não encontrada neste período.")
             else:
@@ -250,8 +254,11 @@ with aba[2]:
                     else:
                         novos_tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
 
-                        dados_filtrados = [d for d in dados_edicao if d["ID Tarefa"] != id_editar]
+                        # Recarrega o arquivo do GitHub antes de salvar
+                        dados_reais, _ = carregar_json_github(ano_e, mes_e)
+                        dados_filtrados = [d for d in dados_reais if d["ID Tarefa"] != id_editar]
 
+                        # Recalcula datas disponíveis
                         datas_subs = {}
                         dias_ajuste = len(novos_tipos) - 1
                         for i, tipo in enumerate(novos_tipos):
@@ -273,10 +280,11 @@ with aba[2]:
                             })
 
                         dados_filtrados.extend(novas_subs)
+
                         sucesso = salvar_arquivo_github(ano_e, mes_e, dados_filtrados)
 
                         if sucesso:
                             st.success("✅ Tarefa atualizada com sucesso!")
                             st.experimental_rerun()
                         else:
-                            st.error("❌ Falha ao salvar as alterações no GitHub.")
+                            st.error("❌ Falha ao atualizar a tarefa. Verifique os logs acima.")
