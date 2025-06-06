@@ -228,15 +228,20 @@ with aba[1]:
 
                 if not novos_tipos:
                     st.warning("⚠️ Selecione ao menos uma subtarefa.")
+                elif not eh_dia_util(data_final):
+                    st.error("❌ A data de entrega precisa ser um dia útil.")
                 else:
-                    dados_consulta = [d for d in dados_consulta if d["ID Tarefa"] != id_editar]
                     novos_tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
 
+                    # Filtra os dados excluindo a tarefa antiga
+                    dados_filtrados = [d for d in dados_consulta if d["ID Tarefa"] != id_editar]
+
+                    # Recalcula as datas disponíveis com base nos dados restantes
                     datas_subs = {}
                     dias_ajuste = len(novos_tipos) - 1
                     for i, tipo in enumerate(novos_tipos):
                         base = retroceder_dias_uteis(data_final, dias_ajuste - i) if len(novos_tipos) > 1 else data_final
-                        datas_subs[tipo] = encontrar_data_disponivel(base, tipo, dados_consulta)
+                        datas_subs[tipo] = encontrar_data_disponivel(base, tipo, dados_filtrados)
 
                     novas_subs = []
                     for tipo in novos_tipos:
@@ -252,11 +257,15 @@ with aba[1]:
                             "Data Entrega": str(datas_subs[tipo])
                         })
 
-                    # Atualizar diretamente os dados filtrados (sem duplicar lógica dentro da função)
-                    dados_atualizados = [d for d in dados_consulta if d["ID Tarefa"] != id_editar]
-                    dados_atualizados.extend(novas_subs)
-                    
-                    sucesso = salvar_arquivo_github(ano_c, mes_c, dados_atualizados)
+                    # Junta dados atualizados com os dados restantes
+                    dados_filtrados.extend(novas_subs)
+
+                    sucesso = salvar_arquivo_github(ano_c, mes_c, dados_filtrados)
+                    if sucesso:
+                        st.success("✅ Tarefa atualizada com sucesso!")
+                        st.experimental_rerun()
+                    else:
+                        st.error("❌ Falha ao salvar as alterações no GitHub.")
                     if sucesso:
                         st.success("✅ Tarefa atualizada com sucesso!")
                         st.experimental_rerun()
