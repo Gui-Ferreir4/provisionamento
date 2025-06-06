@@ -183,7 +183,7 @@ if not dados:
 
 st.subheader("➕ Cadastro de Nova Tarefa")
 
-# 🔢 Gerar ID Global Único (verificando todos os arquivos)
+# 🔢 Gerar ID Global Único (verificando todos os arquivos JSON)
 novo_id_tarefa = gerar_proximo_id_global()
 
 with st.form("form_cadastro"):
@@ -191,7 +191,7 @@ with st.form("form_cadastro"):
     with col1:
         titulo_tarefa = st.text_input("Título da Tarefa")
     with col2:
-        descricao_tarefa = st.text_area("Descrição da Tarefa", height=38)
+        descricao_tarefa = st.text_area("Descrição da Tarefa", height=70)
 
     st.markdown("**Selecione as Subtarefas:**")
     col1, col2, col3 = st.columns(3)
@@ -202,16 +202,13 @@ with st.form("form_cadastro"):
     with col3:
         cria_html = st.checkbox("💻 HTML", value=True)
 
-    # 🔥 Calendário inteligente: permite apenas dias úteis
+    # 🔥 Calendário inteligente: sugere hoje, mas se não for útil, pula para o próximo dia útil
     today = date.today()
     data_entrega = st.date_input(
         "Data de Entrega (Somente dias úteis e não feriados)",
         min_value=today,
         value=today if eh_dia_util(today) else proximo_dia_util(today)
     )
-
-    if not eh_dia_util(data_entrega):
-        st.warning("⚠️ A data selecionada não é um dia útil ou é feriado!")
 
     enviar = st.form_submit_button("💾 Cadastrar Tarefa")
 
@@ -236,10 +233,10 @@ if enviar:
         if cria_layout: tipos_subtarefas.append("Layout")
         if cria_html: tipos_subtarefas.append("HTML")
 
-        # 🔥 Ordem: Texto > Layout > HTML
+        # 🔥 Ordem correta: Texto > Layout > HTML
         tipos_subtarefas.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
 
-        # 🔧 Definir datas conforme ordem, dias úteis e restrições
+        # 🔧 Cálculo de datas considerando dias úteis, feriados e limite diário
         datas_subtarefas = {}
         dias_ajuste = len(tipos_subtarefas) - 1
         for idx, tipo in enumerate(tipos_subtarefas):
