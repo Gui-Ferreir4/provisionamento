@@ -98,5 +98,35 @@
         "Descrição": "Desc C",
         "Data Cadastro": "2025-06-06",
         "Data Entrega": "2025-07-07"
+    },
+    {
+        "ID Tarefa": "29",
+        "Título Tarefa": "Seegunda",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Seegunda",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "aaa",
+        "Data Cadastro": "2025-06-06",
+        "Data Entrega": "2025-07-17"
+    },
+    {
+        "ID Tarefa": "29",
+        "Título Tarefa": "Seegunda",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Seegunda",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "aaa",
+        "Data Cadastro": "2025-06-06",
+        "Data Entrega": "2025-07-18"
+    },
+    {
+        "ID Tarefa": "29",
+        "Título Tarefa": "Seegunda",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Seegunda",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "aaa",
+        "Data Cadastro": "2025-06-06",
+        "Data Entrega": "2025-07-21"
     }
 ]
