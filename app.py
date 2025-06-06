@@ -259,6 +259,6 @@ with aba[1]:
 
                     dados_consulta.extend(novas_subs)
                     sucesso = atualizar_tarefa_github(ano_c, mes_c, id_editar, novas_subs)
-                        if sucesso:
-                            st.success("✅ Tarefa atualizada com sucesso!")
-                            st.experimental_rerun()
+                    if sucesso:
+                        st.success("✅ Tarefa atualizada com sucesso!")
+                        st.experimental_rerun()
