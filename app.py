@@ -81,11 +81,6 @@ def salvar_arquivo_github(ano, mes, data):
             st.error(f"❌ Erro ao salvar: {erro}")
             return False
 
-def atualizar_tarefa_github(ano, mes, id_tarefa, novos_dados):
-    dados, _ = carregar_json_github(ano, mes)
-    dados_filtrados = [d for d in dados if d["ID Tarefa"] != id_tarefa]
-    dados_filtrados.extend(novos_dados)
-    return salvar_arquivo_github(ano, mes, dados_filtrados)
 
 def contar_subtarefas_por_data(lista):
     contador = {}
@@ -257,8 +252,11 @@ with aba[1]:
                             "Data Entrega": str(datas_subs[tipo])
                         })
 
-                    dados_consulta.extend(novas_subs)
-                    sucesso = atualizar_tarefa_github(ano_c, mes_c, id_editar, novas_subs)
+                    # Atualizar diretamente os dados filtrados (sem duplicar lógica dentro da função)
+                    dados_atualizados = [d for d in dados_consulta if d["ID Tarefa"] != id_editar]
+                    dados_atualizados.extend(novas_subs)
+                    
+                    sucesso = salvar_arquivo_github(ano_c, mes_c, dados_atualizados)
                     if sucesso:
                         st.success("✅ Tarefa atualizada com sucesso!")
                         st.experimental_rerun()
