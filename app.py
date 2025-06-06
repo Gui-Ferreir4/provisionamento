@@ -262,3 +262,5 @@ with aba[1]:
                     if sucesso:
                         st.success("✅ Tarefa atualizada com sucesso!")
                         st.experimental_rerun()
+                    else:
+                        st.error("❌ Falha ao atualizar a tarefa. Verifique o período, o ID informado ou o acesso ao GitHub.")
