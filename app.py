@@ -74,7 +74,7 @@ def salvar_arquivo_github(ano, mes, data):
             branch=BRANCH
         )
         return True
-    except Exception as e:
+    except Exception:
         try:
             repo.create_file(
                 path=path,
@@ -134,7 +134,7 @@ with aba[0]:
             l = st.checkbox("🎨 Layout", value=True)
             h = st.checkbox("💻 HTML", value=True)
             hoje = date.today()
-            data_final = st.date_input("Data de Entrega", value=hoje if eh_dia_util(hoje) else proximo_dia_util(hoje), min_value=hoje)
+            data_final = st.date_input("Data de Entrega", value=proximo_dia_util(hoje), min_value=hoje)
             enviar = st.form_submit_button("💾 Cadastrar Tarefa")
 
     if enviar:
@@ -149,9 +149,8 @@ with aba[0]:
             if h: tipos.append("HTML")
 
             tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
-
             ano_e, mes_e = data_final.year, f"{data_final.month:02}"
-            dados_json, sha = carregar_json_github(ano_e, mes_e)
+            dados_json, _ = carregar_json_github(ano_e, mes_e)
             if not dados_json:
                 dados_json = []
 
@@ -174,34 +173,39 @@ with aba[0]:
                     "Data Entrega": str(datas[tipo])
                 })
 
-            salvar_arquivo_github(ano, mes, dados)
-            st.success(f"✅ Tarefa '{titulo}' cadastrada com sucesso!")
+            sucesso = salvar_arquivo_github(ano_e, mes_e, dados_json)
+            if sucesso:
+                st.success(f"✅ Tarefa '{titulo}' cadastrada com sucesso!")
+                st.experimental_rerun()
+
 # --- Aba Consulta ---
 with aba[1]:
     st.header("🔍 Consulta e Edição de Tarefas")
+
     arquivos_json = listar_arquivos_json()
     periodos = sorted([a.replace("tarefas_", "").replace(".json", "") for a in arquivos_json])
+
     periodo_consulta = st.selectbox("📁 Período", periodos, format_func=lambda x: f"{x[:4]}/{x[5:]}")
     ano_c, mes_c = periodo_consulta.split("_")
-    dados_consulta, sha_consulta = carregar_json_github(ano_c, mes_c)
+    dados_consulta, _ = carregar_json_github(ano_c, mes_c)
 
-    st.subheader("📄 Registros Existentes")
+    st.subheader("📄 Tarefas cadastradas")
     if dados_consulta:
         st.dataframe(pd.DataFrame(dados_consulta), use_container_width=True)
     else:
-        st.info("Nenhuma tarefa encontrada para o período selecionado.")
+        st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
 
     st.subheader("✏️ Editar Tarefa")
-    with st.form("form_busca_edicao"):
+    with st.form("form_buscar_edicao"):
         col1, col2, col3, col4 = st.columns([1, 3, 3, 1])
         with col2:
-            id_editar = st.text_input("ID da Tarefa")
-            buscar = st.form_submit_button("🔍 Buscar")
+            id_editar = st.text_input("Informe o ID da Tarefa")
+            buscar = st.form_submit_button("🔍 Carregar Tarefa")
 
     if buscar and id_editar:
         tarefas_encontradas = [t for t in dados_consulta if t["ID Tarefa"] == id_editar]
         if not tarefas_encontradas:
-            st.warning("Tarefa não encontrada no período selecionado.")
+            st.warning("❌ Tarefa não encontrada neste período.")
         else:
             ref = tarefas_encontradas[0]
             titulo_antigo = ref["Título Tarefa"]
@@ -218,7 +222,7 @@ with aba[1]:
                     t1 = st.checkbox("📝 Texto", value="Texto" in tipos_atuais)
                     t2 = st.checkbox("🎨 Layout", value="Layout" in tipos_atuais)
                     t3 = st.checkbox("💻 HTML", value="HTML" in tipos_atuais)
-                    data_final = st.date_input("Data de Entrega", value=max(datas_atuais))
+                    data_final = st.date_input("Nova Data de Entrega", value=max(datas_atuais))
                     atualizar = st.form_submit_button("💾 Atualizar Tarefa")
 
             if atualizar:
@@ -228,14 +232,15 @@ with aba[1]:
                 if t3: novos_tipos.append("HTML")
 
                 if not novos_tipos:
-                    st.warning("⚠️ Selecione pelo menos uma subtarefa.")
+                    st.warning("⚠️ Selecione ao menos uma subtarefa.")
                 else:
                     dados_consulta = [d for d in dados_consulta if d["ID Tarefa"] != id_editar]
                     novos_tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
+
                     datas_subs = {}
                     dias_ajuste = len(novos_tipos) - 1
                     for i, tipo in enumerate(novos_tipos):
-                        base = data_final if len(novos_tipos) == 1 else retroceder_dias_uteis(data_final, dias_ajuste - i)
+                        base = retroceder_dias_uteis(data_final, dias_ajuste - i) if len(novos_tipos) > 1 else data_final
                         datas_subs[tipo] = encontrar_data_disponivel(base, tipo, dados_consulta)
 
                     novas_subs = []
@@ -253,7 +258,7 @@ with aba[1]:
                         })
 
                     dados_consulta.extend(novas_subs)
-                    salvar_arquivo_github(ano, mes, dados)
+                    sucesso = salvar_arquivo_github(ano_c, mes_c, dados_consulta)
                     if sucesso:
                         st.success("✅ Tarefa atualizada com sucesso!")
                         st.experimental_rerun()
