@@ -14,16 +14,10 @@ GITHUB_REPO = st.secrets["github"]["repo"]
 GITHUB_TOKEN = st.secrets["github"]["token"]
 BRANCH = st.secrets["github"]["branch"]
 
-# Feriados nacionais
 feriados_br = holidays.Brazil()
 
 def eh_dia_util(data):
     return data.weekday() < 5 and data not in feriados_br
-
-def dia_util_anterior(data):
-    while not eh_dia_util(data):
-        data -= timedelta(days=1)
-    return data
 
 def proximo_dia_util(data):
     while not eh_dia_util(data):
@@ -86,6 +80,12 @@ def salvar_arquivo_github(ano, mes, data):
         except Exception as erro:
             st.error(f"❌ Erro ao salvar: {erro}")
             return False
+
+def atualizar_tarefa_github(ano, mes, id_tarefa, novos_dados):
+    dados, _ = carregar_json_github(ano, mes)
+    dados_filtrados = [d for d in dados if d["ID Tarefa"] != id_tarefa]
+    dados_filtrados.extend(novos_dados)
+    return salvar_arquivo_github(ano, mes, dados_filtrados)
 
 def contar_subtarefas_por_data(lista):
     contador = {}
