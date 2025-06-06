@@ -28,5 +28,25 @@
         "Descrição": "ACVB",
         "Data Cadastro": "2025-06-06",
         "Data Entrega": "2025-06-06"
+    },
+    {
+        "ID Tarefa": "32",
+        "Título Tarefa": "Jornada Bolo COOP",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Jornada Bolo COOP",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "2222222222222",
+        "Data Cadastro": "2025-06-06",
+        "Data Entrega": "2025-06-11"
+    },
+    {
+        "ID Tarefa": "32",
+        "Título Tarefa": "Jornada Bolo COOP",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Jornada Bolo COOP",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "2222222222222",
+        "Data Cadastro": "2025-06-06",
+        "Data Entrega": "2025-06-12"
     }
 ]
