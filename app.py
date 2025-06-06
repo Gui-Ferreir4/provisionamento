@@ -6,6 +6,7 @@ import base64
 import requests
 from datetime import datetime, date, timedelta
 import holidays
+from github import Github
 
 # GitHub config
 GITHUB_USER = st.secrets["github"]["user"]
