@@ -140,42 +140,47 @@ st.title("🗂️ Provisionador de Tarefas e Subtarefas")
 
 st.subheader("🗂️ Selecione o Período (Ano/Mês)")
 
-# Inicializa períodos disponíveis na sessão
-if "periodos_disponiveis" not in st.session_state:
-    arquivos_json = listar_arquivos_json()
-    st.session_state.periodos_disponiveis = sorted(list(set(
+# Carregar lista de arquivos JSON
+arquivos_json = listar_arquivos_json()
+
+if arquivos_json:
+    periodos = sorted(list(set(
         (a.replace("tarefas_", "").replace(".json", "")) for a in arquivos_json
     )))
+    if "periodos_disponiveis" not in st.session_state:
+        st.session_state.periodos_disponiveis = periodos
 
-# Layout: Lista suspensa + botão atualizar (na mesma linha)
-col1, col2 = st.columns([4, 1])
+    col1, col2 = st.columns([4, 1])
 
-with col1:
-    periodo_selecionado = st.selectbox(
-        "Período",
-        st.session_state.periodos_disponiveis,
-        format_func=lambda x: f"{x[:4]}/{x[5:]}",
-        key="periodo_select"
-    )
+    with col1:
+        periodo_selecionado = st.selectbox(
+            "Período",
+            st.session_state.periodos_disponiveis,
+            format_func=lambda x: f"{x[:4]}/{x[5:]}",
+            key="periodo_select"
+        )
 
-with col2:
-    if st.button("🔄 Atualizar períodos"):
-        arquivos_json = listar_arquivos_json()
-        novos_periodos = sorted(list(set(
-            (a.replace("tarefas_", "").replace(".json", "")) for a in arquivos_json
-        )))
+    with col2:
+        if st.button("🔄 Atualizar períodos"):
+            arquivos_json = listar_arquivos_json()
+            novos_periodos = sorted(list(set(
+                (a.replace("tarefas_", "").replace(".json", "")) for a in arquivos_json
+            )))
 
-        if novos_periodos != st.session_state.periodos_disponiveis:
-            st.session_state.periodos_disponiveis = novos_periodos
-            st.success("🔄 Períodos atualizados com sucesso!")
-        else:
-            st.info("ℹ️ Nenhum novo período encontrado.")
+            if novos_periodos != st.session_state.periodos_disponiveis:
+                st.session_state.periodos_disponiveis = novos_periodos
+                st.success("🔄 Períodos atualizados com sucesso!")
+            else:
+                st.info("ℹ️ Nenhum novo período encontrado.")
 
-# Carregar dados do período selecionado
-ano, mes = periodo_selecionado.split("_")
-dados, sha = carregar_json_github(ano, mes)
-if not dados:
-    dados = []
+    ano, mes = periodo_selecionado.split("_")
+    dados, sha = carregar_json_github(ano, mes)
+    if not dados:
+        dados = []
+
+else:
+    st.warning("⚠️ Nenhum período encontrado. Cadastre uma nova tarefa para criar o primeiro arquivo JSON.")
+    st.stop()
 
 # ===============================
 # 🔧 Cadastro de Nova Tarefa
