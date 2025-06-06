@@ -68,7 +68,13 @@ def salvar_json_github(ano, mes, data, sha=None):
     }
     if sha:
         payload["sha"] = sha
-    requests.put(url, headers=headers, json=payload)
+
+    response = requests.put(url, headers=headers, json=payload)
+
+    if response.status_code not in [200, 201]:
+        st.error(f"❌ Erro ao salvar no GitHub: {response.json()}")
+        return False
+    return True
 
 def contar_subtarefas_por_data(lista):
     contador = {}
@@ -236,6 +242,7 @@ with aba[1]:
                         })
 
                     dados_consulta.extend(novas_subs)
-                    salvar_json_github(ano_c, mes_c, dados_consulta, sha_consulta)
-                    st.success("✅ Tarefa atualizada com sucesso!")
-                    st.experimental_rerun()
+                    sucesso = salvar_json_github(ano_c, mes_c, dados_consulta, sha_consulta)
+                    if sucesso:
+                        st.success("✅ Tarefa atualizada com sucesso!")
+                        st.experimental_rerun()
