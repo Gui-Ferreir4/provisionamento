@@ -57,24 +57,34 @@ def carregar_json_github(ano, mes):
         return json.loads(content), response.json()["sha"]
     return [], None
 
-def salvar_json_github(ano, mes, data, sha=None):
-    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{github_file_url(ano, mes)}"
-    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+def salvar_arquivo_github(ano, mes, data):
+    g = Github(GITHUB_TOKEN)
+    repo = g.get_user().get_repo(GITHUB_REPO)
+    path = github_file_url(ano, mes)
     conteudo = json.dumps(data, ensure_ascii=False, indent=4)
-    payload = {
-        "message": f"Atualizando tarefas {ano}/{mes}",
-        "content": base64.b64encode(conteudo.encode()).decode(),
-        "branch": BRANCH
-    }
-    if sha:
-        payload["sha"] = sha
 
-    response = requests.put(url, headers=headers, json=payload)
-
-    if response.status_code not in [200, 201]:
-        st.error(f"❌ Erro ao salvar no GitHub: {response.json()}")
-        return False
-    return True
+    try:
+        arquivo = repo.get_contents(path, ref=BRANCH)
+        repo.update_file(
+            path=path,
+            message=f"Atualizando tarefas {ano}/{mes}",
+            content=conteudo,
+            sha=arquivo.sha,
+            branch=BRANCH
+        )
+        return True
+    except Exception as e:
+        try:
+            repo.create_file(
+                path=path,
+                message=f"Criando tarefas {ano}/{mes}",
+                content=conteudo,
+                branch=BRANCH
+            )
+            return True
+        except Exception as erro:
+            st.error(f"❌ Erro ao salvar: {erro}")
+            return False
 
 def contar_subtarefas_por_data(lista):
     contador = {}
@@ -163,7 +173,7 @@ with aba[0]:
                     "Data Entrega": str(datas[tipo])
                 })
 
-            salvar_json_github(ano_e, mes_e, dados_json, sha)
+            salvar_arquivo_github(ano, mes, dados)
             st.success(f"✅ Tarefa '{titulo}' cadastrada com sucesso!")
 # --- Aba Consulta ---
 with aba[1]:
@@ -242,7 +252,7 @@ with aba[1]:
                         })
 
                     dados_consulta.extend(novas_subs)
-                    sucesso = salvar_json_github(ano_c, mes_c, dados_consulta, sha_consulta)
+                    salvar_arquivo_github(ano, mes, dados)
                     if sucesso:
                         st.success("✅ Tarefa atualizada com sucesso!")
                         st.experimental_rerun()
