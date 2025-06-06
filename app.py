@@ -258,7 +258,7 @@ with aba[1]:
                         })
 
                     dados_consulta.extend(novas_subs)
-                    sucesso = salvar_arquivo_github(ano_c, mes_c, dados_consulta)
-                    if sucesso:
-                        st.success("✅ Tarefa atualizada com sucesso!")
-                        st.experimental_rerun()
+                    sucesso = atualizar_tarefa_github(ano_c, mes_c, id_editar, novas_subs)
+                        if sucesso:
+                            st.success("✅ Tarefa atualizada com sucesso!")
+                            st.experimental_rerun()
