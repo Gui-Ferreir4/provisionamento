@@ -224,21 +224,23 @@ with aba[1]:
                 elif not eh_dia_util(data_entrega_nova):
                     st.error("❌ A data de entrega deve ser dia útil e não feriado.")
                 else:
+                    # Remove todas as subtarefas antigas
                     dados_consulta = [d for d in dados_consulta if d["ID Tarefa"] != id_editar]
-
+            
+                    # Recria subtarefas conforme nova seleção
                     tipos_novos = []
                     if editar_texto: tipos_novos.append("Texto")
                     if editar_layout: tipos_novos.append("Layout")
                     if editar_html: tipos_novos.append("HTML")
-
+            
                     tipos_novos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
                     datas_subtarefas = {}
                     dias_ajuste = len(tipos_novos) - 1
-
+            
                     for idx, tipo in enumerate(tipos_novos):
                         base = data_entrega_nova if len(tipos_novos) == 1 else retroceder_dias_uteis(data_entrega_nova, dias_ajuste - idx)
                         datas_subtarefas[tipo] = encontrar_data_disponivel(base, tipo, dados_consulta)
-
+            
                     novas_subs = []
                     for tipo in tipos_novos:
                         id_sub = str(["Texto", "Layout", "HTML"].index(tipo) + 1)
@@ -252,7 +254,8 @@ with aba[1]:
                             "Data Cadastro": datetime.today().strftime('%Y-%m-%d'),
                             "Data Entrega": str(datas_subtarefas[tipo])
                         })
-
+            
                     dados_consulta.extend(novas_subs)
                     salvar_json_github(ano_c, mes_c, dados_consulta, sha_consulta)
                     st.success(f"✅ Tarefa {id_editar} atualizada com sucesso.")
+                    st.experimental_rerun()
