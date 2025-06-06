@@ -68,5 +68,35 @@
         "Descrição": "Desc A",
         "Data Cadastro": "2025-06-06",
         "Data Entrega": "2025-07-07"
+    },
+    {
+        "ID Tarefa": "23",
+        "Título Tarefa": "Teste C",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Teste C",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "Desc C",
+        "Data Cadastro": "2025-06-06",
+        "Data Entrega": "2025-07-04"
+    },
+    {
+        "ID Tarefa": "23",
+        "Título Tarefa": "Teste C",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Teste C",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "Desc C",
+        "Data Cadastro": "2025-06-06",
+        "Data Entrega": "2025-07-04"
+    },
+    {
+        "ID Tarefa": "23",
+        "Título Tarefa": "Teste C",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Teste C",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "Desc C",
+        "Data Cadastro": "2025-06-06",
+        "Data Entrega": "2025-07-07"
     }
 ]
