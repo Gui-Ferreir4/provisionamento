@@ -163,86 +163,66 @@ with aba[0]:
 with aba[1]:
     st.header("🔍 Consulta e Edição de Tarefas")
     arquivos_json = listar_arquivos_json()
-    if arquivos_json:
-        periodos = sorted(list(set(
-            (a.replace("tarefas_", "").replace(".json", "")) for a in arquivos_json
-        )))
-    else:
-        st.warning("⚠️ Nenhum período encontrado.")
-        st.stop()
-
-    periodo_consulta = st.selectbox(
-        "📅 Selecione o período para consulta e edição",
-        periodos,
-        format_func=lambda x: f"{x[:4]}/{x[5:]}"
-    )
-
+    periodos = sorted([a.replace("tarefas_", "").replace(".json", "") for a in arquivos_json])
+    periodo_consulta = st.selectbox("📁 Período", periodos, format_func=lambda x: f"{x[:4]}/{x[5:]}")
     ano_c, mes_c = periodo_consulta.split("_")
     dados_consulta, sha_consulta = carregar_json_github(ano_c, mes_c)
 
+    st.subheader("📄 Registros Existentes")
     if dados_consulta:
-        st.subheader(f"📄 Tarefas cadastradas para {ano_c}/{mes_c}")
-        df = pd.DataFrame(dados_consulta)
-        st.dataframe(df, use_container_width=True)
+        st.dataframe(pd.DataFrame(dados_consulta), use_container_width=True)
     else:
-        st.info("ℹ️ Nenhuma tarefa cadastrada para este período.")
-        st.stop()
+        st.info("Nenhuma tarefa encontrada para o período selecionado.")
 
-    st.subheader("✏️ Edição de Tarefa")
-    with st.form("form_editar_tarefa"):
+    st.subheader("✏️ Editar Tarefa")
+    with st.form("form_busca_edicao"):
         col1, col2, col3, col4 = st.columns([1, 3, 3, 1])
         with col2:
-            id_editar = st.text_input("ID da Tarefa que deseja editar")
-            buscar = st.form_submit_button("🔍 Carregar tarefa")
+            id_editar = st.text_input("ID da Tarefa")
+            buscar = st.form_submit_button("🔍 Buscar")
 
-    if buscar:
-        tarefas = [t for t in dados_consulta if t["ID Tarefa"] == id_editar]
-        if not tarefas:
-            st.warning("⚠️ Tarefa não encontrada no período selecionado.")
+    if buscar and id_editar:
+        tarefas_encontradas = [t for t in dados_consulta if t["ID Tarefa"] == id_editar]
+        if not tarefas_encontradas:
+            st.warning("Tarefa não encontrada no período selecionado.")
         else:
-            tarefa_ref = tarefas[0]
-            titulo_atual = tarefa_ref["Título Tarefa"]
-            descricao_atual = tarefa_ref.get("Descrição", "")
-            tipos_atuais = {t["Tipo Subtarefa"] for t in tarefas}
-            datas_entregas = [datetime.strptime(t["Data Entrega"], "%Y-%m-%d").date() for t in tarefas]
+            ref = tarefas_encontradas[0]
+            titulo_antigo = ref["Título Tarefa"]
+            descricao_antiga = ref.get("Descrição", "")
+            tipos_atuais = {t["Tipo Subtarefa"] for t in tarefas_encontradas}
+            datas_atuais = [datetime.strptime(t["Data Entrega"], "%Y-%m-%d").date() for t in tarefas_encontradas]
 
-            with st.form("form_editar_campos"):
+            with st.form("form_edicao_tarefa"):
                 col1, col2, col3, col4 = st.columns([1, 3, 3, 1])
                 with col2:
-                    novo_titulo = st.text_input("Título da Tarefa", value=titulo_atual)
-                    nova_descricao = st.text_area("Descrição da Tarefa", value=descricao_atual, height=80)
-                    st.markdown("**Atualize as Subtarefas:**")
-                    editar_texto = st.checkbox("📝 Texto", value="Texto" in tipos_atuais)
-                    editar_layout = st.checkbox("🎨 Layout", value="Layout" in tipos_atuais)
-                    editar_html = st.checkbox("💻 HTML", value="HTML" in tipos_atuais)
-                    data_entrega_nova = st.date_input("Nova Data de Entrega", value=max(datas_entregas))
-                    confirmar = st.form_submit_button("💾 Atualizar Tarefa")
+                    novo_titulo = st.text_input("Título da Tarefa", value=titulo_antigo)
+                    nova_desc = st.text_area("Descrição da Tarefa", value=descricao_antiga, height=80)
+                    st.markdown("**Subtarefas:**")
+                    t1 = st.checkbox("📝 Texto", value="Texto" in tipos_atuais)
+                    t2 = st.checkbox("🎨 Layout", value="Layout" in tipos_atuais)
+                    t3 = st.checkbox("💻 HTML", value="HTML" in tipos_atuais)
+                    data_final = st.date_input("Data de Entrega", value=max(datas_atuais))
+                    atualizar = st.form_submit_button("💾 Atualizar Tarefa")
 
-            if confirmar:
-                if not (editar_texto or editar_layout or editar_html):
-                    st.warning("⚠️ Selecione ao menos uma subtarefa.")
-                elif not eh_dia_util(data_entrega_nova):
-                    st.error("❌ A data de entrega deve ser dia útil e não feriado.")
+            if atualizar:
+                novos_tipos = []
+                if t1: novos_tipos.append("Texto")
+                if t2: novos_tipos.append("Layout")
+                if t3: novos_tipos.append("HTML")
+
+                if not novos_tipos:
+                    st.warning("⚠️ Selecione pelo menos uma subtarefa.")
                 else:
-                    # Remove todas as subtarefas antigas
                     dados_consulta = [d for d in dados_consulta if d["ID Tarefa"] != id_editar]
-            
-                    # Recria subtarefas conforme nova seleção
-                    tipos_novos = []
-                    if editar_texto: tipos_novos.append("Texto")
-                    if editar_layout: tipos_novos.append("Layout")
-                    if editar_html: tipos_novos.append("HTML")
-            
-                    tipos_novos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
-                    datas_subtarefas = {}
-                    dias_ajuste = len(tipos_novos) - 1
-            
-                    for idx, tipo in enumerate(tipos_novos):
-                        base = data_entrega_nova if len(tipos_novos) == 1 else retroceder_dias_uteis(data_entrega_nova, dias_ajuste - idx)
-                        datas_subtarefas[tipo] = encontrar_data_disponivel(base, tipo, dados_consulta)
-            
+                    novos_tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
+                    datas_subs = {}
+                    dias_ajuste = len(novos_tipos) - 1
+                    for i, tipo in enumerate(novos_tipos):
+                        base = data_final if len(novos_tipos) == 1 else retroceder_dias_uteis(data_final, dias_ajuste - i)
+                        datas_subs[tipo] = encontrar_data_disponivel(base, tipo, dados_consulta)
+
                     novas_subs = []
-                    for tipo in tipos_novos:
+                    for tipo in novos_tipos:
                         id_sub = str(["Texto", "Layout", "HTML"].index(tipo) + 1)
                         novas_subs.append({
                             "ID Tarefa": id_editar,
@@ -250,12 +230,12 @@ with aba[1]:
                             "Subtarefa": id_sub,
                             "Título Subtarefa": f"{tipo}_{novo_titulo}",
                             "Tipo Subtarefa": tipo,
-                            "Descrição": nova_descricao,
-                            "Data Cadastro": datetime.today().strftime('%Y-%m-%d'),
-                            "Data Entrega": str(datas_subtarefas[tipo])
+                            "Descrição": nova_desc,
+                            "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
+                            "Data Entrega": str(datas_subs[tipo])
                         })
-            
+
                     dados_consulta.extend(novas_subs)
                     salvar_json_github(ano_c, mes_c, dados_consulta, sha_consulta)
-                    st.success(f"✅ Tarefa {id_editar} atualizada com sucesso.")
+                    st.success("✅ Tarefa atualizada com sucesso!")
                     st.experimental_rerun()
