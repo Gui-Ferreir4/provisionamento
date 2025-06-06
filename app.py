@@ -1,3 +1,4 @@
+# app.py
 import streamlit as st
 import pandas as pd
 import json
@@ -27,6 +28,15 @@ def proximo_dia_util(data):
     while not eh_dia_util(data):
         data += timedelta(days=1)
     return data
+
+def retroceder_dias_uteis(base, dias_uteis):
+    atual = base
+    while dias_uteis > 0:
+        atual -= timedelta(days=1)
+        if eh_dia_util(atual) and atual.month == base.month:
+            dias_uteis -= 1
+    return atual
+
 def github_file_url(ano, mes):
     return f"data/tarefas_{ano}_{mes}.json"
 
@@ -87,6 +97,7 @@ def gerar_proximo_id_global():
         ids += [int(d["ID Tarefa"]) for d in dados if d["ID Tarefa"].isdigit()]
     return max(ids) + 1 if ids else 1
 
+# Interface principal com abas
 st.set_page_config(page_title="Provisionador de Tarefas", layout="wide")
 st.title("🗂️ Provisionador de Tarefas")
 
@@ -97,24 +108,17 @@ with aba[0]:
     st.header("➕ Cadastro de Nova Tarefa")
     novo_id = gerar_proximo_id_global()
     with st.form("form_cadastro"):
-        col1, col2 = st.columns(2)
-        with col1:
+        col1, col2, col3, col4 = st.columns([1, 3, 3, 1])
+        with col2:
             titulo = st.text_input("Título da Tarefa")
-        with col2:
-            descricao = st.text_area("Descrição da Tarefa", height=70)
-
-        col1, col2, col3 = st.columns(3)
-        with col1:
+            descricao = st.text_area("Descrição da Tarefa", height=80)
+            st.markdown("**Subtarefas:**")
             t = st.checkbox("📝 Texto", value=True)
-        with col2:
             l = st.checkbox("🎨 Layout", value=True)
-        with col3:
             h = st.checkbox("💻 HTML", value=True)
-
-        hoje = date.today()
-        data_final = st.date_input("Data de Entrega", value=hoje if eh_dia_util(hoje) else proximo_dia_util(hoje), min_value=hoje)
-
-        enviar = st.form_submit_button("💾 Cadastrar Tarefa")
+            hoje = date.today()
+            data_final = st.date_input("Data de Entrega", value=hoje if eh_dia_util(hoje) else proximo_dia_util(hoje), min_value=hoje)
+            enviar = st.form_submit_button("💾 Cadastrar Tarefa")
 
     if enviar:
         if not (t or l or h):
@@ -137,8 +141,7 @@ with aba[0]:
             dias = len(tipos) - 1
             datas = {}
             for i, tipo in enumerate(tipos):
-                base = data_final if len(tipos) == 1 else data_final - timedelta(days=dias - i)
-                base = dia_util_anterior(base)
+                base = retroceder_dias_uteis(data_final, dias - i) if len(tipos) > 1 else data_final
                 datas[tipo] = encontrar_data_disponivel(base, tipo, dados_json)
 
             for tipo in tipos:
@@ -156,7 +159,6 @@ with aba[0]:
 
             salvar_json_github(ano_e, mes_e, dados_json, sha)
             st.success(f"✅ Tarefa '{titulo}' cadastrada com sucesso!")
-
 # --- Aba Consulta ---
 with aba[1]:
     st.header("🔍 Consulta e Edição de Tarefas")
@@ -188,8 +190,10 @@ with aba[1]:
 
     st.subheader("✏️ Edição de Tarefa")
     with st.form("form_editar_tarefa"):
-        id_editar = st.text_input("ID da Tarefa que deseja editar")
-        buscar = st.form_submit_button("🔍 Carregar tarefa")
+        col1, col2, col3, col4 = st.columns([1, 3, 3, 1])
+        with col2:
+            id_editar = st.text_input("ID da Tarefa que deseja editar")
+            buscar = st.form_submit_button("🔍 Carregar tarefa")
 
     if buscar:
         tarefas = [t for t in dados_consulta if t["ID Tarefa"] == id_editar]
@@ -203,27 +207,16 @@ with aba[1]:
             datas_entregas = [datetime.strptime(t["Data Entrega"], "%Y-%m-%d").date() for t in tarefas]
 
             with st.form("form_editar_campos"):
-                col1, col2 = st.columns(2)
-                with col1:
+                col1, col2, col3, col4 = st.columns([1, 3, 3, 1])
+                with col2:
                     novo_titulo = st.text_input("Título da Tarefa", value=titulo_atual)
-                with col2:
-                    nova_descricao = st.text_area("Descrição da Tarefa", value=descricao_atual, height=70)
-
-                st.markdown("**Atualize as Subtarefas:**")
-                col1, col2, col3 = st.columns(3)
-                with col1:
+                    nova_descricao = st.text_area("Descrição da Tarefa", value=descricao_atual, height=80)
+                    st.markdown("**Atualize as Subtarefas:**")
                     editar_texto = st.checkbox("📝 Texto", value="Texto" in tipos_atuais)
-                with col2:
                     editar_layout = st.checkbox("🎨 Layout", value="Layout" in tipos_atuais)
-                with col3:
                     editar_html = st.checkbox("💻 HTML", value="HTML" in tipos_atuais)
-
-                data_entrega_nova = st.date_input(
-                    "Nova Data de Entrega",
-                    value=max(datas_entregas)
-                )
-
-                confirmar = st.form_submit_button("💾 Atualizar Tarefa")
+                    data_entrega_nova = st.date_input("Nova Data de Entrega", value=max(datas_entregas))
+                    confirmar = st.form_submit_button("💾 Atualizar Tarefa")
 
             if confirmar:
                 if not (editar_texto or editar_layout or editar_html):
@@ -232,6 +225,7 @@ with aba[1]:
                     st.error("❌ A data de entrega deve ser dia útil e não feriado.")
                 else:
                     dados_consulta = [d for d in dados_consulta if d["ID Tarefa"] != id_editar]
+
                     tipos_novos = []
                     if editar_texto: tipos_novos.append("Texto")
                     if editar_layout: tipos_novos.append("Layout")
@@ -242,8 +236,7 @@ with aba[1]:
                     dias_ajuste = len(tipos_novos) - 1
 
                     for idx, tipo in enumerate(tipos_novos):
-                        base = data_entrega_nova if len(tipos_novos) == 1 else data_entrega_nova - timedelta(days=dias_ajuste - idx)
-                        base = dia_util_anterior(base)
+                        base = data_entrega_nova if len(tipos_novos) == 1 else retroceder_dias_uteis(data_entrega_nova, dias_ajuste - idx)
                         datas_subtarefas[tipo] = encontrar_data_disponivel(base, tipo, dados_consulta)
 
                     novas_subs = []
@@ -263,4 +256,3 @@ with aba[1]:
                     dados_consulta.extend(novas_subs)
                     salvar_json_github(ano_c, mes_c, dados_consulta, sha_consulta)
                     st.success(f"✅ Tarefa {id_editar} atualizada com sucesso.")
-
