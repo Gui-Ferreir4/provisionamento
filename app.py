@@ -124,6 +124,85 @@ st.title("🗂️ Provisionador de Tarefas")
 # Abas principais
 aba = st.tabs(["📋 Cadastro", "🔍 Consulta", "✏️ Edição"])
 
+# --- Aba Cadastro ---
+with aba[0]:
+    st.header("➕ Cadastro de Nova Tarefa")
+    novo_id = gerar_proximo_id_global()
+
+    with st.form("form_cadastro"):
+        col1, col2, col3, col4 = st.columns([1, 3, 3, 1])
+        with col2:
+            titulo = st.text_input("Título da Tarefa")
+            descricao = st.text_area("Descrição da Tarefa", height=80)
+            st.markdown("**Subtarefas:**")
+            t = st.checkbox("📝 Texto", value=True)
+            l = st.checkbox("🎨 Layout", value=True)
+            h = st.checkbox("💻 HTML", value=True)
+            hoje = date.today()
+            data_final = st.date_input("Data de Entrega", value=proximo_dia_util(hoje), min_value=hoje)
+            enviar = st.form_submit_button("💾 Cadastrar Tarefa")
+
+    if enviar:
+        if not (t or l or h):
+            st.warning("⚠️ Selecione pelo menos uma subtarefa.")
+        elif not eh_dia_util(data_final):
+            st.error("❌ A data deve ser útil e não feriado.")
+        else:
+            tipos = []
+            if t: tipos.append("Texto")
+            if l: tipos.append("Layout")
+            if h: tipos.append("HTML")
+
+            tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
+            ano_e, mes_e = data_final.year, f"{data_final.month:02}"
+            dados_json, _ = carregar_json_github(ano_e, mes_e)
+            if not dados_json:
+                dados_json = []
+
+            dias = len(tipos) - 1
+            datas = {}
+            for i, tipo in enumerate(tipos):
+                base = retroceder_dias_uteis(data_final, dias - i) if len(tipos) > 1 else data_final
+                datas[tipo] = encontrar_data_disponivel(base, tipo, dados_json)
+
+            for tipo in tipos:
+                id_sub = str(["Texto", "Layout", "HTML"].index(tipo) + 1)
+                dados_json.append({
+                    "ID Tarefa": str(novo_id),
+                    "Título Tarefa": titulo,
+                    "Subtarefa": id_sub,
+                    "Título Subtarefa": f"{tipo}_{titulo}",
+                    "Tipo Subtarefa": tipo,
+                    "Descrição": descricao,
+                    "Data Cadastro": datetime.today().strftime('%Y-%m-%d'),
+                    "Data Entrega": str(datas[tipo])
+                })
+
+            sucesso = salvar_arquivo_github(ano_e, mes_e, dados_json)
+            if sucesso:
+                st.success(f"✅ Tarefa '{titulo}' cadastrada com sucesso!")
+                st.experimental_rerun()
+
+# --- Aba Consulta ---
+with aba[1]:
+    st.header("🔍 Consulta de Tarefas")
+
+    arquivos_json = listar_arquivos_json()
+    periodos = sorted([a.replace("tarefas_", "").replace(".json", "") for a in arquivos_json])
+
+    if not periodos:
+        st.warning("⚠️ Nenhum período encontrado.")
+    else:
+        periodo_consulta = st.selectbox("📁 Período", periodos, format_func=lambda x: f"{x[:4]}/{x[5:]}")
+        ano_c, mes_c = periodo_consulta.split("_")
+        dados_consulta, _ = carregar_json_github(ano_c, mes_c)
+
+        st.subheader("📄 Tarefas cadastradas")
+        if dados_consulta:
+            st.dataframe(pd.DataFrame(dados_consulta), use_container_width=True)
+        else:
+            st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
+
 # --- Aba Edição ---
 with aba[2]:
     st.header("✏️ Edição de Tarefas")
