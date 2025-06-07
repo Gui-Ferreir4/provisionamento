@@ -174,7 +174,7 @@ with aba[0]:
             if sucesso:
                 st.success(f"✅ Tarefa '{titulo}' cadastrada com sucesso!")
                 registrar_log(f"✅ Tarefa {novo_id} cadastrada no arquivo tarefas_{ano_e}_{mes_e}.json")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("❌ Erro ao salvar a tarefa.")
                 registrar_log(f"❌ Falha ao cadastrar tarefa {novo_id} em tarefas_{ano_e}_{mes_e}.json")
@@ -305,6 +305,7 @@ with aba[2]:
                             )
                             st.success("✅ Tarefa atualizada com sucesso!")
                             registrar_log(f"✅ Tarefa {id_editar} atualizada em {path_arquivo}")
+                            st.stop()
                             st.experimental_rerun()
                         except Exception as e:
                             st.error("❌ Falha ao atualizar a tarefa.")
