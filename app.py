@@ -7,7 +7,6 @@ import requests
 from datetime import datetime, date, timedelta
 import holidays
 from github import Github
-import os
 
 # GitHub config
 GITHUB_USER = st.secrets["github"]["user"]
@@ -17,6 +16,15 @@ BRANCH = st.secrets["github"]["branch"]
 
 feriados_br = holidays.Brazil()
 
+# Inicializa log de sessão
+if "log" not in st.session_state:
+    st.session_state.log = []
+
+def registrar_log(msg):
+    data_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    st.session_state.log.append(f"[{data_hora}] {msg}")
+
+# Utilitários de datas
 def eh_dia_util(data):
     return data.weekday() < 5 and data not in feriados_br
 
@@ -33,6 +41,7 @@ def retroceder_dias_uteis(base, dias_uteis):
             dias_uteis -= 1
     return atual
 
+# Arquivo e GitHub
 def github_file_url(ano, mes):
     return f"data/tarefas_{ano}_{mes}.json"
 
@@ -53,41 +62,25 @@ def carregar_json_github(ano, mes):
         return json.loads(content), response.json()["sha"]
     return [], None
 
-def caminho_arquivo_local(ano, mes):
-    return f"/tmp/tarefas_{ano}_{mes}.json"
-
-def baixar_arquivo_json_local(ano, mes, caminho_local):
-    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{github_file_url(ano, mes)}"
-    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        content = base64.b64decode(response.json()["content"])
-        with open(caminho_local, "wb") as f:
-            f.write(content)
-        return response.json()["sha"]
-    else:
-        st.error(f"❌ Falha ao baixar arquivo do GitHub: {response.status_code}")
-        return None
-
-def sobrescrever_arquivo_github(ano, mes, caminho_local, sha_antigo):
+def salvar_arquivo_github(ano, mes, data):
     g = Github(GITHUB_TOKEN)
     repo = g.get_user().get_repo(GITHUB_REPO)
     path = github_file_url(ano, mes)
-
-    with open(caminho_local, "r", encoding="utf-8") as f:
-        conteudo = f.read()
+    conteudo = json.dumps(data, ensure_ascii=False, indent=4)
 
     try:
+        arquivo = repo.get_contents(path, ref=BRANCH)
+        registrar_log(f"🔄 Atualizando arquivo existente: {path} (SHA: {arquivo.sha})")
         repo.update_file(
             path=path,
-            message=f"Tarefa editada via app - {ano}/{mes}",
+            message=f"Atualizando tarefas {ano}/{mes}",
             content=conteudo,
-            sha=sha_antigo,
+            sha=arquivo.sha,
             branch=BRANCH
         )
         return True
     except Exception as e:
-        st.error(f"❌ Erro ao sobrescrever no GitHub: {e}")
+        registrar_log(f"❌ Erro ao atualizar {path}: {e}")
         return False
 
 def contar_subtarefas_por_data(lista):
@@ -117,12 +110,11 @@ def gerar_proximo_id_global():
         ids += [int(d["ID Tarefa"]) for d in dados if d["ID Tarefa"].isdigit()]
     return max(ids) + 1 if ids else 1
 
-# Interface principal com abas
+# Interface com abas
 st.set_page_config(page_title="Provisionador de Tarefas", layout="wide")
 st.title("🗂️ Provisionador de Tarefas")
 
-# Abas principais
-aba = st.tabs(["📋 Cadastro", "🔍 Consulta", "✏️ Edição"])
+aba = st.tabs(["📋 Cadastro", "🔍 Consulta", "✏️ Edição", "📜 LOG"])
 
 # --- Aba Cadastro ---
 with aba[0]:
@@ -181,7 +173,11 @@ with aba[0]:
             sucesso = salvar_arquivo_github(ano_e, mes_e, dados_json)
             if sucesso:
                 st.success(f"✅ Tarefa '{titulo}' cadastrada com sucesso!")
+                registrar_log(f"✅ Tarefa {novo_id} cadastrada no arquivo tarefas_{ano_e}_{mes_e}.json")
                 st.experimental_rerun()
+            else:
+                st.error("❌ Erro ao salvar a tarefa.")
+                registrar_log(f"❌ Falha ao cadastrar tarefa {novo_id} em tarefas_{ano_e}_{mes_e}.json")
 
 # --- Aba Consulta ---
 with aba[1]:
@@ -224,8 +220,10 @@ with aba[2]:
             conteudo = repo.get_contents(path_arquivo, ref=BRANCH)
             dados_json = json.loads(conteudo.decoded_content.decode())
             sha_atual = conteudo.sha
+            registrar_log(f"📂 Arquivo carregado: {path_arquivo} (SHA: {sha_atual})")
         except Exception as e:
             st.error(f"❌ Erro ao carregar o arquivo: {e}")
+            registrar_log(f"❌ Erro ao carregar {path_arquivo}: {e}")
             dados_json = []
             sha_atual = None
 
@@ -240,6 +238,7 @@ with aba[2]:
 
             if not tarefas_encontradas:
                 st.warning("❌ Tarefa não encontrada neste período.")
+                registrar_log(f"⚠️ ID {id_editar} não encontrado em {path_arquivo}")
             else:
                 ref = tarefas_encontradas[0]
                 titulo_antigo = ref["Título Tarefa"]
@@ -271,13 +270,13 @@ with aba[2]:
                         st.error("❌ A data de entrega precisa ser um dia útil.")
                     else:
                         novos_tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
-                        dados_restantes = [d for d in dados_json if d["ID Tarefa"] != id_editar]
+                        dados_filtrados = [d for d in dados_json if d["ID Tarefa"] != id_editar]
 
                         datas_subs = {}
                         dias_ajuste = len(novos_tipos) - 1
                         for i, tipo in enumerate(novos_tipos):
                             base = retroceder_dias_uteis(data_final, dias_ajuste - i) if dias_ajuste else data_final
-                            datas_subs[tipo] = encontrar_data_disponivel(base, tipo, dados_restantes)
+                            datas_subs[tipo] = encontrar_data_disponivel(base, tipo, dados_filtrados)
 
                         novas_subs = []
                         for tipo in novos_tipos:
@@ -293,23 +292,30 @@ with aba[2]:
                                 "Data Entrega": str(datas_subs[tipo])
                             })
 
-                        dados_restantes.extend(novas_subs)
-                        novo_conteudo = json.dumps(dados_restantes, ensure_ascii=False, indent=4)
+                        dados_filtrados.extend(novas_subs)
+                        novo_conteudo = json.dumps(dados_filtrados, ensure_ascii=False, indent=4)
 
                         try:
                             repo.update_file(
                                 path=path_arquivo,
-                                message=f"Atualizando tarefa {id_editar}",
+                                message=f"Edição da tarefa {id_editar}",
                                 content=novo_conteudo,
                                 sha=sha_atual,
                                 branch=BRANCH
                             )
                             st.success("✅ Tarefa atualizada com sucesso!")
+                            registrar_log(f"✅ Tarefa {id_editar} atualizada em {path_arquivo}")
                             st.experimental_rerun()
                         except Exception as e:
-                            st.error(f"❌ Falha ao atualizar a tarefa: {e}")
-                            if sucesso:
-                                st.success("✅ Tarefa atualizada com sucesso!")
-                                st.experimental_rerun()
-                            else:
-                                st.error("❌ Falha ao salvar no GitHub.")
+                            st.error("❌ Falha ao atualizar a tarefa.")
+                            registrar_log(f"❌ Erro ao atualizar {id_editar}: {e}")
+
+# --- Aba LOG ---
+with aba[3]:
+    st.header("📜 LOG do Sistema")
+
+    if not st.session_state.log:
+        st.info("ℹ️ Nenhum log registrado ainda.")
+    else:
+        for linha in reversed(st.session_state.log):
+            st.code(linha)
