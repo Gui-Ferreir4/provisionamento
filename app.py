@@ -263,7 +263,7 @@ with aba[2]:
                     if t1: novos_tipos.append("Texto")
                     if t2: novos_tipos.append("Layout")
                     if t3: novos_tipos.append("HTML")
-
+                
                     if not novos_tipos:
                         st.warning("⚠️ Selecione ao menos uma subtarefa.")
                     elif not eh_dia_util(data_final):
@@ -271,13 +271,13 @@ with aba[2]:
                     else:
                         novos_tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
                         dados_filtrados = [d for d in dados_json if d["ID Tarefa"] != id_editar]
-
+                
                         datas_subs = {}
                         dias_ajuste = len(novos_tipos) - 1
                         for i, tipo in enumerate(novos_tipos):
                             base = retroceder_dias_uteis(data_final, dias_ajuste - i) if dias_ajuste else data_final
                             datas_subs[tipo] = encontrar_data_disponivel(base, tipo, dados_filtrados)
-
+                
                         novas_subs = []
                         for tipo in novos_tipos:
                             id_sub = str(["Texto", "Layout", "HTML"].index(tipo) + 1)
@@ -291,25 +291,20 @@ with aba[2]:
                                 "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
                                 "Data Entrega": str(datas_subs[tipo])
                             })
-
+                
                         dados_filtrados.extend(novas_subs)
-                        novo_conteudo = json.dumps(dados_filtrados, ensure_ascii=False, indent=4)
+                
+                        # Usa a função unificada de gravação
+                        sucesso = salvar_arquivo_github(ano, mes, dados_filtrados)
+                
+                        if sucesso:
+                            st.success(f"✅ Tarefa {id_editar} atualizada com sucesso!")
+                            registrar_log(f"✅ Tarefa {id_editar} atualizada com sucesso no arquivo {path_arquivo}")
+                            st.rerun()
+                        else:
+                            st.error("❌ Falha ao salvar a atualização.")
+                            registrar_log(f"❌ Falha ao atualizar tarefa {id_editar} no arquivo {path_arquivo}")
 
-                        try:
-                            repo.update_file(
-                                path=path_arquivo,
-                                message=f"Edição da tarefa {id_editar}",
-                                content=novo_conteudo,
-                                sha=sha_atual,
-                                branch=BRANCH
-                            )
-                            st.success("✅ Tarefa atualizada com sucesso!")
-                            registrar_log(f"✅ Tarefa {id_editar} atualizada em {path_arquivo}")
-                            st.stop()
-                            st.experimental_rerun()
-                        except Exception as e:
-                            st.error("❌ Falha ao atualizar a tarefa.")
-                            registrar_log(f"❌ Erro ao atualizar {id_editar}: {e}")
 
 # --- Aba LOG ---
 with aba[3]:
