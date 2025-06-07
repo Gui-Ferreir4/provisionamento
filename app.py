@@ -63,25 +63,48 @@ def carregar_json_github(ano, mes):
     return [], None
 
 def salvar_arquivo_github(ano, mes, data):
-    g = Github(GITHUB_TOKEN)
-    repo = g.get_user().get_repo(GITHUB_REPO)
-    path = github_file_url(ano, mes)
-    conteudo = json.dumps(data, ensure_ascii=False, indent=4)
-
     try:
-        arquivo = repo.get_contents(path, ref=BRANCH)
-        registrar_log(f"🔄 Atualizando arquivo existente: {path} (SHA: {arquivo.sha})")
-        repo.update_file(
-            path=path,
-            message=f"Atualizando tarefas {ano}/{mes}",
-            content=conteudo,
-            sha=arquivo.sha,
-            branch=BRANCH
-        )
+        g = Github(GITHUB_TOKEN)
+        repo = g.get_user().get_repo(GITHUB_REPO)
+        path = github_file_url(ano, mes)
+        conteudo = json.dumps(data, ensure_ascii=False, indent=4)
+
+        # Buscar SHA mais atual do arquivo
+        try:
+            arquivo = repo.get_contents(path, ref=BRANCH)
+            sha_arquivo = arquivo.sha
+            registrar_log(f"🔄 Atualizando arquivo existente: {path} (SHA: {sha_arquivo})")
+        except Exception as e:
+            registrar_log(f"⚠️ Arquivo {path} não existe no GitHub. Será criado.")
+            sha_arquivo = None
+
+        # Atualizar ou criar arquivo
+        if sha_arquivo:
+            repo.update_file(
+                path=path,
+                message=f"Atualizando tarefas {ano}/{mes}",
+                content=conteudo,
+                sha=sha_arquivo,
+                branch=BRANCH
+            )
+            registrar_log(f"✅ Arquivo atualizado com sucesso: {path}")
+        else:
+            repo.create_file(
+                path=path,
+                message=f"Criando tarefas {ano}/{mes}",
+                content=conteudo,
+                branch=BRANCH
+            )
+            registrar_log(f"✅ Arquivo criado com sucesso: {path}")
+
         return True
+
     except Exception as e:
-        registrar_log(f"❌ Erro ao atualizar {path}: {e}")
+        erro_msg = f"❌ Erro ao salvar no GitHub: {e}"
+        st.error(erro_msg)
+        registrar_log(erro_msg)
         return False
+
 
 def contar_subtarefas_por_data(lista):
     contador = {}
