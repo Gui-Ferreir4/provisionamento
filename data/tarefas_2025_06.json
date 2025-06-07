@@ -88,5 +88,35 @@
         "Descrição": "oi",
         "Data Cadastro": "2025-06-07",
         "Data Entrega": "2025-06-20"
+    },
+    {
+        "ID Tarefa": "34",
+        "Título Tarefa": "teste",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_teste",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "oi",
+        "Data Cadastro": "2025-06-07",
+        "Data Entrega": "2025-06-18"
+    },
+    {
+        "ID Tarefa": "34",
+        "Título Tarefa": "teste",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_teste",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "oi",
+        "Data Cadastro": "2025-06-07",
+        "Data Entrega": "2025-06-19"
+    },
+    {
+        "ID Tarefa": "34",
+        "Título Tarefa": "teste",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_teste",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "oi",
+        "Data Cadastro": "2025-06-07",
+        "Data Entrega": "2025-06-20"
     }
 ]
