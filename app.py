@@ -355,17 +355,17 @@ with aba[2]:
                 
                         dados_filtrados.extend(novas_subs)
                 
-                        sucesso = sobrescrever_arquivo_github_sem_sha(ano, mes, dados_filtrados)
+                        sucesso = salvar_arquivo_github(ano_e, mes_e, dados_json)
                 
                         # Após sucesso:
-                        st.session_state["atualizacao_ok"] = True
-                        st.rerun()
-                        
-                        # Fora do form:
-                        if st.session_state.get("atualizacao_ok"):
-                            st.success("✅ Tarefa atualizada com sucesso!")
-                            registrar_log("🟢 Mensagem exibida após atualização")
-                            del st.session_state["atualizacao_ok"]
+                        if sucesso:
+                            st.success(f"✅ Tarefa '{titulo}' cadastrada com sucesso!")
+                            registrar_log(f"✅ Tarefa {novo_id} cadastrada no arquivo tarefas_{ano_e}_{mes_e}.json")
+                            st.rerun()
+                        else:
+                            st.error("❌ Erro ao salvar a tarefa.")
+                            registrar_log(f"❌ Falha ao cadastrar tarefa {novo_id} em tarefas_{ano_e}_{mes_e}.json")
+
 
 
 
