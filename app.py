@@ -135,6 +135,38 @@ def gerar_proximo_id_global():
         ids += [int(d["ID Tarefa"]) for d in dados if d["ID Tarefa"].isdigit()]
     return max(ids) + 1 if ids else 1
 
+def sobrescrever_arquivo_github_sem_sha(ano, mes, data):
+    g = Github(GITHUB_TOKEN)
+    repo = g.get_user().get_repo(GITHUB_REPO)
+    path = github_file_url(ano, mes)
+    conteudo = json.dumps(data, ensure_ascii=False, indent=4)
+
+    try:
+        arquivo = repo.get_contents(path, ref=BRANCH)
+        repo.delete_file(
+            path=path,
+            message=f"🗑️ Deletando arquivo antigo {path}",
+            sha=arquivo.sha,
+            branch=BRANCH
+        )
+        registrar_log(f"🗑️ Arquivo deletado: {path}")
+    except Exception as e:
+        registrar_log(f"⚠️ Nenhum arquivo anterior para deletar: {path} ({e})")
+
+    try:
+        repo.create_file(
+            path=path,
+            message=f"✅ Criando novo arquivo com tarefa atualizada {ano}/{mes}",
+            content=conteudo,
+            branch=BRANCH
+        )
+        registrar_log(f"✅ Novo arquivo criado: {path}")
+        return True
+    except Exception as e:
+        st.error(f"❌ Erro ao criar arquivo: {e}")
+        registrar_log(f"❌ Falha ao criar novo arquivo: {e}")
+        return False
+
 # Interface com abas
 st.set_page_config(page_title="Provisionador de Tarefas", layout="wide")
 st.title("🗂️ Provisionador de Tarefas")
@@ -323,7 +355,7 @@ with aba[2]:
                 
                         dados_filtrados.extend(novas_subs)
                 
-                        sucesso = salvar_arquivo_github(ano, mes, dados_filtrados)
+                        sucesso = sobrescrever_arquivo_github_sem_sha(ano, mes, dados_filtrados)
                 
                         if sucesso:
                             st.success(f"✅ Tarefa {id_editar} atualizada com sucesso!")
