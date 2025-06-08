@@ -209,68 +209,74 @@ with abas[2]:
                         atualizar = st.form_submit_button("💾 Atualizar Tarefa")
 
                 if atualizar:
+                    st.info("⏳ Iniciando processo de atualização da tarefa...")
+                
                     novos_tipos = []
                     if t1: novos_tipos.append("Texto")
                     if t2: novos_tipos.append("Layout")
                     if t3: novos_tipos.append("HTML")
-
+                
                     if not novos_tipos:
                         st.warning("⚠️ Selecione ao menos uma subtarefa.")
                     elif not eh_dia_util(nova_data):
                         st.error("❌ A data de entrega precisa ser um dia útil.")
                     else:
-                        registrar_log(f"🔁 Iniciando atualização da tarefa {id_editar}")
-
-                        # 1️⃣ Remove a tarefa antiga
-                        dados_filtrados = [d for d in dados_json if d["ID Tarefa"] != id_editar]
-                        registrar_log(f"🗑️ Tarefa {id_editar} removida do conteúdo local.")
-
-                        # 2️⃣ Recarrega o SHA atual do arquivo
-                        g = Github(GITHUB_TOKEN)
-                        repo = g.get_user().get_repo(GITHUB_REPO)
-                        caminho = github_file_url(ano, mes)
                         try:
+                            # Etapa 1: Carrega novamente o SHA atual do arquivo
+                            st.info("📂 Carregando conteúdo e SHA atual do arquivo...")
+                            g = Github(GITHUB_TOKEN)
+                            repo = g.get_user().get_repo(GITHUB_REPO)
+                            caminho = github_file_url(ano, mes)
                             arquivo = repo.get_contents(caminho, ref=BRANCH)
-                            sha_atual = arquivo.sha
-                            registrar_log(f"🔄 SHA recarregado: {sha_atual}")
-                        except Exception as e:
-                            st.error("❌ Erro ao recarregar SHA.")
-                            registrar_log(f"❌ Erro ao recarregar SHA: {e}")
-                            sha_atual = None
-
-                        # 3️⃣ Monta as novas subtarefas
-                        novas_subs = []
-                        dias_ajuste = len(novos_tipos) - 1
-                        for i, tipo in enumerate(sorted(novos_tipos, key=lambda x: ["Texto", "Layout", "HTML"].index(x))):
-                            base = retroceder_dias_uteis(nova_data, dias_ajuste - i) if dias_ajuste else nova_data
-                            data_final = encontrar_data_disponivel(base, tipo, dados_filtrados)
-                            novas_subs.append({
-                                "ID Tarefa": id_editar,
-                                "Título Tarefa": novo_titulo,
-                                "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
-                                "Título Subtarefa": f"{tipo}_{novo_titulo}",
-                                "Tipo Subtarefa": tipo,
-                                "Descrição": nova_desc,
-                                "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
-                                "Data Entrega": str(data_final)
-                            })
-
-                        dados_filtrados.extend(novas_subs)
-
-                        # 4️⃣ Grava novamente com SHA atualizado
-                        try:
+                            conteudo = json.loads(arquivo.decoded_content.decode())
+                            sha_arquivo = arquivo.sha
+                            registrar_log(f"📂 SHA carregado: {sha_arquivo}")
+                            st.success("✅ SHA carregado com sucesso.")
+                
+                            # Etapa 2: Remove tarefa existente
+                            st.info(f"🗑️ Removendo tarefa {id_editar} do conteúdo...")
+                            conteudo = [item for item in conteudo if item["ID Tarefa"] != id_editar]
+                            registrar_log(f"🗑️ Tarefa {id_editar} removida.")
+                
+                            # Etapa 3: Recria subtarefas da tarefa
+                            st.info("🔁 Recriando subtarefas com os novos dados...")
+                            novas_subs = []
+                            dias_ajuste = len(novos_tipos) - 1
+                            for i, tipo in enumerate(sorted(novos_tipos, key=lambda x: ["Texto", "Layout", "HTML"].index(x))):
+                                base = retroceder_dias_uteis(nova_data, dias_ajuste - i) if dias_ajuste else nova_data
+                                data_final = encontrar_data_disponivel(base, tipo, conteudo)
+                                novas_subs.append({
+                                    "ID Tarefa": id_editar,
+                                    "Título Tarefa": novo_titulo,
+                                    "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo) + 1),
+                                    "Título Subtarefa": f"{tipo}_{novo_titulo}",
+                                    "Tipo Subtarefa": tipo,
+                                    "Descrição": nova_desc,
+                                    "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
+                                    "Data Entrega": str(data_final)
+                                })
+                
+                            conteudo.extend(novas_subs)
+                            registrar_log(f"➕ {len(novas_subs)} subtarefas adicionadas para {id_editar}.")
+                
+                            # Etapa 4: Grava o arquivo com update_file
+                            st.info("💾 Gravando conteúdo atualizado no GitHub...")
                             repo.update_file(
                                 path=caminho,
-                                message=f"Atualização da tarefa {id_editar}",
-                                content=json.dumps(dados_filtrados, ensure_ascii=False, indent=4),
-                                sha=sha_atual,
+                                message=f"Atualizando tarefa {id_editar}",
+                                content=json.dumps(conteudo, ensure_ascii=False, indent=4),
+                                sha=sha_arquivo,
                                 branch=BRANCH
                             )
+                
                             st.success("✅ Tarefa atualizada com sucesso!")
-                            registrar_log(f"✅ Tarefa {id_editar} atualizada no GitHub.")
+                            registrar_log(f"✅ Tarefa {id_editar} atualizada no GitHub em {caminho}.")
+                
                         except Exception as e:
-                            st.error(f"❌ Erro ao atualizar tarefa: {e}")
-                            registrar_log(f"❌ Falha ao atualizar tarefa {id_editar}: {e}")
+                            erro_msg = f"❌ Erro durante atualização: {e}"
+                            st.error(erro_msg)
+                            registrar_log(erro_msg)
+
 
 # --- ABA LOG ---
 with abas[3]:
