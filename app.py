@@ -357,13 +357,15 @@ with aba[2]:
                 
                         sucesso = sobrescrever_arquivo_github_sem_sha(ano, mes, dados_filtrados)
                 
-                        if sucesso:
-                            st.success(f"✅ Tarefa {id_editar} atualizada com sucesso!")
-                            registrar_log(f"✅ Tarefa {id_editar} atualizada no arquivo tarefas_{ano}_{mes}.json")
-                            st.rerun()
-                        else:
-                            st.error("❌ Falha ao atualizar a tarefa.")
-                            registrar_log(f"❌ Erro ao atualizar tarefa {id_editar} no arquivo tarefas_{ano}_{mes}.json")
+                        # Após sucesso:
+                        st.session_state["atualizacao_ok"] = True
+                        st.rerun()
+                        
+                        # Fora do form:
+                        if st.session_state.get("atualizacao_ok"):
+                            st.success("✅ Tarefa atualizada com sucesso!")
+                            registrar_log("🟢 Mensagem exibida após atualização")
+                            del st.session_state["atualizacao_ok"]
 
 
 
