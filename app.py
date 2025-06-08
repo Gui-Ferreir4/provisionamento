@@ -293,8 +293,12 @@ with aba[2]:
                         st.error("❌ A data de entrega precisa ser um dia útil.")
                     else:
                         novos_tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
-                        dados_filtrados = [d for d in dados_json if d["ID Tarefa"] != id_editar]
                 
+                        # 1️⃣ DELETA a tarefa atual
+                        dados_filtrados = [d for d in dados_json if d["ID Tarefa"] != id_editar]
+                        registrar_log(f"🗑️ Tarefa {id_editar} removida do arquivo antes de atualização.")
+                
+                        # 2️⃣ CADASTRA novamente como se fosse nova
                         datas_subs = {}
                         dias_ajuste = len(novos_tipos) - 1
                         for i, tipo in enumerate(novos_tipos):
@@ -317,16 +321,16 @@ with aba[2]:
                 
                         dados_filtrados.extend(novas_subs)
                 
-                        # Usa a função unificada de gravação
                         sucesso = salvar_arquivo_github(ano, mes, dados_filtrados)
                 
                         if sucesso:
                             st.success(f"✅ Tarefa {id_editar} atualizada com sucesso!")
-                            registrar_log(f"✅ Tarefa {id_editar} atualizada com sucesso no arquivo {path_arquivo}")
+                            registrar_log(f"✅ Tarefa {id_editar} atualizada no arquivo tarefas_{ano}_{mes}.json")
                             st.rerun()
                         else:
-                            st.error("❌ Falha ao salvar a atualização.")
-                            registrar_log(f"❌ Falha ao atualizar tarefa {id_editar} no arquivo {path_arquivo}")
+                            st.error("❌ Falha ao atualizar a tarefa.")
+                            registrar_log(f"❌ Erro ao atualizar tarefa {id_editar} no arquivo tarefas_{ano}_{mes}.json")
+
 
 
 # --- Aba LOG ---
