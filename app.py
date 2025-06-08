@@ -62,23 +62,25 @@ def carregar_json_github(ano, mes):
         return json.loads(content), response.json()["sha"]
     return [], None
 
-def salvar_arquivo_github(ano, mes, data):
+def salvar_arquivo_github(ano, mes, data, sha_override=None):
     try:
         g = Github(GITHUB_TOKEN)
         repo = g.get_user().get_repo(GITHUB_REPO)
         path = github_file_url(ano, mes)
         conteudo = json.dumps(data, ensure_ascii=False, indent=4)
 
-        # Buscar SHA mais atual do arquivo
-        try:
-            arquivo = repo.get_contents(path, ref=BRANCH)
-            sha_arquivo = arquivo.sha
-            registrar_log(f"🔄 Atualizando arquivo existente: {path} (SHA: {sha_arquivo})")
-        except Exception as e:
-            registrar_log(f"⚠️ Arquivo {path} não existe no GitHub. Será criado.")
-            sha_arquivo = None
+        if sha_override:
+            sha_arquivo = sha_override
+            registrar_log(f"🔄 Atualizando com SHA fornecido: {sha_arquivo}")
+        else:
+            try:
+                arquivo = repo.get_contents(path, ref=BRANCH)
+                sha_arquivo = arquivo.sha
+                registrar_log(f"🔄 Atualizando arquivo existente: {path} (SHA: {sha_arquivo})")
+            except Exception as e:
+                registrar_log(f"⚠️ Arquivo {path} não existe. Será criado.")
+                sha_arquivo = None
 
-        # Atualizar ou criar arquivo
         if sha_arquivo:
             repo.update_file(
                 path=path,
@@ -321,7 +323,7 @@ with aba[2]:
                 
                         dados_filtrados.extend(novas_subs)
                 
-                        sucesso = salvar_arquivo_github(ano, mes, dados_filtrados)
+                        sucesso = salvar_arquivo_github(ano, mes, dados_filtrados, sha_override=sha_atual)
                 
                         if sucesso:
                             st.success(f"✅ Tarefa {id_editar} atualizada com sucesso!")
