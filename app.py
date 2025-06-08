@@ -323,7 +323,7 @@ with aba[2]:
                 
                         dados_filtrados.extend(novas_subs)
                 
-                        sucesso = salvar_arquivo_github(ano, mes, dados_filtrados, sha_override=sha_atual)
+                        sucesso = salvar_arquivo_github(ano, mes, dados_filtrados)
                 
                         if sucesso:
                             st.success(f"✅ Tarefa {id_editar} atualizada com sucesso!")
