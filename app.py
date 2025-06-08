@@ -196,7 +196,7 @@ with abas[2]:
                 tipos_atuais = {t["Tipo Subtarefa"] for t in tarefas}
                 datas_atuais = [datetime.strptime(t["Data Entrega"], "%Y-%m-%d").date() for t in tarefas]
 
-                with st.form("form_edicao_tarefa"):
+                with st.form("form_edicao_tarefa", clear_on_submit=False):
                     col1, col2, col3 = st.columns([1, 4, 1])
                     with col2:
                         novo_titulo = st.text_input("Título da Tarefa", value=titulo_antigo)
@@ -206,10 +206,13 @@ with abas[2]:
                         t2 = st.checkbox("🎨 Layout", value="Layout" in tipos_atuais)
                         t3 = st.checkbox("💻 HTML", value="HTML" in tipos_atuais)
                         nova_data = st.date_input("Nova data de entrega", value=max(datas_atuais))
-                        atualizar = st.form_submit_button("💾 Atualizar Tarefa")
-
+                
+                # Botão fora do form
+                atualizar = st.button("💾 Atualizar Tarefa")
+                
+                # Execução da lógica fora do form
                 if atualizar:
-                    st.info("⏳ Iniciando processo de atualização da tarefa...")
+                    st.info("⏳ Iniciando atualização da tarefa...")
                 
                     novos_tipos = []
                     if t1: novos_tipos.append("Texto")
@@ -222,24 +225,21 @@ with abas[2]:
                         st.error("❌ A data de entrega precisa ser um dia útil.")
                     else:
                         try:
-                            # Etapa 1: Carrega novamente o SHA atual do arquivo
-                            st.info("📂 Carregando conteúdo e SHA atual do arquivo...")
+                            # Etapa 1: carrega SHA atual
                             g = Github(GITHUB_TOKEN)
                             repo = g.get_user().get_repo(GITHUB_REPO)
                             caminho = github_file_url(ano, mes)
                             arquivo = repo.get_contents(caminho, ref=BRANCH)
                             conteudo = json.loads(arquivo.decoded_content.decode())
                             sha_arquivo = arquivo.sha
-                            registrar_log(f"📂 SHA carregado: {sha_arquivo}")
+                            registrar_log(f"📂 SHA atualizado: {sha_arquivo}")
                             st.success("✅ SHA carregado com sucesso.")
                 
-                            # Etapa 2: Remove tarefa existente
-                            st.info(f"🗑️ Removendo tarefa {id_editar} do conteúdo...")
+                            # Etapa 2: remove tarefa antiga
                             conteudo = [item for item in conteudo if item["ID Tarefa"] != id_editar]
                             registrar_log(f"🗑️ Tarefa {id_editar} removida.")
                 
-                            # Etapa 3: Recria subtarefas da tarefa
-                            st.info("🔁 Recriando subtarefas com os novos dados...")
+                            # Etapa 3: monta novas subtarefas
                             novas_subs = []
                             dias_ajuste = len(novos_tipos) - 1
                             for i, tipo in enumerate(sorted(novos_tipos, key=lambda x: ["Texto", "Layout", "HTML"].index(x))):
@@ -248,7 +248,7 @@ with abas[2]:
                                 novas_subs.append({
                                     "ID Tarefa": id_editar,
                                     "Título Tarefa": novo_titulo,
-                                    "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo) + 1),
+                                    "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
                                     "Título Subtarefa": f"{tipo}_{novo_titulo}",
                                     "Tipo Subtarefa": tipo,
                                     "Descrição": nova_desc,
@@ -257,10 +257,8 @@ with abas[2]:
                                 })
                 
                             conteudo.extend(novas_subs)
-                            registrar_log(f"➕ {len(novas_subs)} subtarefas adicionadas para {id_editar}.")
                 
-                            # Etapa 4: Grava o arquivo com update_file
-                            st.info("💾 Gravando conteúdo atualizado no GitHub...")
+                            # Etapa 4: grava com update_file
                             repo.update_file(
                                 path=caminho,
                                 message=f"Atualizando tarefa {id_editar}",
@@ -270,10 +268,10 @@ with abas[2]:
                             )
                 
                             st.success("✅ Tarefa atualizada com sucesso!")
-                            registrar_log(f"✅ Tarefa {id_editar} atualizada no GitHub em {caminho}.")
+                            registrar_log(f"✅ Tarefa {id_editar} atualizada no GitHub com SHA {sha_arquivo}.")
                 
                         except Exception as e:
-                            erro_msg = f"❌ Erro durante atualização: {e}"
+                            erro_msg = f"❌ Erro ao atualizar: {e}"
                             st.error(erro_msg)
                             registrar_log(erro_msg)
 
