@@ -198,15 +198,17 @@ with abas[0]:
                 tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
                 novas = []
                 alertas_total = []
-
                 dias = len(tipos) - 1
+                bloquear = False
+                
                 for i, tipo in enumerate(tipos):
                     base = retroceder_dias_uteis(data_entrega, dias - i) if dias > 0 else data_entrega
                     data_validada, alertas = encontrar_data_disponivel(base, tipo, dados_json, data_entrega)
                 
                     if data_validada is None:
-                        st.error(f"❌ Subtarefa '{tipo}' não pôde ser agendada. Verifique o mês da entrega.")
-                        registrar_log(f"❌ Subtarefa '{tipo}' rejeitada: {alertas}")
+                        st.error(f"❌ Subtarefa '{tipo}' não pôde ser agendada. Verifique o mês ou restrições da data.")
+                        registrar_log(f"❌ Subtarefa '{tipo}' rejeitada. Motivo: {alertas}")
+                        bloquear = True
                         break
                 
                     novas.append({
@@ -220,13 +222,13 @@ with abas[0]:
                         "Data Entrega": str(data_validada)
                     })
                     alertas_total.extend(alertas)
-
-                if len(novas) == len(tipos):
+                
+                if not bloquear and len(novas) == len(tipos):
                     dados_json.extend(novas)
                     if salvar_arquivo_github(ano, mes, dados_json):
                         st.success("✅ Tarefa cadastrada com sucesso!")
                         registrar_log(f"✅ Cadastro tarefa {novo_id} em tarefas_{ano}_{mes}.json")
-
+                
                 for a in alertas_total:
                     st.warning(a)
 
@@ -274,16 +276,18 @@ with abas[0]:
                             novas_subs = []
                             alertas_total = []
                             dias = len(novos_tipos) - 1
-
+                            bloquear = False
+                            
                             for i, tipo in enumerate(sorted(novos_tipos, key=lambda x: ["Texto", "Layout", "HTML"].index(x))):
-                                base = retroceder_dias_uteis(nova_data, dias - i) if dias else nova_data
-                                nova_data_final, alertas = encontrar_data_disponivel(base, tipo, dados_filtrados, nova_data)
-
-                                if not nova_data_final:
-                                    st.error(f"❌ Não foi possível agendar subtarefa '{tipo}'.")
-                                    registrar_log(f"❌ Subtarefa '{tipo}' não gerada. Motivo: {alertas}")
+                                base = retroceder_dias_uteis(nova_data, dias - i) if dias > 0 else nova_data
+                                data_validada, alertas = encontrar_data_disponivel(base, tipo, dados_filtrados, nova_data)
+                            
+                                if data_validada is None:
+                                    st.error(f"❌ Subtarefa '{tipo}' não pôde ser agendada. Verifique o mês ou restrições.")
+                                    registrar_log(f"❌ Subtarefa '{tipo}' rejeitada. Motivo: {alertas}")
+                                    bloquear = True
                                     break
-
+                            
                                 novas_subs.append({
                                     "ID Tarefa": id_editar,
                                     "Título Tarefa": novo_titulo,
@@ -292,16 +296,16 @@ with abas[0]:
                                     "Tipo Subtarefa": tipo,
                                     "Descrição": nova_desc,
                                     "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
-                                    "Data Entrega": str(nova_data_final)
+                                    "Data Entrega": str(data_validada)
                                 })
                                 alertas_total.extend(alertas)
-
-                            if len(novas_subs) == len(novos_tipos):
+                            
+                            if not bloquear and len(novas_subs) == len(novos_tipos):
                                 dados_filtrados.extend(novas_subs)
                                 if salvar_arquivo_github(ano, mes, dados_filtrados):
                                     st.success("✅ Tarefa atualizada com sucesso!")
                                     registrar_log(f"✅ Tarefa {id_editar} atualizada em {ano}/{mes}")
-
+                            
                             for a in alertas_total:
                                 st.warning(a)
 
