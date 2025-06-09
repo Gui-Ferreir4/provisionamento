@@ -147,70 +147,70 @@ abas = st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📜 LOG"])
 
 # --- ABA UNIFICADA ---
 with abas[0]:
-        st.markdown("---")
-        st.markdown("### 🆕 Cadastrar Nova Tarefa")
+    st.markdown("---")
+    st.markdown("### 🆕 Cadastrar Nova Tarefa")
 
-        novo_id = gerar_proximo_id()
+    novo_id = gerar_proximo_id()
 
-        with col2:
-            with st.form("form_cadastro"):
-                titulo = st.text_input("Título da Tarefa")
-                descricao = st.text_area("Descrição", height=80)
-                st.markdown("**Subtarefas:**")
-                t = st.checkbox("📝 Texto", value=True)
-                l = st.checkbox("🎨 Layout", value=True)
-                h = st.checkbox("💻 HTML", value=True)
-                hoje = date.today()
-                data_entrega = st.date_input("Data Final", value=hoje + timedelta(days=1), min_value=hoje)
-                cadastrar = st.form_submit_button("💾 Cadastrar")
+    with col2:
+        with st.form("form_cadastro"):
+            titulo = st.text_input("Título da Tarefa")
+            descricao = st.text_area("Descrição", height=80)
+            st.markdown("**Subtarefas:**")
+            t = st.checkbox("📝 Texto", value=True)
+            l = st.checkbox("🎨 Layout", value=True)
+            h = st.checkbox("💻 HTML", value=True)
+            hoje = date.today()
+            data_entrega = st.date_input("Data Final", value=hoje + timedelta(days=1), min_value=hoje)
+            cadastrar = st.form_submit_button("💾 Cadastrar")
 
-        if cadastrar:
-            if not (t or l or h):
-                st.warning("⚠️ Marque pelo menos uma subtarefa.")
-            elif data_entrega < date.today():
-                st.error("❌ A data final não pode ser anterior a hoje.")
-            else:
-                tipos = []
-                if t: tipos.append("Texto")
-                if l: tipos.append("Layout")
-                if h: tipos.append("HTML")
+    if cadastrar:
+        if not (t or l or h):
+            st.warning("⚠️ Marque pelo menos uma subtarefa.")
+        elif data_entrega < date.today():
+            st.error("❌ A data final não pode ser anterior a hoje.")
+        else:
+            tipos = []
+            if t: tipos.append("Texto")
+            if l: tipos.append("Layout")
+            if h: tipos.append("HTML")
 
-                tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
-                novas = []
-                alertas_total = []
-                dias = len(tipos) - 1
-                bloquear = False
-                
-                for i, tipo in enumerate(tipos):
-                    base = retroceder_dias_uteis(data_entrega, dias - i) if dias > 0 else data_entrega
-                    data_validada, alertas = encontrar_data_disponivel(base, tipo, dados_json, data_entrega)
-                
-                    if data_validada is None:
-                        st.error(f"❌ Subtarefa '{tipo}' não pôde ser agendada. Verifique o mês ou restrições da data.")
-                        registrar_log(f"❌ Subtarefa '{tipo}' rejeitada. Motivo: {alertas}")
-                        bloquear = True
-                        break
-                
-                    novas.append({
-                        "ID Tarefa": str(novo_id),
-                        "Título Tarefa": titulo,
-                        "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
-                        "Título Subtarefa": f"{tipo}_{titulo}",
-                        "Tipo Subtarefa": tipo,
-                        "Descrição": descricao,
-                        "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
-                        "Data Entrega": str(data_validada)
-                    })
-                    alertas_total.extend(alertas)
-                
-                if not bloquear and len(novas) == len(tipos):
-                    dados_json.extend(novas)
-                    if salvar_arquivo_github(ano, mes, dados_json):
-                        st.success("✅ Tarefa cadastrada com sucesso!")
-                        registrar_log(f"✅ Cadastro tarefa {novo_id} em tarefas_{ano}_{mes}.json")
-                
-                for a in alertas_total:
-                    st.warning(a)
+            tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
+            novas = []
+            alertas_total = []
+            dias = len(tipos) - 1
+            bloquear = False
+            
+            for i, tipo in enumerate(tipos):
+                base = retroceder_dias_uteis(data_entrega, dias - i) if dias > 0 else data_entrega
+                data_validada, alertas = encontrar_data_disponivel(base, tipo, dados_json, data_entrega)
+            
+                if data_validada is None:
+                    st.error(f"❌ Subtarefa '{tipo}' não pôde ser agendada. Verifique o mês ou restrições da data.")
+                    registrar_log(f"❌ Subtarefa '{tipo}' rejeitada. Motivo: {alertas}")
+                    bloquear = True
+                    break
+            
+                novas.append({
+                    "ID Tarefa": str(novo_id),
+                    "Título Tarefa": titulo,
+                    "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
+                    "Título Subtarefa": f"{tipo}_{titulo}",
+                    "Tipo Subtarefa": tipo,
+                    "Descrição": descricao,
+                    "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
+                    "Data Entrega": str(data_validada)
+                })
+                alertas_total.extend(alertas)
+            
+            if not bloquear and len(novas) == len(tipos):
+                dados_json.extend(novas)
+                if salvar_arquivo_github(ano, mes, dados_json):
+                    st.success("✅ Tarefa cadastrada com sucesso!")
+                    registrar_log(f"✅ Cadastro tarefa {novo_id} em tarefas_{ano}_{mes}.json")
+            
+            for a in alertas_total:
+                st.warning(a)
 
 
     # --- ABA CONSULTA ---
