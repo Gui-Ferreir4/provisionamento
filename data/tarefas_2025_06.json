@@ -108,5 +108,15 @@
         "Descrição": "aaaaaaaaaaaaaa",
         "Data Cadastro": "2025-06-09",
         "Data Entrega": "2025-07-16"
+    },
+    {
+        "ID Tarefa": "35",
+        "Título Tarefa": "Jornada Bolo COOP",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Jornada Bolo COOP",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "oii",
+        "Data Cadastro": "2025-06-09",
+        "Data Entrega": "2025-06-09"
     }
 ]
