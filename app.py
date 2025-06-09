@@ -202,13 +202,13 @@ with abas[0]:
                 dias = len(tipos) - 1
                 for i, tipo in enumerate(tipos):
                     base = retroceder_dias_uteis(data_entrega, dias - i) if dias > 0 else data_entrega
-                    data_final, alertas = encontrar_data_disponivel(base, tipo, dados_json, data_entrega)
-
-                    if not data_final:
-                        st.error(f"❌ Subtarefa '{tipo}' não pôde ser agendada. Verifique as restrições.")
-                        registrar_log(f"❌ Subtarefa '{tipo}' não gerada. Motivo: {alertas}")
+                    data_validada, alertas = encontrar_data_disponivel(base, tipo, dados_json, data_entrega)
+                
+                    if data_validada is None:
+                        st.error(f"❌ Subtarefa '{tipo}' não pôde ser agendada. Verifique o mês da entrega.")
+                        registrar_log(f"❌ Subtarefa '{tipo}' rejeitada: {alertas}")
                         break
-
+                
                     novas.append({
                         "ID Tarefa": str(novo_id),
                         "Título Tarefa": titulo,
@@ -217,7 +217,7 @@ with abas[0]:
                         "Tipo Subtarefa": tipo,
                         "Descrição": descricao,
                         "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
-                        "Data Entrega": str(data_final)
+                        "Data Entrega": str(data_validada)
                     })
                     alertas_total.extend(alertas)
 
