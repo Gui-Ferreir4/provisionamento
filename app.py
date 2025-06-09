@@ -55,20 +55,38 @@ def salvar_arquivo_github(ano, mes, data):
         repo = g.get_user().get_repo(GITHUB_REPO)
         path = github_file_url(ano, mes)
         conteudo = json.dumps(data, ensure_ascii=False, indent=4)
-        arquivo = repo.get_contents(path, ref=BRANCH)
-        repo.update_file(
-            path=path,
-            message=f"Atualizando tarefas {ano}/{mes}",
-            content=conteudo,
-            sha=arquivo.sha,
-            branch=BRANCH
-        )
-        registrar_log(f"✅ Arquivo atualizado: {path}")
+
+        try:
+            arquivo = repo.get_contents(path, ref=BRANCH)
+            sha = arquivo.sha
+            repo.update_file(
+                path=path,
+                message=f"Atualizando tarefas {ano}/{mes}",
+                content=conteudo,
+                sha=sha,
+                branch=BRANCH
+            )
+            registrar_log(f"✅ Arquivo atualizado: {path}")
+        except Exception as e:
+            if "404" in str(e):
+                repo.create_file(
+                    path=path,
+                    message=f"Criando novo arquivo tarefas_{ano}_{mes}.json",
+                    content=conteudo,
+                    branch=BRANCH
+                )
+                registrar_log(f"📄 Novo arquivo criado: {path}")
+            else:
+                raise e
+
         return True
+
     except Exception as e:
-        registrar_log(f"❌ Erro ao atualizar: {e}")
+        erro_msg = f"❌ Erro ao salvar no GitHub: {e}"
         st.error(f"Erro: {e}")
+        registrar_log(erro_msg)
         return False
+
 
 def encontrar_data_disponivel(data_base, subtipo, dados):
     while True:
