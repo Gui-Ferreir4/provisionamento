@@ -116,7 +116,7 @@ with abas[0]:
     novo_id = gerar_proximo_id()
 
     with st.form("form_cadastro"):
-        col1, col2, col3, col4 = st.columns([1, 3, 3, 1])
+        col1, col2, col3 = st.columns([1, 4, 1])
         with col2:
             titulo = st.text_input("Título da Tarefa")
             descricao = st.text_area("Descrição", height=80)
