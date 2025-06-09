@@ -108,7 +108,7 @@ def gerar_proximo_id():
 st.set_page_config("Provisionador de Tarefas", layout="wide")
 st.title("🧩 Provisionador de Tarefas")
 
-abas = st.tabs(["📋 Cadastro", "🔍 Consulta", "✏️ Edição", "📜 LOG"])
+abas = st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📜 LOG"])
 
 # --- ABA CADASTRO ---
 with abas[0]:
@@ -163,7 +163,7 @@ with abas[0]:
                 registrar_log(f"✅ Cadastro tarefa {novo_id} em tarefas_{ano}_{mes}.json")
 
 # --- ABA UNIFICADA: 📋 Tarefas Cadastradas ---
-with st.tabs(["📋 Tarefas Cadastradas", "🔍 Consulta", "📜 LOG"])[0]:
+with abas[2]:
     st.header("📋 Tarefas Cadastradas")
 
     arquivos = listar_arquivos_json()
