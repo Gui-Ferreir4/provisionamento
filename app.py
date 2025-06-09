@@ -186,49 +186,49 @@ with abas[1]:
 
         st.markdown("---")
         st.markdown("### ✏️ Editar Tarefa")
-        with col2:
-            id_editar = st.text_input("🔍 Digite o ID da Tarefa que deseja editar:")
-
-        if id_editar:
-            tarefas = [t for t in dados_json if t["ID Tarefa"] == id_editar]
-
-            if not tarefas:
-                with col2:
-                    st.warning(f"❌ Nenhuma tarefa encontrada com ID {id_editar}.")
-                    registrar_log(f"⚠️ ID {id_editar} não localizado em tarefas_{ano}_{mes}.json")
-            else:
-                ref = tarefas[0]
-                titulo_antigo = ref["Título Tarefa"]
-                descricao_antiga = ref.get("Descrição", "")
-                tipos_atuais = {t["Tipo Subtarefa"] for t in tarefas}
-                datas_atuais = [datetime.strptime(t["Data Entrega"], "%Y-%m-%d").date() for t in tarefas]
-
-                with col2:
-                    novo_titulo = st.text_input("Novo Título", value=titulo_antigo)
-                    nova_desc = st.text_area("Nova Descrição", value=descricao_antiga, height=80)
-                    st.markdown("**Subtarefas:**")
-                    t1 = st.checkbox("📝 Texto", value="Texto" in tipos_atuais)
-                    t2 = st.checkbox("🎨 Layout", value="Layout" in tipos_atuais)
-                    t3 = st.checkbox("💻 HTML", value="HTML" in tipos_atuais)
-                    nova_data = st.date_input("Nova Data de Entrega", value=max(datas_atuais))
-
-                with col2:
-                    if st.button("💾 Confirmar Atualização"):
-                        st.session_state["edicao_pendente"] = {
-                            "id": id_editar,
-                            "ano": ano,
-                            "mes": mes,
-                            "titulo": novo_titulo,
-                            "descricao": nova_desc,
-                            "tipos": {
-                                "Texto": t1,
-                                "Layout": t2,
-                                "HTML": t3
-                            },
-                            "data_final": nova_data.isoformat(),
-                            "original": dados_json
-                        }
-                        st.success("✅ Dados carregados para atualização. Role abaixo e confirme.")
+            with col2:
+                id_editar = st.text_input("🔍 Digite o ID da Tarefa que deseja editar:")
+    
+            if id_editar:
+                tarefas = [t for t in dados_json if t["ID Tarefa"] == id_editar]
+    
+                if not tarefas:
+                    with col2:
+                        st.warning(f"❌ Nenhuma tarefa encontrada com ID {id_editar}.")
+                        registrar_log(f"⚠️ ID {id_editar} não localizado em tarefas_{ano}_{mes}.json")
+                else:
+                    ref = tarefas[0]
+                    titulo_antigo = ref["Título Tarefa"]
+                    descricao_antiga = ref.get("Descrição", "")
+                    tipos_atuais = {t["Tipo Subtarefa"] for t in tarefas}
+                    datas_atuais = [datetime.strptime(t["Data Entrega"], "%Y-%m-%d").date() for t in tarefas]
+    
+                    with col2:
+                        novo_titulo = st.text_input("Novo Título", value=titulo_antigo)
+                        nova_desc = st.text_area("Nova Descrição", value=descricao_antiga, height=80)
+                        st.markdown("**Subtarefas:**")
+                        t1 = st.checkbox("📝 Texto", value="Texto" in tipos_atuais)
+                        t2 = st.checkbox("🎨 Layout", value="Layout" in tipos_atuais)
+                        t3 = st.checkbox("💻 HTML", value="HTML" in tipos_atuais)
+                        nova_data = st.date_input("Nova Data de Entrega", value=max(datas_atuais))
+    
+                    with col2:
+                        if st.button("💾 Confirmar Atualização"):
+                            st.session_state["edicao_pendente"] = {
+                                "id": id_editar,
+                                "ano": ano,
+                                "mes": mes,
+                                "titulo": novo_titulo,
+                                "descricao": nova_desc,
+                                "tipos": {
+                                    "Texto": t1,
+                                    "Layout": t2,
+                                    "HTML": t3
+                                },
+                                "data_final": nova_data.isoformat(),
+                                "original": dados_json
+                            }
+                            st.success("✅ Dados carregados para atualização. Role abaixo e confirme.")
 
         if "edicao_pendente" in st.session_state:
             st.markdown("### 🚀 Finalizar Atualização da Tarefa")
