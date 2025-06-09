@@ -163,7 +163,7 @@ with abas[0]:
                 registrar_log(f"✅ Cadastro tarefa {novo_id} em tarefas_{ano}_{mes}.json")
 
 # --- ABA UNIFICADA: 📋 Tarefas Cadastradas ---
-with abas[2]:
+with abas[1]:
     st.header("📋 Tarefas Cadastradas")
 
     arquivos = listar_arquivos_json()
@@ -296,10 +296,8 @@ with abas[2]:
                         st.error(f"❌ Erro: {e}")
                         registrar_log(f"❌ Erro na atualização da tarefa {id_editar}: {e}")
 
-
-
 # --- ABA LOG ---
-with abas[3]:
+with abas[2]:
     st.header("📜 LOG do Sistema")
 
     if not st.session_state.log:
