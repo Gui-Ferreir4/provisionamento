@@ -48,5 +48,35 @@
         "Descrição": "1",
         "Data Cadastro": "2025-06-09",
         "Data Entrega": "2025-07-01"
+    },
+    {
+        "ID Tarefa": "39",
+        "Título Tarefa": "teste mes",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_teste mes",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "1111",
+        "Data Cadastro": "2025-06-09",
+        "Data Entrega": "2025-06-27"
+    },
+    {
+        "ID Tarefa": "39",
+        "Título Tarefa": "teste mes",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_teste mes",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "1111",
+        "Data Cadastro": "2025-06-09",
+        "Data Entrega": "2025-06-30"
+    },
+    {
+        "ID Tarefa": "39",
+        "Título Tarefa": "teste mes",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_teste mes",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "1111",
+        "Data Cadastro": "2025-06-09",
+        "Data Entrega": "2025-07-01"
     }
 ]
