@@ -198,7 +198,7 @@ with abas[2]:
                     tipos_atuais = {t["Tipo Subtarefa"] for t in tarefas}
                     st.markdown("**Subtarefas Ativas:**")
                     t1 = st.checkbox("📝 Texto", value="Texto" in tipos_atuais)
-                    t2 = st.checkbox("🎨 Layout", value="Layout" in tipos_atuis)
+                    t2 = st.checkbox("🎨 Layout", value="Layout" in tipos_atuais)
                     t3 = st.checkbox("💻 HTML", value="HTML" in tipos_atuais)
 
                     datas_atuais = [datetime.strptime(t["Data Entrega"], "%Y-%m-%d").date() for t in tarefas]
