@@ -184,8 +184,8 @@ with abas[1]:
             else:
                 st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
 
-        st.markdown("---")
-        st.markdown("### ✏️ Editar Tarefa")
+    st.markdown("---")
+    st.markdown("### ✏️ Editar Tarefa")
         with col2:
             id_editar = st.text_input("🔍 Digite o ID da Tarefa que deseja editar:")
 
