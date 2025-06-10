@@ -118,5 +118,35 @@
         "Descrição": "Ola",
         "Data Cadastro": "2025-06-10",
         "Data Entrega": "2025-11-24"
+    },
+    {
+        "ID Tarefa": "57",
+        "Título Tarefa": "clube-de-beneficios-estimulo-upgrade-2-com-pontosv2",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_clube-de-beneficios-estimulo-upgrade-2-com-pontosv2",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "Ola",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-19"
+    },
+    {
+        "ID Tarefa": "57",
+        "Título Tarefa": "clube-de-beneficios-estimulo-upgrade-2-com-pontosv2",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_clube-de-beneficios-estimulo-upgrade-2-com-pontosv2",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "Ola",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-21"
+    },
+    {
+        "ID Tarefa": "57",
+        "Título Tarefa": "clube-de-beneficios-estimulo-upgrade-2-com-pontosv2",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_clube-de-beneficios-estimulo-upgrade-2-com-pontosv2",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "Ola",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-24"
     }
 ]
