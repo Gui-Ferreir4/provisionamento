@@ -32,22 +32,29 @@ def retroceder_dias_uteis(d, dias):
     return d
 
 def github_file_url(ano, mes):
-    return f"data/tarefas_{ano}_{mes}.json"
+    return f"docs/data/tarefas_{ano}_{mes}.json"
 
 def listar_arquivos_json():
-    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/data"
+    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/docs/data?ref={BRANCH}"
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
     r = requests.get(url, headers=headers)
-    return [f["name"] for f in r.json() if f["name"].endswith(".json")] if r.status_code == 200 else []
+    if r.status_code == 200:
+        return [f["name"] for f in r.json() if f["name"].endswith(".json")]
+    else:
+        print(f"Erro ao listar arquivos: {r.status_code} - {r.text}")
+        return []
 
 def carregar_json_github(ano, mes):
-    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{github_file_url(ano, mes)}"
+    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{github_file_url(ano, mes)}?ref={BRANCH}"
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
     r = requests.get(url, headers=headers)
     if r.status_code == 200:
         content = base64.b64decode(r.json()["content"])
         return json.loads(content), r.json()["sha"]
-    return [], None
+    else:
+        print(f"Erro ao carregar JSON: {r.status_code} - {r.text}")
+        return [], None
+
 
 def salvar_arquivo_github(ano, mes, data):
     try:
