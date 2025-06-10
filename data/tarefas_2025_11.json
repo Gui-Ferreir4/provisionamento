@@ -418,5 +418,35 @@
         "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
         "Data Cadastro": "2025-06-10",
         "Data Entrega": "2025-11-19"
+    },
+    {
+        "ID Tarefa": "68",
+        "Título Tarefa": "prospecao_bemvindo",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_prospecao_bemvindo",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-17"
+    },
+    {
+        "ID Tarefa": "68",
+        "Título Tarefa": "prospecao_bemvindo",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_prospecao_bemvindo",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-18"
+    },
+    {
+        "ID Tarefa": "68",
+        "Título Tarefa": "prospecao_bemvindo",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_prospecao_bemvindo",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-19"
     }
 ]
