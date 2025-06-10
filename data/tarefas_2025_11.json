@@ -58,5 +58,35 @@
         "Descrição": "Ola",
         "Data Cadastro": "2025-06-10",
         "Data Entrega": "2025-11-24"
+    },
+    {
+        "ID Tarefa": "55",
+        "Título Tarefa": "Produtos_Carrinho_Abandonado_ESTEE",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Produtos_Carrinho_Abandonado_ESTEE",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "Ola",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-19"
+    },
+    {
+        "ID Tarefa": "55",
+        "Título Tarefa": "Produtos_Carrinho_Abandonado_ESTEE",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Produtos_Carrinho_Abandonado_ESTEE",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "Ola",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-21"
+    },
+    {
+        "ID Tarefa": "55",
+        "Título Tarefa": "Produtos_Carrinho_Abandonado_ESTEE",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Produtos_Carrinho_Abandonado_ESTEE",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "Ola",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-24"
     }
 ]
