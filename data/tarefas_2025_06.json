@@ -28,5 +28,35 @@
         "Descrição": "adsadasdasdas",
         "Data Cadastro": "2025-06-10",
         "Data Entrega": "2025-06-20"
+    },
+    {
+        "ID Tarefa": "41",
+        "Título Tarefa": "sdsdasdasd",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_sdsdasdasd",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "adsadasdasdas",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-06-18"
+    },
+    {
+        "ID Tarefa": "41",
+        "Título Tarefa": "sdsdasdasd",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_sdsdasdasd",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "adsadasdasdas",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-06-19"
+    },
+    {
+        "ID Tarefa": "41",
+        "Título Tarefa": "sdsdasdasd",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_sdsdasdasd",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "adsadasdasdas",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-06-20"
     }
 ]
