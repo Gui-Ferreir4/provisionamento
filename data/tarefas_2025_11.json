@@ -328,5 +328,35 @@
         "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
         "Data Cadastro": "2025-06-10",
         "Data Entrega": "2025-11-19"
+    },
+    {
+        "ID Tarefa": "65",
+        "Título Tarefa": "201120_GrupoPereira_TrocoSolidario_Fort_v2",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_201120_GrupoPereira_TrocoSolidario_Fort_v2",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-17"
+    },
+    {
+        "ID Tarefa": "65",
+        "Título Tarefa": "201120_GrupoPereira_TrocoSolidario_Fort_v2",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_201120_GrupoPereira_TrocoSolidario_Fort_v2",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-18"
+    },
+    {
+        "ID Tarefa": "65",
+        "Título Tarefa": "201120_GrupoPereira_TrocoSolidario_Fort_v2",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_201120_GrupoPereira_TrocoSolidario_Fort_v2",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-19"
     }
 ]
