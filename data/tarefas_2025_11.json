@@ -28,5 +28,35 @@
         "Descrição": "Casa gato",
         "Data Cadastro": "2025-06-10",
         "Data Entrega": "2025-11-24"
+    },
+    {
+        "ID Tarefa": "54",
+        "Título Tarefa": "Feirinha Condor",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Feirinha Condor",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "Ola",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-19"
+    },
+    {
+        "ID Tarefa": "54",
+        "Título Tarefa": "Feirinha Condor",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Feirinha Condor",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "Ola",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-21"
+    },
+    {
+        "ID Tarefa": "54",
+        "Título Tarefa": "Feirinha Condor",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Feirinha Condor",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "Ola",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-24"
     }
 ]
