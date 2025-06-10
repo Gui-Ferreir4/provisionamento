@@ -1,35 +1,5 @@
 [
     {
-        "ID Tarefa": "53",
-        "Título Tarefa": "Famacinha COOP",
-        "Subtarefa": "1",
-        "Título Subtarefa": "Texto_Famacinha COOP",
-        "Tipo Subtarefa": "Texto",
-        "Descrição": "Casa gato",
-        "Data Cadastro": "2025-06-10",
-        "Data Entrega": "2025-11-19"
-    },
-    {
-        "ID Tarefa": "53",
-        "Título Tarefa": "Famacinha COOP",
-        "Subtarefa": "2",
-        "Título Subtarefa": "Layout_Famacinha COOP",
-        "Tipo Subtarefa": "Layout",
-        "Descrição": "Casa gato",
-        "Data Cadastro": "2025-06-10",
-        "Data Entrega": "2025-11-21"
-    },
-    {
-        "ID Tarefa": "53",
-        "Título Tarefa": "Famacinha COOP",
-        "Subtarefa": "3",
-        "Título Subtarefa": "HTML_Famacinha COOP",
-        "Tipo Subtarefa": "HTML",
-        "Descrição": "Casa gato",
-        "Data Cadastro": "2025-06-10",
-        "Data Entrega": "2025-11-24"
-    },
-    {
         "ID Tarefa": "54",
         "Título Tarefa": "Feirinha Condor",
         "Subtarefa": "1",
@@ -478,5 +448,35 @@
         "Descrição": "teste",
         "Data Cadastro": "2025-06-10",
         "Data Entrega": "2025-11-18"
+    },
+    {
+        "ID Tarefa": "53",
+        "Título Tarefa": "Famacinha COOP",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Famacinha COOP",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "Casa gato",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-05"
+    },
+    {
+        "ID Tarefa": "53",
+        "Título Tarefa": "Famacinha COOP",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Famacinha COOP",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "Casa gato",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-06"
+    },
+    {
+        "ID Tarefa": "53",
+        "Título Tarefa": "Famacinha COOP",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Famacinha COOP",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "Casa gato",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-07"
     }
 ]
