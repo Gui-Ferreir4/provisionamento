@@ -51,32 +51,22 @@
     },
     {
         "ID Tarefa": "47",
-        "Título Tarefa": "Ano novo",
+        "Título Tarefa": "Dia da arvore",
         "Subtarefa": "1",
-        "Título Subtarefa": "Texto_Ano novo",
+        "Título Subtarefa": "Texto_Dia da arvore",
         "Tipo Subtarefa": "Texto",
-        "Descrição": "festa",
+        "Descrição": "sdfasdasdasd",
         "Data Cadastro": "2025-06-10",
-        "Data Entrega": "2025-10-30"
+        "Data Entrega": "2025-11-11"
     },
     {
         "ID Tarefa": "47",
-        "Título Tarefa": "Ano novo",
-        "Subtarefa": "2",
-        "Título Subtarefa": "Layout_Ano novo",
-        "Tipo Subtarefa": "Layout",
-        "Descrição": "festa",
-        "Data Cadastro": "2025-06-10",
-        "Data Entrega": "2025-10-31"
-    },
-    {
-        "ID Tarefa": "47",
-        "Título Tarefa": "Ano novo",
+        "Título Tarefa": "Dia da arvore",
         "Subtarefa": "3",
-        "Título Subtarefa": "HTML_Ano novo",
+        "Título Subtarefa": "HTML_Dia da arvore",
         "Tipo Subtarefa": "HTML",
-        "Descrição": "festa",
+        "Descrição": "sdfasdasdasd",
         "Data Cadastro": "2025-06-10",
-        "Data Entrega": "2025-10-31"
+        "Data Entrega": "2025-11-12"
     }
 ]
