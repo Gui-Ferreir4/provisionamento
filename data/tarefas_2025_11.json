@@ -388,5 +388,35 @@
         "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
         "Data Cadastro": "2025-06-10",
         "Data Entrega": "2025-11-19"
+    },
+    {
+        "ID Tarefa": "67",
+        "Título Tarefa": "210708_JoMalone_ReguaAtivacao_CrosSell2_Bath&Body_V2",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_210708_JoMalone_ReguaAtivacao_CrosSell2_Bath&Body_V2",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-17"
+    },
+    {
+        "ID Tarefa": "67",
+        "Título Tarefa": "210708_JoMalone_ReguaAtivacao_CrosSell2_Bath&Body_V2",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_210708_JoMalone_ReguaAtivacao_CrosSell2_Bath&Body_V2",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-18"
+    },
+    {
+        "ID Tarefa": "67",
+        "Título Tarefa": "210708_JoMalone_ReguaAtivacao_CrosSell2_Bath&Body_V2",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_210708_JoMalone_ReguaAtivacao_CrosSell2_Bath&Body_V2",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-11-19"
     }
 ]
