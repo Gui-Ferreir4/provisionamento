@@ -32,10 +32,10 @@ def retroceder_dias_uteis(d, dias):
     return d
 
 def github_file_url(ano, mes):
-    return f"docs/data/tarefas_{ano}_{mes}.json"
+    return f"provisionamento/docs/data/tarefas_{ano}_{mes}.json"
 
 def listar_arquivos_json():
-    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/docs/data?ref={BRANCH}"
+    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/provisionamento/docs/data"
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
     r = requests.get(url, headers=headers)
     if r.status_code == 200:
