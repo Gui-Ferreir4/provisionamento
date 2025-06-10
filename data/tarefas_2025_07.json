@@ -108,5 +108,35 @@
         "Descrição": "Teste",
         "Data Cadastro": "2025-06-10",
         "Data Entrega": "2025-07-04"
+    },
+    {
+        "ID Tarefa": "50",
+        "Título Tarefa": "Carro",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Carro",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "Vermelho",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-07-02"
+    },
+    {
+        "ID Tarefa": "50",
+        "Título Tarefa": "Carro",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Carro",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "Vermelho",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-07-03"
+    },
+    {
+        "ID Tarefa": "50",
+        "Título Tarefa": "Carro",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Carro",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "Vermelho",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-07-04"
     }
 ]
