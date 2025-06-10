@@ -78,5 +78,35 @@
         "Descrição": "1111",
         "Data Cadastro": "2025-06-09",
         "Data Entrega": "2025-07-01"
+    },
+    {
+        "ID Tarefa": "49",
+        "Título Tarefa": "Modelo 1",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Modelo 1",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "Teste",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-07-02"
+    },
+    {
+        "ID Tarefa": "49",
+        "Título Tarefa": "Modelo 1",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Modelo 1",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "Teste",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-07-03"
+    },
+    {
+        "ID Tarefa": "49",
+        "Título Tarefa": "Modelo 1",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Modelo 1",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "Teste",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-07-04"
     }
 ]
