@@ -48,5 +48,35 @@
         "Descrição": "festa",
         "Data Cadastro": "2025-06-10",
         "Data Entrega": "2025-11-24"
+    },
+    {
+        "ID Tarefa": "47",
+        "Título Tarefa": "Ano novo",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Ano novo",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "festa",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-10-30"
+    },
+    {
+        "ID Tarefa": "47",
+        "Título Tarefa": "Ano novo",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Ano novo",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "festa",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-10-31"
+    },
+    {
+        "ID Tarefa": "47",
+        "Título Tarefa": "Ano novo",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Ano novo",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "festa",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-10-31"
     }
 ]
