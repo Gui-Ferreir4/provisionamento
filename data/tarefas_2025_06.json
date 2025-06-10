@@ -148,5 +148,25 @@
         "Descrição": "",
         "Data Cadastro": "2025-06-09",
         "Data Entrega": "2025-06-26"
+    },
+    {
+        "ID Tarefa": "40",
+        "Título Tarefa": "Natal",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Natal",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "Festa",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-12-24"
+    },
+    {
+        "ID Tarefa": "40",
+        "Título Tarefa": "Natal",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Natal",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "Festa",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-12-24"
     }
 ]
