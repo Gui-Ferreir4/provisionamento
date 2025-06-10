@@ -7,7 +7,7 @@ from datetime import datetime, date, timedelta
 from github import Github
 import holidays
 
-# --- CONFIGURAÇÕES ---
+# --- CONFIGS ---
 GITHUB_USER = st.secrets["github"]["user"]
 GITHUB_REPO = st.secrets["github"]["repo"]
 GITHUB_TOKEN = st.secrets["github"]["token"]
@@ -22,60 +22,20 @@ def registrar_log(msg):
     hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     st.session_state.log.append(f"[{hora}] {msg}")
 
-# --- FUNÇÕES DE DATA ---
-def eh_dia_util(d):
-    return d.weekday() < 5 and d not in feriados_br
-
+# --- FUNÇÕES ---
+def eh_dia_util(d): return d.weekday() < 5 and d not in feriados_br
+def proximo_dia_util(d): return d + timedelta(days=1) if not eh_dia_util(d) else d
 def retroceder_dias_uteis(d, dias):
     while dias > 0:
         d -= timedelta(days=1)
-        if eh_dia_util(d):
-            dias -= 1
+        if eh_dia_util(d): dias -= 1
     return d
 
-def encontrar_data_disponivel(data_base, tipo_subtarefa, dados_existentes, data_final):
-    tentativas = 0
-    max_tentativas = 30
-    alertas = []
-    hoje = date.today()
-
-    while tentativas < max_tentativas:
-        tentativas += 1
-
-        if data_base < hoje:
-            alertas.append(f"🗓 Subtarefa '{tipo_subtarefa}' foi ajustada porque {data_base} é anterior a hoje.")
-            data_base = hoje
-
-        if data_base.month != data_final.month or data_base.year != data_final.year:
-            alertas.append(f"🛘 Quebra de mês detectada: subtarefa '{tipo_subtarefa}' ({data_base}) difere do mês da tarefa principal ({data_final}).")
-            return None, alertas
-
-        if not eh_dia_util(data_base):
-            alertas.append(f"🛑 {data_base} é fim de semana ou feriado. Subtarefa '{tipo_subtarefa}' ajustada automaticamente.")
-            data_base -= timedelta(days=1)
-            continue
-
-        ocupadas = sum(
-            1 for d in dados_existentes
-            if d["Data Entrega"] == str(data_base) and d["Tipo Subtarefa"] == tipo_subtarefa
-        )
-
-        if ocupadas >= 5:
-            alertas.append(f"⚠️ Dia {data_base} já tem 5 subtarefas '{tipo_subtarefa}'. Tentando data anterior.")
-            data_base -= timedelta(days=1)
-            continue
-
-        return data_base, alertas
-
-    alertas.append(f"❌ Não foi possível encontrar data válida para subtarefa '{tipo_subtarefa}'.")
-    return None, alertas
-
-# --- GITHUB UTILS ---
 def github_file_url(ano, mes):
-    return f"docs/data/tarefas_{ano}_{mes}.json"
+    return f"data/tarefas_{ano}_{mes}.json"
 
 def listar_arquivos_json():
-    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/docs/data"
+    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/data"
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
     r = requests.get(url, headers=headers)
     return [f["name"] for f in r.json() if f["name"].endswith(".json")] if r.status_code == 200 else []
@@ -127,6 +87,15 @@ def salvar_arquivo_github(ano, mes, data):
         registrar_log(erro_msg)
         return False
 
+
+def encontrar_data_disponivel(data_base, subtipo, dados):
+    while True:
+        if eh_dia_util(data_base):
+            ocupadas = sum(1 for d in dados if d["Data Entrega"] == str(data_base) and d["Tipo Subtarefa"] == subtipo)
+            if ocupadas < 5:
+                return data_base
+        data_base -= timedelta(days=1)
+
 def gerar_proximo_id():
     arquivos = listar_arquivos_json()
     ids = []
@@ -135,7 +104,6 @@ def gerar_proximo_id():
         dados, _ = carregar_json_github(ano, mes)
         ids += [int(d["ID Tarefa"]) for d in dados if d["ID Tarefa"].isdigit()]
     return max(ids) + 1 if ids else 1
-
 # --- INTERFACE ---
 st.set_page_config("Provisionador de Tarefas", layout="wide")
 st.title("🧩 Provisionador de Tarefas")
