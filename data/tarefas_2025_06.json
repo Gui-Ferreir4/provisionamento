@@ -198,5 +198,35 @@
         "Descrição": "",
         "Data Cadastro": "2025-06-10",
         "Data Entrega": "2025-06-11"
+    },
+    {
+        "ID Tarefa": "42",
+        "Título Tarefa": "gui",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_gui",
+        "Tipo Subtarefa": "Texto",
+        "Descrição": "",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-06-18"
+    },
+    {
+        "ID Tarefa": "42",
+        "Título Tarefa": "gui",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_gui",
+        "Tipo Subtarefa": "Layout",
+        "Descrição": "",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-06-19"
+    },
+    {
+        "ID Tarefa": "42",
+        "Título Tarefa": "gui",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_gui",
+        "Tipo Subtarefa": "HTML",
+        "Descrição": "",
+        "Data Cadastro": "2025-06-10",
+        "Data Entrega": "2025-06-20"
     }
 ]
