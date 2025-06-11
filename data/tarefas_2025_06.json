@@ -5,19 +5,10 @@
         "Subtarefa": "1",
         "Título Subtarefa": "Texto_aaaaaaaaaaa",
         "Tipo Subtarefa": "Texto",
-        "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
+        "Chamado": "",
         "Data Cadastro": "2025-06-11",
-        "Data Entrega": "2025-06-06"
-    },
-    {
-        "ID Tarefa": "63",
-        "Título Tarefa": "aaaaaaaaaaa",
-        "Subtarefa": "2",
-        "Título Subtarefa": "Layout_aaaaaaaaaaa",
-        "Tipo Subtarefa": "Layout",
-        "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
-        "Data Cadastro": "2025-06-11",
-        "Data Entrega": "2025-06-09"
+        "Data Entrega": "2025-06-09",
+        "Status": "Pendente"
     },
     {
         "ID Tarefa": "63",
@@ -25,8 +16,9 @@
         "Subtarefa": "3",
         "Título Subtarefa": "HTML_aaaaaaaaaaa",
         "Tipo Subtarefa": "HTML",
-        "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
+        "Chamado": "",
         "Data Cadastro": "2025-06-11",
-        "Data Entrega": "2025-06-10"
+        "Data Entrega": "2025-06-10",
+        "Status": "Pendente"
     }
 ]
