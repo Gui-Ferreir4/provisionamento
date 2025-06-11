@@ -214,87 +214,79 @@ with abas[1]:
     
                     with col2:
                         if st.button("💾 Confirmar Atualização"):
-                            st.session_state["edicao_pendente"] = {
-                                "id": id_editar,
-                                "ano": ano,
-                                "mes": mes,
-                                "titulo": novo_titulo,
-                                "descricao": nova_desc,
-                                "tipos": {
-                                    "Texto": t1,
-                                    "Layout": t2,
-                                    "HTML": t3
-                                },
-                                "data_final": nova_data.isoformat(),
-                                "original": dados_json
-                            }
-                            st.success("✅ Dados carregados para atualização. Role abaixo e confirme.")
-
-        if "edicao_pendente" in st.session_state:
-            st.markdown("### 🚀 Finalizar Atualização da Tarefa")
-            with col2:
-                if st.button("✅ Atualizar Agora"):
-                    try:
-                        dados = st.session_state["edicao_pendente"]
-                        id_editar = dados["id"]
-                        ano, mes = dados["ano"], dados["mes"]
-                        novo_titulo = dados["titulo"]
-                        nova_desc = dados["descricao"]
-                        tipos_selecionados = [k for k, v in dados["tipos"].items() if v]
-                        data_final = datetime.strptime(dados["data_final"], "%Y-%m-%d").date()
-                        dados_json = dados["original"]
-
-                        if not tipos_selecionados:
-                            st.error("❌ Nenhuma subtarefa foi selecionada.")
-                            registrar_log(f"❌ Cancelado: nenhuma subtarefa marcada para ID {id_editar}")
-                            del st.session_state["edicao_pendente"]
-                        else:
-                            registrar_log(f"🔄 Atualizando tarefa {id_editar} no arquivo tarefas_{ano}_{mes}.json")
-
-                            # 1. Remover tarefa antiga
-                            dados_filtrados = [d for d in dados_json if d["ID Tarefa"] != id_editar]
-                            registrar_log(f"🗑️ Tarefa {id_editar} removida.")
-
-                            # 2. Gerar novas subtarefas
-                            novas_subs = []
-                            dias_ajuste = len(tipos_selecionados) - 1
-                            for i, tipo in enumerate(sorted(tipos_selecionados, key=lambda x: ["Texto", "Layout", "HTML"].index(x))):
-                                base = retroceder_dias_uteis(data_final, dias_ajuste - i) if dias_ajuste else data_final
-                                entrega = encontrar_data_disponivel(base, tipo, dados_filtrados)
-                                novas_subs.append({
-                                    "ID Tarefa": id_editar,
-                                    "Título Tarefa": novo_titulo,
-                                    "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
-                                    "Título Subtarefa": f"{tipo}_{novo_titulo}",
-                                    "Tipo Subtarefa": tipo,
-                                    "Descrição": nova_desc,
-                                    "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
-                                    "Data Entrega": str(entrega)
-                                })
-
-                            dados_filtrados.extend(novas_subs)
-
-                            # 3. Salvar no GitHub
-                            g = Github(GITHUB_TOKEN)
-                            repo = g.get_user().get_repo(GITHUB_REPO)
-                            caminho = github_file_url(ano, mes)
-                            arquivo = repo.get_contents(caminho, ref=BRANCH)
-                            sha_arquivo = arquivo.sha
-                            repo.update_file(
-                                path=caminho,
-                                message=f"Atualização da tarefa {id_editar}",
-                                content=json.dumps(dados_filtrados, ensure_ascii=False, indent=4),
-                                sha=sha_arquivo,
-                                branch=BRANCH
-                            )
-
-                            st.success(f"✅ Tarefa {id_editar} atualizada com sucesso!")
-                            registrar_log(f"✅ Tarefa {id_editar} atualizada com SHA {sha_arquivo}.")
-                            del st.session_state["edicao_pendente"]
-
-                    except Exception as e:
-                        st.error(f"❌ Erro: {e}")
-                        registrar_log(f"❌ Erro na atualização da tarefa {id_editar}: {e}")
+                            try:
+                                dados = {
+                                    "id": id_editar,
+                                    "ano": ano,
+                                    "mes": mes,
+                                    "titulo": novo_titulo,
+                                    "descricao": nova_desc,
+                                    "tipos": {
+                                        "Texto": t1,
+                                        "Layout": t2,
+                                        "HTML": t3
+                                    },
+                                    "data_final": nova_data.isoformat(),
+                                    "original": dados_json
+                                }
+                    
+                                id_editar = dados["id"]
+                                ano, mes = dados["ano"], dados["mes"]
+                                novo_titulo = dados["titulo"]
+                                nova_desc = dados["descricao"]
+                                tipos_selecionados = [k for k, v in dados["tipos"].items() if v]
+                                data_final = datetime.strptime(dados["data_final"], "%Y-%m-%d").date()
+                                dados_json = dados["original"]
+                    
+                                if not tipos_selecionados:
+                                    st.error("❌ Nenhuma subtarefa foi selecionada.")
+                                    registrar_log(f"❌ Cancelado: nenhuma subtarefa marcada para ID {id_editar}")
+                                else:
+                                    registrar_log(f"🔄 Atualizando tarefa {id_editar} no arquivo tarefas_{ano}_{mes}.json")
+                    
+                                    # 1. Remover tarefa antiga
+                                    dados_filtrados = [d for d in dados_json if d["ID Tarefa"] != id_editar]
+                                    registrar_log(f"🗑️ Tarefa {id_editar} removida.")
+                    
+                                    # 2. Gerar novas subtarefas
+                                    novas_subs = []
+                                    dias_ajuste = len(tipos_selecionados) - 1
+                                    for i, tipo in enumerate(sorted(tipos_selecionados, key=lambda x: ["Texto", "Layout", "HTML"].index(x))):
+                                        base = retroceder_dias_uteis(data_final, dias_ajuste - i) if dias_ajuste else data_final
+                                        entrega = encontrar_data_disponivel(base, tipo, dados_filtrados)
+                                        novas_subs.append({
+                                            "ID Tarefa": id_editar,
+                                            "Título Tarefa": novo_titulo,
+                                            "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
+                                            "Título Subtarefa": f"{tipo}_{novo_titulo}",
+                                            "Tipo Subtarefa": tipo,
+                                            "Descrição": nova_desc,
+                                            "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
+                                            "Data Entrega": str(entrega)
+                                        })
+                    
+                                    dados_filtrados.extend(novas_subs)
+                    
+                                    # 3. Salvar no GitHub
+                                    g = Github(GITHUB_TOKEN)
+                                    repo = g.get_user().get_repo(GITHUB_REPO)
+                                    caminho = github_file_url(ano, mes)
+                                    arquivo = repo.get_contents(caminho, ref=BRANCH)
+                                    sha_arquivo = arquivo.sha
+                                    repo.update_file(
+                                        path=caminho,
+                                        message=f"Atualização da tarefa {id_editar}",
+                                        content=json.dumps(dados_filtrados, ensure_ascii=False, indent=4),
+                                        sha=sha_arquivo,
+                                        branch=BRANCH
+                                    )
+                    
+                                    st.success(f"✅ Tarefa {id_editar} atualizada com sucesso!")
+                                    registrar_log(f"✅ Tarefa {id_editar} atualizada com SHA {sha_arquivo}.")
+                    
+                            except Exception as e:
+                                st.error(f"❌ Erro: {e}")
+                                registrar_log(f"❌ Erro na atualização da tarefa {id_editar}: {e}")
 
 # --- ABA LOG ---
 with abas[2]:
