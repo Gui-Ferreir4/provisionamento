@@ -327,29 +327,20 @@ with abas[1]:
                                     branch=BRANCH
                                 )
 
-                            registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada.")
-                            st.session_state["tarefa_atualizada"] = f"Tarefa {st.session_state.id_em_edicao} atualizada com sucesso!"
-                                
-                            # Corrige o estado da aba para retornar à visualização da tabela
-                            st.session_state["modo_edicao"] = False
-                            st.session_state["id_em_edicao"] = None
-                            
-                            # Exibição da tabela novamente se não estiver em modo de edição
-                            if not st.session_state.modo_edicao:
-                                    if dados_json:
-                                        st.markdown("### 📄 Tarefas no Período Selecionado")
-                                        st.dataframe(pd.DataFrame(dados_json), use_container_width=True)
-                                    else:
-                                        st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
-                            else:
-                                # Garante limpeza do ID se for None
-                                if st.session_state.get("id_em_edicao") is None:
-                                    st.session_state.pop("id_em_edicao", None)
-                                    st.rerun()
+                                registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada.")
+                                st.session_state["tarefa_atualizada"] = f"Tarefa {st.session_state.id_em_edicao} atualizada com sucesso!"
+                                st.session_state["modo_edicao"] = False
+                                st.session_state["id_em_edicao"] = None
 
-                            except Exception as e:
-                                st.error(f"❌ Erro: {e}")
-                                registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
+                                st.success(f"✅ {st.session_state['tarefa_atualizada']}")
+                                del st.session_state["tarefa_atualizada"]
+
+                                st.markdown("### 📄 Tarefas no Período Selecionado")
+                                st.dataframe(pd.DataFrame(dados_filtrados), use_container_width=True)
+
+                        except Exception as e:
+                            st.error(f"❌ Erro: {e}")
+                            registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
 
 
 # --- ABA LOG ---
