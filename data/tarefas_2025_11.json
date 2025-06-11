@@ -1,35 +1,5 @@
 [
     {
-        "ID Tarefa": "56",
-        "Título Tarefa": "CFS Promocional Maio - 2905 - Catálogo Monte Carlo",
-        "Subtarefa": "1",
-        "Título Subtarefa": "Texto_CFS Promocional Maio - 2905 - Catálogo Monte Carlo",
-        "Tipo Subtarefa": "Texto",
-        "Descrição": "Ola",
-        "Data Cadastro": "2025-06-10",
-        "Data Entrega": "2025-11-19"
-    },
-    {
-        "ID Tarefa": "56",
-        "Título Tarefa": "CFS Promocional Maio - 2905 - Catálogo Monte Carlo",
-        "Subtarefa": "2",
-        "Título Subtarefa": "Layout_CFS Promocional Maio - 2905 - Catálogo Monte Carlo",
-        "Tipo Subtarefa": "Layout",
-        "Descrição": "Ola",
-        "Data Cadastro": "2025-06-10",
-        "Data Entrega": "2025-11-21"
-    },
-    {
-        "ID Tarefa": "56",
-        "Título Tarefa": "CFS Promocional Maio - 2905 - Catálogo Monte Carlo",
-        "Subtarefa": "3",
-        "Título Subtarefa": "HTML_CFS Promocional Maio - 2905 - Catálogo Monte Carlo",
-        "Tipo Subtarefa": "HTML",
-        "Descrição": "Ola",
-        "Data Cadastro": "2025-06-10",
-        "Data Entrega": "2025-11-24"
-    },
-    {
         "ID Tarefa": "57",
         "Título Tarefa": "clube-de-beneficios-estimulo-upgrade-2-com-pontosv2",
         "Subtarefa": "1",
@@ -538,5 +508,38 @@
         "Descrição": "240409_COOP_Pontual_BlindarADrogariaMaesFamiliaMaio (1) (1).html",
         "Data Cadastro": "2025-06-10",
         "Data Entrega": "2025-11-19"
+    },
+    {
+        "ID Tarefa": "56",
+        "Título Tarefa": "CFS Promocional Maio - 2905 - Catálogo Monte Carlo",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_CFS Promocional Maio - 2905 - Catálogo Monte Carlo",
+        "Tipo Subtarefa": "Texto",
+        "Chamado": "",
+        "Data Cadastro": "2025-06-11",
+        "Data Entrega": "2025-11-19",
+        "Status": "Concluído"
+    },
+    {
+        "ID Tarefa": "56",
+        "Título Tarefa": "CFS Promocional Maio - 2905 - Catálogo Monte Carlo",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_CFS Promocional Maio - 2905 - Catálogo Monte Carlo",
+        "Tipo Subtarefa": "Layout",
+        "Chamado": "",
+        "Data Cadastro": "2025-06-11",
+        "Data Entrega": "2025-11-21",
+        "Status": "Concluído"
+    },
+    {
+        "ID Tarefa": "56",
+        "Título Tarefa": "CFS Promocional Maio - 2905 - Catálogo Monte Carlo",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_CFS Promocional Maio - 2905 - Catálogo Monte Carlo",
+        "Tipo Subtarefa": "HTML",
+        "Chamado": "",
+        "Data Cadastro": "2025-06-11",
+        "Data Entrega": "2025-11-24",
+        "Status": "Pendente"
     }
 ]
