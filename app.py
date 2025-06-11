@@ -280,14 +280,14 @@ with abas[1]:
                             st.success(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com sucesso!")
                             registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com SHA {sha_arquivo}.")
 
-                            # Limpa e volta para a tabela
-                            del st.session_state["modo_edicao"]
-                            del st.session_state["id_em_edicao"]
+                            # Limpa tudo e volta à tela inicial
+                            st.session_state.clear()
                             st.rerun()
 
                     except Exception as e:
                         st.error(f"❌ Erro: {e}")
                         registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.id_em_edicao}: {e}")
+
 
 
 # --- ABA LOG ---
