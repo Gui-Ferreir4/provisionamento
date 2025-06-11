@@ -128,25 +128,19 @@ def gerar_proximo_id():
             ids += [int(d["ID Tarefa"]) for d in dados if d["ID Tarefa"].isdigit()]
     return max(ids) + 1 if ids else 1
 
-# PARTE 2: TELA DE CADASTRO DE TAREFAS
+# INÍCIO DAS ABAS
+abas = st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📜 LOG"])
 
-with st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📜 LOG"])[0]:
-    st.title("📋 Cadastro de Tarefas")
+# PARTE 2: CADASTRO
+with abas[0]:
+    st.title("📋 Cadastro de Tarefa")
 
-    # Seleção do projeto
     projeto = st.selectbox("Selecione o Projeto", PROJETOS)
-
-    # Seleção de período (ano e mês)
-    col_a, col_b = st.columns(2)
-    with col_a:
-        ano = st.selectbox("Ano", [str(y) for y in range(2024, datetime.today().year + 2)])
-    with col_b:
-        mes = st.selectbox("Mês", [f"{m:02d}" for m in range(1, 13)])
-
-    # Entrada de dados
     novo_id = gerar_proximo_id()
+
     titulo = st.text_input("Título da Tarefa")
     chamado = st.text_input("Chamado (número do Hike)")
+
     col1, col2, col3 = st.columns(3)
     with col1:
         t1 = st.checkbox("📝 Texto")
@@ -166,11 +160,15 @@ with st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📜 LOG"])[0]:
             st.error("A data final não pode ser anterior à data de hoje.")
         else:
             try:
+                ano = str(datetime.today().year)
+                mes = f"{datetime.today().month:02d}"
                 dados_existentes, _ = carregar_json_github(projeto, ano, mes)
+
                 novas = []
                 tipos = {"Texto": t1, "Layout": t2, "HTML": t3}
                 tipos_selecionados = [k for k, v in tipos.items() if v]
                 dias_ajuste = len(tipos_selecionados) - 1
+
                 for i, tipo in enumerate(sorted(tipos_selecionados, key=lambda x: ["Texto", "Layout", "HTML"].index(x))):
                     base = retroceder_dias_uteis(data_final, dias_ajuste - i)
                     entrega = encontrar_data_disponivel(base, tipo, dados_existentes)
@@ -194,22 +192,19 @@ with st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📜 LOG"])[0]:
             except Exception as e:
                 st.error(f"Erro ao cadastrar: {e}")
                 registrar_log(f"❌ Erro ao cadastrar tarefa {novo_id}: {e}")
-# PARTE 3: TAREFAS CADASTRADAS (CONSULTA E EDIÇÃO)
 
-with st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📜 LOG"])[1]:
+# PARTE 3: TAREFAS CADASTRADAS
+with abas[1]:
     st.title("📋 Tarefas Cadastradas")
 
-    # Seleção do projeto
-    projeto_sel = st.selectbox("Selecione o Projeto", PROJETOS, key="projeto_consulta")
+    projeto_sel = st.selectbox("Selecione o Projeto para Consulta", PROJETOS, key="projeto_consulta")
 
-    # Listar arquivos disponíveis
     arquivos = listar_arquivos_json(projeto_sel)
     periodos = sorted([a.replace("tarefas_", "").replace(".json", "") for a in arquivos])
 
     if not periodos:
         st.warning("⚠️ Nenhum arquivo encontrado para este projeto.")
     else:
-        # Controle para permitir recarregamento ao selecionar mesmo arquivo
         if "ultimo_periodo" not in st.session_state:
             st.session_state.ultimo_periodo = None
 
@@ -247,92 +242,8 @@ with st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📜 LOG"])[1]:
                     st.markdown("### 📄 Tarefas no Período Selecionado")
                     st.dataframe(pd.DataFrame(dados_json), use_container_width=True)
 
-            else:
-                tarefas = [t for t in dados_json if t["ID Tarefa"] == st.session_state.get("id_em_edicao")]
-                if not tarefas:
-                    st.session_state.pop("modo_edicao", None)
-                    st.session_state.pop("id_em_edicao", None)
-                    st.rerun()
-
-                ref = tarefas[0]
-                titulo_antigo = ref["Título Tarefa"]
-                chamado_antigo = ref.get("Chamado", "")
-                tipos_atuais = {t["Tipo Subtarefa"] for t in tarefas}
-                datas_atuais = [datetime.strptime(t["Data Entrega"], "%Y-%m-%d").date() for t in tarefas]
-
-                st.markdown("### ✏️ Editar Tarefa")
-                novo_titulo = st.text_input("Novo Título", value=titulo_antigo)
-                novo_chamado = st.text_area("Novo Chamado (número do Hike)", value=chamado_antigo, height=80)
-
-                st.markdown("**Subtarefas e Status:**")
-                tipos = ["Texto", "Layout", "HTML"]
-                checkboxes_tipos = {}
-                checkboxes_status = {}
-
-                for tipo in tipos:
-                    col_sub, col_stat = st.columns([1, 1])
-                    with col_sub:
-                        existe = tipo in tipos_atuais
-                        checkboxes_tipos[tipo] = st.checkbox(f"✅ {tipo}", value=existe, key=f"tipo_{tipo}")
-                    with col_stat:
-                        if existe:
-                            concluido = any(t["Tipo Subtarefa"] == tipo and t.get("Status") == "Concluído" for t in tarefas)
-                            checkboxes_status[tipo] = st.checkbox(f"✔️ Concluído", value=concluido, key=f"stat_{tipo}")
-
-                nova_data = st.date_input("Nova Data de Entrega", value=max(datas_atuais))
-
-                col_btn1, col_btn2 = st.columns([1, 1])
-                with col_btn1:
-                    if st.button("💾 Confirmar Atualização"):
-                        try:
-                            tipos_selecionados = [k for k, v in checkboxes_tipos.items() if v]
-                            if not tipos_selecionados:
-                                st.error("❌ Nenhuma subtarefa foi selecionada.")
-                                registrar_log(f"❌ Cancelado: nenhuma subtarefa marcada para ID {st.session_state.id_em_edicao}")
-                            else:
-                                registrar_log(f"🔄 Atualizando tarefa {st.session_state.id_em_edicao} em {projeto_sel}/tarefas_{ano}_{mes}.json")
-                                dados_filtrados = [d for d in dados_json if d["ID Tarefa"] != st.session_state.id_em_edicao]
-
-                                novas_subs = []
-                                dias_ajuste = len(tipos_selecionados) - 1
-                                for i, tipo in enumerate(sorted(tipos_selecionados, key=lambda x: ["Texto", "Layout", "HTML"].index(x))):
-                                    base = retroceder_dias_uteis(nova_data, dias_ajuste - i)
-                                    entrega = encontrar_data_disponivel(base, tipo, dados_filtrados)
-                                    status = "Concluído" if checkboxes_status.get(tipo) else "Pendente"
-                                    novas_subs.append({
-                                        "ID Tarefa": st.session_state.id_em_edicao,
-                                        "Título Tarefa": novo_titulo,
-                                        "Subtarefa": str(i+1),
-                                        "Título Subtarefa": f"{tipo}_{novo_titulo}",
-                                        "Tipo Subtarefa": tipo,
-                                        "Chamado": novo_chamado,
-                                        "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
-                                        "Data Entrega": str(entrega),
-                                        "Status": status
-                                    })
-
-                                dados_filtrados.extend(novas_subs)
-
-                                salvar_arquivo_github(projeto_sel, ano, mes, dados_filtrados)
-
-                                st.success("✅ Tarefa atualizada com sucesso.")
-                                time.sleep(1)
-                                st.session_state.pop("modo_edicao", None)
-                                st.session_state.pop("id_em_edicao", None)
-                                st.rerun()
-                        except Exception as e:
-                            st.error(f"❌ Erro: {e}")
-                            registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
-
-                with col_btn2:
-                    if st.button("👁️ Visualizar Tabela"):
-                        st.session_state.pop("modo_edicao", None)
-                        st.session_state.pop("id_em_edicao", None)
-                        st.rerun()
-
-# PARTE 4: ABA DE LOG
-
-with st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📜 LOG"])[2]:
+# PARTE 4: LOG
+with abas[2]:
     st.title("📜 LOG DE ATIVIDADES")
 
     if st.session_state.log:
@@ -340,4 +251,4 @@ with st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📜 LOG"])[2]:
         for linha in reversed(st.session_state.log):
             st.markdown(f"- {linha}")
     else:
-        st.info("Nenhuma atividade registrada ainda.")
+        st.info("ℹ️ Nenhuma atividade registrada ainda.")
