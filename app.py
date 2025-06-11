@@ -204,7 +204,12 @@ with abas[1]:
                         st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
 
             else:
-                tarefas = [t for t in dados_json if t["ID Tarefa"] == st.session_state.id_em_edicao]
+                tarefas = [t for t in dados_json if t["ID Tarefa"] == st.session_state.get("id_em_edicao")]
+                if not tarefas:
+                    del st.session_state["modo_edicao"]
+                    del st.session_state["id_em_edicao"]
+                    st.rerun()
+
                 ref = tarefas[0]
                 titulo_antigo = ref["Título Tarefa"]
                 chamado_antigo = ref.get("Chamado", "")
@@ -280,13 +285,15 @@ with abas[1]:
                             st.success(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com sucesso!")
                             registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com SHA {sha_arquivo}.")
 
-                            # Limpa tudo e volta à tela inicial
-                            st.session_state.clear()
+                            # Limpa e volta à tela principal
+                            del st.session_state["modo_edicao"]
+                            del st.session_state["id_em_edicao"]
                             st.rerun()
 
                     except Exception as e:
                         st.error(f"❌ Erro: {e}")
                         registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.id_em_edicao}: {e}")
+
 
 
 
