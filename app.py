@@ -214,11 +214,14 @@ with abas[1]:
                     checkboxes_status = {}
 
                     for tipo in tipos:
-                        existe = tipo in tipos_atuais
-                        concluido = any(t["Tipo Subtarefa"] == tipo and t.get("Status") == "Concluído" for t in tarefas)
-                        checkboxes_tipos[tipo] = st.checkbox(f"✅ {tipo}", value=existe)
-                        if existe:
-                            checkboxes_status[tipo] = st.checkbox(f"✔️ Concluído ({tipo})", value=concluido)
+                        col_sub, col_stat = st.columns([1, 1])
+                        with col_sub:
+                            existe = tipo in tipos_atuais
+                            checkboxes_tipos[tipo] = st.checkbox(f"✅ {tipo}", value=existe)
+                        with col_stat:
+                            if existe:
+                                concluido = any(t["Tipo Subtarefa"] == tipo and t.get("Status") == "Concluído" for t in tarefas)
+                                checkboxes_status[tipo] = st.checkbox(f"✔️ Concluído", value=concluido, key=f"chk_{tipo}")
 
                     nova_data = st.date_input("Nova Data de Entrega", value=max(datas_atuais))
 
