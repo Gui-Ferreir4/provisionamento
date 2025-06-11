@@ -30,36 +30,6 @@
         "Data Entrega": "2025-11-24"
     },
     {
-        "ID Tarefa": "58",
-        "Título Tarefa": "220630_CencosudNacional_Prezunic_ReguaRelac_NPSTerceiraOndaEcom_LFisica_emkt_V6 (2)",
-        "Subtarefa": "1",
-        "Título Subtarefa": "Texto_220630_CencosudNacional_Prezunic_ReguaRelac_NPSTerceiraOndaEcom_LFisica_emkt_V6 (2)",
-        "Tipo Subtarefa": "Texto",
-        "Descrição": "Ola",
-        "Data Cadastro": "2025-06-10",
-        "Data Entrega": "2025-11-18"
-    },
-    {
-        "ID Tarefa": "58",
-        "Título Tarefa": "220630_CencosudNacional_Prezunic_ReguaRelac_NPSTerceiraOndaEcom_LFisica_emkt_V6 (2)",
-        "Subtarefa": "2",
-        "Título Subtarefa": "Layout_220630_CencosudNacional_Prezunic_ReguaRelac_NPSTerceiraOndaEcom_LFisica_emkt_V6 (2)",
-        "Tipo Subtarefa": "Layout",
-        "Descrição": "Ola",
-        "Data Cadastro": "2025-06-10",
-        "Data Entrega": "2025-11-19"
-    },
-    {
-        "ID Tarefa": "58",
-        "Título Tarefa": "220630_CencosudNacional_Prezunic_ReguaRelac_NPSTerceiraOndaEcom_LFisica_emkt_V6 (2)",
-        "Subtarefa": "3",
-        "Título Subtarefa": "HTML_220630_CencosudNacional_Prezunic_ReguaRelac_NPSTerceiraOndaEcom_LFisica_emkt_V6 (2)",
-        "Tipo Subtarefa": "HTML",
-        "Descrição": "Ola",
-        "Data Cadastro": "2025-06-10",
-        "Data Entrega": "2025-11-21"
-    },
-    {
         "ID Tarefa": "59",
         "Título Tarefa": "8_vc_conhece_o_madero_cashback_base_wifi_38742_20241031",
         "Subtarefa": "1",
@@ -540,6 +510,39 @@
         "Chamado": "",
         "Data Cadastro": "2025-06-11",
         "Data Entrega": "2025-11-24",
+        "Status": "Pendente"
+    },
+    {
+        "ID Tarefa": "58",
+        "Título Tarefa": "220630_CencosudNacional_Prezunic_ReguaRelac_NPSTerceiraOndaEcom_LFisica_emkt_V6 (2)",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_220630_CencosudNacional_Prezunic_ReguaRelac_NPSTerceiraOndaEcom_LFisica_emkt_V6 (2)",
+        "Tipo Subtarefa": "Texto",
+        "Chamado": "",
+        "Data Cadastro": "2025-06-11",
+        "Data Entrega": "2025-11-18",
+        "Status": "Concluído"
+    },
+    {
+        "ID Tarefa": "58",
+        "Título Tarefa": "220630_CencosudNacional_Prezunic_ReguaRelac_NPSTerceiraOndaEcom_LFisica_emkt_V6 (2)",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_220630_CencosudNacional_Prezunic_ReguaRelac_NPSTerceiraOndaEcom_LFisica_emkt_V6 (2)",
+        "Tipo Subtarefa": "Layout",
+        "Chamado": "",
+        "Data Cadastro": "2025-06-11",
+        "Data Entrega": "2025-11-19",
+        "Status": "Concluído"
+    },
+    {
+        "ID Tarefa": "58",
+        "Título Tarefa": "220630_CencosudNacional_Prezunic_ReguaRelac_NPSTerceiraOndaEcom_LFisica_emkt_V6 (2)",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_220630_CencosudNacional_Prezunic_ReguaRelac_NPSTerceiraOndaEcom_LFisica_emkt_V6 (2)",
+        "Tipo Subtarefa": "HTML",
+        "Chamado": "",
+        "Data Cadastro": "2025-06-11",
+        "Data Entrega": "2025-11-21",
         "Status": "Pendente"
     }
 ]
