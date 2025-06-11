@@ -165,18 +165,20 @@ with abas[0]:
 
 # --- ABA UNIFICADA: 📋 Tarefas Cadastradas ---
 with abas[1]:
-    st.header("📋 Tarefas Cadastradas")
-
-    arquivos = listar_arquivos_json()
-    periodos = sorted([a.replace("tarefas_", "").replace(".json", "") for a in arquivos])
-
-    if not periodos:
-        st.warning("⚠️ Nenhum arquivo encontrado.")
-    else:
-        if "ultimo_periodo" not in st.session_state:
-            st.session_state.ultimo_periodo = None
-
-        st.markdown("### 📂 Selecione o Período")
+    col_prin = st.columns([1, 4, 1])
+        with col_prin[1]:
+            st.header("📋 Tarefas Cadastradas")
+        
+            arquivos = listar_arquivos_json()
+            periodos = sorted([a.replace("tarefas_", "").replace(".json", "") for a in arquivos])
+        
+            if not periodos:
+                st.warning("⚠️ Nenhum arquivo encontrado.")
+            else:
+                if "ultimo_periodo" not in st.session_state:
+                    st.session_state.ultimo_periodo = None
+        
+                st.markdown("### 📂 Selecione o Período")
         col_top = st.columns([1, 4, 1])
         with col_top[1]:
             periodo = st.selectbox(
