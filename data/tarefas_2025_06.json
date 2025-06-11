@@ -7,7 +7,7 @@
         "Tipo Subtarefa": "Texto",
         "Chamado": "",
         "Data Cadastro": "2025-06-11",
-        "Data Entrega": "2025-06-06",
+        "Data Entrega": "2025-06-09",
         "Status": "Concluído"
     },
     {
@@ -16,17 +16,6 @@
         "Subtarefa": "2",
         "Título Subtarefa": "Layout_hehe",
         "Tipo Subtarefa": "Layout",
-        "Chamado": "",
-        "Data Cadastro": "2025-06-11",
-        "Data Entrega": "2025-06-09",
-        "Status": "Pendente"
-    },
-    {
-        "ID Tarefa": "63",
-        "Título Tarefa": "hehe",
-        "Subtarefa": "3",
-        "Título Subtarefa": "HTML_hehe",
-        "Tipo Subtarefa": "HTML",
         "Chamado": "",
         "Data Cadastro": "2025-06-11",
         "Data Entrega": "2025-06-10",
