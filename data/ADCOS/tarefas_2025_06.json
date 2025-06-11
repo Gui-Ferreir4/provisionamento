@@ -41,6 +41,7 @@
         "Chamado": "202",
         "Data Cadastro": "2025-06-11",
         "Data Entrega": "2025-06-11",
+        "Status": "Concluído",
         "Projeto": "ADCOS"
     },
     {
@@ -52,6 +53,7 @@
         "Chamado": "202",
         "Data Cadastro": "2025-06-11",
         "Data Entrega": "2025-06-12",
+        "Status": "Concluído",
         "Projeto": "ADCOS"
     },
     {
@@ -63,6 +65,7 @@
         "Chamado": "202",
         "Data Cadastro": "2025-06-11",
         "Data Entrega": "2025-06-13",
+        "Status": "Concluído",
         "Projeto": "ADCOS"
     }
 ]
