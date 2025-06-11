@@ -7,8 +7,19 @@
         "Tipo Subtarefa": "Texto",
         "Chamado": "",
         "Data Cadastro": "2025-06-11",
-        "Data Entrega": "2025-06-09",
+        "Data Entrega": "2025-06-06",
         "Status": "Concluído"
+    },
+    {
+        "ID Tarefa": "63",
+        "Título Tarefa": "ola",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_ola",
+        "Tipo Subtarefa": "Layout",
+        "Chamado": "",
+        "Data Cadastro": "2025-06-11",
+        "Data Entrega": "2025-06-09",
+        "Status": "Pendente"
     },
     {
         "ID Tarefa": "63",
