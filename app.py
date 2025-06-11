@@ -259,9 +259,9 @@ with abas[1]:
     
                 nova_data = st.date_input("Nova Data de Entrega", value=max(datas_atuais))
     
-                col_btn1, col_btn2 = st.columns([1, 1])
-                with col_btn1:
-                    if st.button("💾 Confirmar Atualização"):
+                col_btn = st.columns([1, 6, 1])
+                with col_btn[1]:
+                    if st.button("💾 Atualizar Tarefa"):
                         try:
                             tipos_selecionados = [k for k, v in checkboxes_tipos.items() if v]
                             if not tipos_selecionados:
@@ -269,10 +269,10 @@ with abas[1]:
                                 registrar_log(f"❌ Cancelado: nenhuma subtarefa marcada para ID {st.session_state.id_em_edicao}")
                             else:
                                 registrar_log(f"🔄 Atualizando tarefa {st.session_state.id_em_edicao} no arquivo tarefas_{ano}_{mes}.json")
-    
+                
                                 dados_filtrados = [d for d in dados_json if d["ID Tarefa"] != st.session_state.id_em_edicao]
                                 registrar_log(f"🗑️ Tarefa {st.session_state.id_em_edicao} removida.")
-    
+                
                                 novas_subs = []
                                 dias_ajuste = len(tipos_selecionados) - 1
                                 for i, tipo in enumerate(sorted(tipos_selecionados, key=lambda x: ["Texto", "Layout", "HTML"].index(x))):
@@ -290,9 +290,9 @@ with abas[1]:
                                         "Data Entrega": str(entrega),
                                         "Status": status
                                     })
-    
+                
                                 dados_filtrados.extend(novas_subs)
-    
+                
                                 g = Github(GITHUB_TOKEN)
                                 repo = g.get_user().get_repo(GITHUB_REPO)
                                 caminho = github_file_url(ano, mes)
@@ -305,27 +305,18 @@ with abas[1]:
                                     sha=sha_arquivo,
                                     branch=BRANCH
                                 )
-    
+                
                                 st.success(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com sucesso!")
                                 registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com SHA {sha_arquivo}.")
-    
-                                time.sleep(1)
+                
+                                time.sleep(1)  # Espera a mensagem de sucesso ser visualizada
                                 st.session_state["modo_edicao"] = False
                                 st.session_state["id_em_edicao"] = None
                                 st.rerun()
-    
+                
                         except Exception as e:
                             st.error(f"❌ Erro: {e}")
                             registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
-    
-                with col_btn2:
-                    if st.button("👁️ Visualizar Tabela"):
-                        st.session_state["modo_edicao"] = False
-                        st.session_state["id_em_edicao"] = None
-                        st.rerun()
-
-
-
 
 # --- ABA LOG ---
 with abas[2]:
