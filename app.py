@@ -119,7 +119,7 @@ with abas[0]:
         col1, col2, col3 = st.columns([1, 4, 1])
         with col2:
             titulo = st.text_input("Título da Tarefa")
-            descricao = st.text_area("Descrição", height=80)
+            chamado = st.text_input("Chamado (número do Hike)")
             st.markdown("**Subtarefas:**")
             t = st.checkbox("📝 Texto", value=True)
             l = st.checkbox("🎨 Layout", value=True)
@@ -152,7 +152,7 @@ with abas[0]:
                     "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
                     "Título Subtarefa": f"{tipo}_{titulo}",
                     "Tipo Subtarefa": tipo,
-                    "Descrição": descricao,
+                    "Chamado": chamado,
                     "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
                     "Data Entrega": str(data_final)
                 })
@@ -172,12 +172,13 @@ with abas[1]:
     if not periodos:
         st.warning("⚠️ Nenhum arquivo encontrado.")
     else:
-        col1, col2, col3 = st.columns([1, 4, 1])
+        col1, col2 = st.columns([2, 3])
         with col2:
             periodo = st.selectbox("📂 Selecione o Período", periodos, format_func=lambda x: f"{x[:4]}/{x[5:]}")
             ano, mes = periodo.split("_")
             dados_json, _ = carregar_json_github(ano, mes)
 
+        with col1:    
             if dados_json:
                 st.markdown("### 📄 Tarefas no Período Selecionado")
                 st.dataframe(pd.DataFrame(dados_json), use_container_width=True)
@@ -199,18 +200,24 @@ with abas[1]:
                 else:
                     ref = tarefas[0]
                     titulo_antigo = ref["Título Tarefa"]
-                    descricao_antiga = ref.get("Descrição", "")
+                    chamado_antigo = ref.get("Chamado", "")
                     tipos_atuais = {t["Tipo Subtarefa"] for t in tarefas}
                     datas_atuais = [datetime.strptime(t["Data Entrega"], "%Y-%m-%d").date() for t in tarefas]
     
                     with col2:
                         novo_titulo = st.text_input("Novo Título", value=titulo_antigo)
-                        nova_desc = st.text_area("Nova Descrição", value=descricao_antiga, height=80)
-                        st.markdown("**Subtarefas:**")
-                        t1 = st.checkbox("📝 Texto", value="Texto" in tipos_atuais)
-                        t2 = st.checkbox("🎨 Layout", value="Layout" in tipos_atuais)
-                        t3 = st.checkbox("💻 HTML", value="HTML" in tipos_atuais)
-                        nova_data = st.date_input("Nova Data de Entrega", value=max(datas_atuais))
+                        nova_desc = st.text_area("Nova Descrição", value=chamado_antigo, height=80)
+                        st.markdown("**Subtarefas e Status:**")
+                        tipos = ["Texto", "Layout", "HTML"]
+                        checkboxes_tipos = {}
+                        checkboxes_status = {}
+                        
+                        for tipo in tipos:
+                            existe = tipo in tipos_atuais
+                            concluido = any(t["Tipo Subtarefa"] == tipo and t.get("Status") == "Concluído" for t in tarefas)
+                            checkboxes_tipos[tipo] = st.checkbox(f"✅ {tipo}", value=existe)
+                            if existe:
+                                checkboxes_status[tipo] = st.checkbox(f"✔️ Concluído ({tipo})", value=concluido)
     
                     with col2:
                         if st.button("💾 Confirmar Atualização"):
@@ -220,7 +227,7 @@ with abas[1]:
                                     "ano": ano,
                                     "mes": mes,
                                     "titulo": novo_titulo,
-                                    "descricao": nova_desc,
+                                    "chamado": novo_chamado,
                                     "tipos": {
                                         "Texto": t1,
                                         "Layout": t2,
@@ -233,7 +240,7 @@ with abas[1]:
                                 id_editar = dados["id"]
                                 ano, mes = dados["ano"], dados["mes"]
                                 novo_titulo = dados["titulo"]
-                                nova_desc = dados["descricao"]
+                                novo_chamado = dados["chamado"]
                                 tipos_selecionados = [k for k, v in dados["tipos"].items() if v]
                                 data_final = datetime.strptime(dados["data_final"], "%Y-%m-%d").date()
                                 dados_json = dados["original"]
@@ -254,15 +261,17 @@ with abas[1]:
                                     for i, tipo in enumerate(sorted(tipos_selecionados, key=lambda x: ["Texto", "Layout", "HTML"].index(x))):
                                         base = retroceder_dias_uteis(data_final, dias_ajuste - i) if dias_ajuste else data_final
                                         entrega = encontrar_data_disponivel(base, tipo, dados_filtrados)
+                                        status = "Concluído" if checkboxes_status.get(tipo) else "Pendente"
                                         novas_subs.append({
                                             "ID Tarefa": id_editar,
                                             "Título Tarefa": novo_titulo,
                                             "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
                                             "Título Subtarefa": f"{tipo}_{novo_titulo}",
                                             "Tipo Subtarefa": tipo,
-                                            "Descrição": nova_desc,
+                                            "Chamado": novo_chamado,
                                             "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
-                                            "Data Entrega": str(entrega)
+                                            "Data Entrega": str(entrega),
+                                            "Status": status
                                         })
                     
                                     dados_filtrados.extend(novas_subs)
