@@ -315,7 +315,7 @@ with abas[1]:
 
                     except Exception as e:
                         st.error(f"❌ Erro: {e}")
-                        registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.id_em_edicao}: {e}")
+                        registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
 
 
 
