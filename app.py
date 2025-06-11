@@ -186,14 +186,16 @@ with abas[1]:
                 key="periodo_selecionado"
             )
 
-        # Resetar modo edição se mudou ou reafirmou a seleção
-        if st.session_state.ultimo_periodo != st.session_state.periodo_selecionado:
-            st.session_state.ultimo_periodo = st.session_state.periodo_selecionado
+        # Verifica mudança real, sem forçar rerun na primeira carga
+        if st.session_state.ultimo_periodo is not None and st.session_state.ultimo_periodo != st.session_state.periodo_selecionado:
             if "modo_edicao" in st.session_state:
                 del st.session_state["modo_edicao"]
             if "id_em_edicao" in st.session_state:
                 del st.session_state["id_em_edicao"]
+            st.session_state.ultimo_periodo = st.session_state.periodo_selecionado
             st.experimental_rerun()
+        else:
+            st.session_state.ultimo_periodo = st.session_state.periodo_selecionado
 
         ano, mes = st.session_state.periodo_selecionado.split("_")
         dados_json, _ = carregar_json_github(ano, mes)
