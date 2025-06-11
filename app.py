@@ -193,7 +193,7 @@ with abas[1]:
             if "id_em_edicao" in st.session_state:
                 del st.session_state["id_em_edicao"]
             st.session_state.ultimo_periodo = st.session_state.periodo_selecionado
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.session_state.ultimo_periodo = st.session_state.periodo_selecionado
 
@@ -311,7 +311,7 @@ with abas[1]:
                             time.sleep(1)
                             del st.session_state["modo_edicao"]
                             del st.session_state["id_em_edicao"]
-                            st.experimental_rerun()
+                            st.rerun()
 
                     except Exception as e:
                         st.error(f"❌ Erro: {e}")
