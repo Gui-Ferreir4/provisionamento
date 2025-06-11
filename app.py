@@ -325,6 +325,8 @@ with abas[1]:
                         st.rerun()
 
 
+
+
 # --- ABA LOG ---
 with abas[2]:
     st.header("📜 LOG do Sistema")
