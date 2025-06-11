@@ -271,7 +271,6 @@ with abas[1]:
                                 registrar_log(f"🔄 Atualizando tarefa {st.session_state.id_em_edicao} no arquivo tarefas_{ano}_{mes}.json")
                 
                                 dados_filtrados = [d for d in dados_json if d["ID Tarefa"] != st.session_state.id_em_edicao]
-                                registrar_log(f"🗑️ Tarefa {st.session_state.id_em_edicao} removida.")
                 
                                 novas_subs = []
                                 dias_ajuste = len(tipos_selecionados) - 1
@@ -297,19 +296,18 @@ with abas[1]:
                                 repo = g.get_user().get_repo(GITHUB_REPO)
                                 caminho = github_file_url(ano, mes)
                                 arquivo = repo.get_contents(caminho, ref=BRANCH)
-                                sha_arquivo = arquivo.sha
                                 repo.update_file(
                                     path=caminho,
                                     message=f"Atualização da tarefa {st.session_state.id_em_edicao}",
                                     content=json.dumps(dados_filtrados, ensure_ascii=False, indent=4),
-                                    sha=sha_arquivo,
+                                    sha=arquivo.sha,
                                     branch=BRANCH
                                 )
                 
                                 st.success(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com sucesso!")
-                                registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com SHA {sha_arquivo}.")
+                                registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada.")
                 
-                                time.sleep(1)  # Espera a mensagem de sucesso ser visualizada
+                                # Retorna à visualização da tabela
                                 st.session_state["modo_edicao"] = False
                                 st.session_state["id_em_edicao"] = None
                                 st.rerun()
@@ -317,6 +315,7 @@ with abas[1]:
                         except Exception as e:
                             st.error(f"❌ Erro: {e}")
                             registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
+
 
 # --- ABA LOG ---
 with abas[2]:
