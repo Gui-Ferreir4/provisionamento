@@ -213,6 +213,14 @@ with abas[1]:
             id_input = st.text_input("ID da Tarefa", value="")
 
             if not st.session_state.modo_edicao:
+                # Sempre exibe a tabela quando não está editando
+                if dados_json:
+                    st.markdown("### 📄 Tarefas no Período Selecionado")
+                    st.dataframe(pd.DataFrame(dados_json), use_container_width=True)
+                else:
+                    st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
+            
+                # Se um ID foi digitado, tenta entrar em modo de edição
                 if id_input:
                     tarefas = [t for t in dados_json if t["ID Tarefa"] == id_input]
                     if not tarefas:
@@ -222,12 +230,6 @@ with abas[1]:
                         st.session_state.modo_edicao = True
                         st.session_state.id_em_edicao = id_input
                         st.rerun()
-                else:
-                    if dados_json:
-                        st.markdown("### 📄 Tarefas no Período Selecionado")
-                        st.dataframe(pd.DataFrame(dados_json), use_container_width=True)
-                    else:
-                        st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
 
             else:
                 tarefas = [t for t in dados_json if t["ID Tarefa"] == st.session_state.id_em_edicao]
