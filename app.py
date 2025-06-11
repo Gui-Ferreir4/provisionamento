@@ -310,10 +310,10 @@ with abas[1]:
 
                                 registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada.")
                                 st.session_state["tarefa_atualizada"] = f"Tarefa {st.session_state.id_em_edicao} atualizada com sucesso!"
-                                    if st.button("👁️ Visualizar Tabela"):
-                                        # Corrige o estado da aba para retornar à visualização da tabela
-                                        st.session_state["modo_edicao"] = False
-                                        st.session_state["id_em_edicao"] = None
+                                    
+                                # Corrige o estado da aba para retornar à visualização da tabela
+                                st.session_state["modo_edicao"] = False
+                                st.session_state["id_em_edicao"] = None
                                 
                                 # Exibição da tabela novamente se não estiver em modo de edição
                                 if not st.session_state.modo_edicao:
