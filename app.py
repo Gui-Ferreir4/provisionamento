@@ -165,8 +165,8 @@ with abas[0]:
 
 # --- ABA UNIFICADA: 📋 Tarefas Cadastradas ---
 with abas[1]:
-    col_prin = st.columns([1, 4, 1])
-        with col_prin[1]:
+        col_top = st.columns([1, 4, 1])
+        with col_top[1]:
             st.header("📋 Tarefas Cadastradas")
         
             arquivos = listar_arquivos_json()
@@ -179,8 +179,6 @@ with abas[1]:
                     st.session_state.ultimo_periodo = None
         
                 st.markdown("### 📂 Selecione o Período")
-        col_top = st.columns([1, 4, 1])
-        with col_top[1]:
             periodo = st.selectbox(
                 "", periodos,
                 format_func=lambda x: f"{x[:4]}/{x[5:]}",
