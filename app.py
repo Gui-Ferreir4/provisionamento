@@ -169,13 +169,13 @@ with abas[1]:
 
     arquivos = listar_arquivos_json()
     periodos = sorted([a.replace("tarefas_", "").replace(".json", "") for a in arquivos])
-    
+
     if not periodos:
         st.warning("⚠️ Nenhum arquivo encontrado.")
     else:
         if "ultimo_periodo" not in st.session_state:
             st.session_state.ultimo_periodo = None
-    
+
         st.markdown("### 📂 Selecione o Período")
         col_top = st.columns([1, 4, 1])
         with col_top[1]:
@@ -184,7 +184,7 @@ with abas[1]:
                 format_func=lambda x: f"{x[:4]}/{x[5:]}",
                 key="periodo_selecionado"
             )
-    
+
         if st.session_state.ultimo_periodo is not None and st.session_state.ultimo_periodo != st.session_state.periodo_selecionado:
             st.session_state.ultimo_periodo = st.session_state.periodo_selecionado
             st.session_state["modo_edicao"] = False
@@ -192,21 +192,26 @@ with abas[1]:
             st.rerun()
         else:
             st.session_state.ultimo_periodo = st.session_state.periodo_selecionado
-    
+
         ano, mes = st.session_state.periodo_selecionado.split("_")
         dados_json, _ = carregar_json_github(ano, mes)
-    
+
         if "modo_edicao" not in st.session_state:
             st.session_state["modo_edicao"] = False
         if "id_em_edicao" not in st.session_state:
             st.session_state["id_em_edicao"] = None
-    
+
         col_main = st.columns([1, 4, 1])
         with col_main[1]:
             st.markdown("### ✏️ Digite o ID da Tarefa para editar")
+
+            # Exibe mensagem de sucesso se tarefa foi atualizada
+            if st.session_state.get("tarefa_atualizada"):
+                st.success(f"✅ {st.session_state['tarefa_atualizada']}")
+                del st.session_state["tarefa_atualizada"]
+
             id_input = st.text_input("ID da Tarefa", value="")
-    
-            # Se não estiver em modo de edição
+
             if not st.session_state.modo_edicao:
                 if id_input:
                     tarefas = [t for t in dados_json if t["ID Tarefa"] == id_input]
@@ -223,30 +228,29 @@ with abas[1]:
                         st.dataframe(pd.DataFrame(dados_json), use_container_width=True)
                     else:
                         st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
-    
-            # Se estiver em modo de edição
+
             else:
                 tarefas = [t for t in dados_json if t["ID Tarefa"] == st.session_state.id_em_edicao]
                 if not tarefas:
                     st.session_state["modo_edicao"] = False
                     st.session_state["id_em_edicao"] = None
                     st.rerun()
-    
+
                 ref = tarefas[0]
                 titulo_antigo = ref["Título Tarefa"]
                 chamado_antigo = ref.get("Chamado", "")
                 tipos_atuais = {t["Tipo Subtarefa"] for t in tarefas}
                 datas_atuais = [datetime.strptime(t["Data Entrega"], "%Y-%m-%d").date() for t in tarefas]
-    
+
                 st.markdown("### 🛠️ Editar Tarefa")
                 novo_titulo = st.text_input("Novo Título", value=titulo_antigo)
                 novo_chamado = st.text_area("Novo Chamado (número do Hike)", value=chamado_antigo, height=80)
-    
+
                 st.markdown("**Subtarefas e Status:**")
                 tipos = ["Texto", "Layout", "HTML"]
                 checkboxes_tipos = {}
                 checkboxes_status = {}
-    
+
                 for tipo in tipos:
                     col_sub, col_stat = st.columns([1, 1])
                     with col_sub:
@@ -256,12 +260,12 @@ with abas[1]:
                         if existe:
                             concluido = any(t["Tipo Subtarefa"] == tipo and t.get("Status") == "Concluído" for t in tarefas)
                             checkboxes_status[tipo] = st.checkbox(f"✔️ Concluído", value=concluido, key=f"stat_{tipo}")
-    
+
                 nova_data = st.date_input("Nova Data de Entrega", value=max(datas_atuais))
-    
-                col_btn1, col_btn2 = st.columns([1, 1])
-                with col_btn1:
-                    if st.button("💾 Confirmar Atualização"):
+
+                col_btn = st.columns([1, 6, 1])
+                with col_btn[1]:
+                    if st.button("💾 Atualizar Tarefa"):
                         try:
                             tipos_selecionados = [k for k, v in checkboxes_tipos.items() if v]
                             if not tipos_selecionados:
@@ -269,10 +273,9 @@ with abas[1]:
                                 registrar_log(f"❌ Cancelado: nenhuma subtarefa marcada para ID {st.session_state.id_em_edicao}")
                             else:
                                 registrar_log(f"🔄 Atualizando tarefa {st.session_state.id_em_edicao} no arquivo tarefas_{ano}_{mes}.json")
-    
+
                                 dados_filtrados = [d for d in dados_json if d["ID Tarefa"] != st.session_state.id_em_edicao]
-                                registrar_log(f"🗑️ Tarefa {st.session_state.id_em_edicao} removida.")
-    
+
                                 novas_subs = []
                                 dias_ajuste = len(tipos_selecionados) - 1
                                 for i, tipo in enumerate(sorted(tipos_selecionados, key=lambda x: ["Texto", "Layout", "HTML"].index(x))):
@@ -290,53 +293,44 @@ with abas[1]:
                                         "Data Entrega": str(entrega),
                                         "Status": status
                                     })
-    
+
                                 dados_filtrados.extend(novas_subs)
-    
+
                                 g = Github(GITHUB_TOKEN)
                                 repo = g.get_user().get_repo(GITHUB_REPO)
                                 caminho = github_file_url(ano, mes)
                                 arquivo = repo.get_contents(caminho, ref=BRANCH)
-                                sha_arquivo = arquivo.sha
                                 repo.update_file(
                                     path=caminho,
                                     message=f"Atualização da tarefa {st.session_state.id_em_edicao}",
                                     content=json.dumps(dados_filtrados, ensure_ascii=False, indent=4),
-                                    sha=sha_arquivo,
+                                    sha=arquivo.sha,
                                     branch=BRANCH
                                 )
-    
-                                st.success(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com sucesso!")
-                                registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com SHA {sha_arquivo}.")
-    
-                                time.sleep(1)
-                                st.session_state["modo_edicao"] = False
-                                st.session_state["id_em_edicao"] = None
+
+                                registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada.")
+                                st.session_state["tarefa_atualizada"] = f"Tarefa {st.session_state.id_em_edicao} atualizada com sucesso!"
+                                    if st.button("👁️ Visualizar Tabela"):
+                                        # Corrige o estado da aba para retornar à visualização da tabela
+                                        st.session_state["modo_edicao"] = False
+                                        st.session_state["id_em_edicao"] = None
+                                
+                                # Exibição da tabela novamente se não estiver em modo de edição
+                                if not st.session_state.modo_edicao:
+                                    if dados_json:
+                                        st.markdown("### 📄 Tarefas no Período Selecionado")
+                                        st.dataframe(pd.DataFrame(dados_json), use_container_width=True)
+                                    else:
+                                        st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
+                                else:
+                                    # Garante limpeza do ID se for None
+                                    if st.session_state.get("id_em_edicao") is None:
+                                        st.session_state.pop("id_em_edicao", None)
                                 st.rerun()
-    
+
                         except Exception as e:
                             st.error(f"❌ Erro: {e}")
                             registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
-    
-                with col_btn2:
-                    if st.button("👁️ Visualizar Tabela"):
-                        # Corrige o estado da aba para retornar à visualização da tabela
-                        st.session_state["modo_edicao"] = False
-                        st.session_state["id_em_edicao"] = None
-                
-                # Exibição da tabela novamente se não estiver em modo de edição
-                if not st.session_state.modo_edicao:
-                    if dados_json:
-                        st.markdown("### 📄 Tarefas no Período Selecionado")
-                        st.dataframe(pd.DataFrame(dados_json), use_container_width=True)
-                    else:
-                        st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
-                else:
-                    # Garante limpeza do ID se for None
-                    if st.session_state.get("id_em_edicao") is None:
-                        st.session_state.pop("id_em_edicao", None)
-
-
 
 
 # --- ABA LOG ---
