@@ -263,7 +263,7 @@ with abas[1]:
 
                 nova_data = st.date_input("Nova Data de Entrega", value=max(datas_atuais))
 
-                col_btn = st.columns([1, 6, 1])
+                col_btn = st.columns([1, 4, 1])
                 with col_btn[1]:
                     if st.button("💾 Atualizar Tarefa"):
                         try:
