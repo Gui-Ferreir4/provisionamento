@@ -1,21 +1,10 @@
 [
     {
         "ID Tarefa": "52",
-        "Título Tarefa": "teste",
+        "Título Tarefa": "kkk",
         "Subtarefa": "1",
-        "Título Subtarefa": "Texto_teste",
+        "Título Subtarefa": "Texto_kkk",
         "Tipo Subtarefa": "Texto",
-        "Chamado": "",
-        "Data Cadastro": "2025-06-11",
-        "Data Entrega": "2025-10-14",
-        "Status": "Concluído"
-    },
-    {
-        "ID Tarefa": "52",
-        "Título Tarefa": "teste",
-        "Subtarefa": "2",
-        "Título Subtarefa": "Layout_teste",
-        "Tipo Subtarefa": "Layout",
         "Chamado": "",
         "Data Cadastro": "2025-06-11",
         "Data Entrega": "2025-10-15",
@@ -23,10 +12,10 @@
     },
     {
         "ID Tarefa": "52",
-        "Título Tarefa": "teste",
-        "Subtarefa": "3",
-        "Título Subtarefa": "HTML_teste",
-        "Tipo Subtarefa": "HTML",
+        "Título Tarefa": "kkk",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_kkk",
+        "Tipo Subtarefa": "Layout",
         "Chamado": "",
         "Data Cadastro": "2025-06-11",
         "Data Entrega": "2025-10-16",
