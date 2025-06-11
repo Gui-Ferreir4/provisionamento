@@ -1,5 +1,3 @@
-# PARTE 1: Configurações iniciais, lista de projetos, e atualização das funções de arquivos por projeto
-
 import streamlit as st
 import pandas as pd
 import time
@@ -17,15 +15,13 @@ GITHUB_TOKEN = st.secrets["github"]["token"]
 BRANCH = st.secrets["github"]["branch"]
 feriados_br = holidays.Brazil()
 
-# --- LISTA DE PROJETOS ---
 PROJETOS = [
-    "ADCOS", "BANESE CARD", "CAIXA CONSÓRCIO", "CLARO - ENDOMARKETING",
-    "CLUBE DO PADEIRO", "CONDOR", "COOP", "DAVÓ", "DROGA LESTE", "DALBEN",
-    "ATACDÃO DIA  A DIA", "ELC-BRASIL - LAMER", "ELC-BRASIL - MAC", "ELC-BRASIL - TOOFACED",
-    "ELC-BRASIL CLINIQUE", "ELC-BRASIL ESTÉE LAUDER", "ELC-BRASIL JO MALONE",
-    "ELC-CHILE CLINIQUE", "ELC-CHILE ESTÉE LAUDER", "ELC-CHILE MAC",
-    "EMBRATEL", "FEMSA", "GRUPO PEREIRA", "INTER SUPERMERCADOS", "MADERO",
-    "MULVI PAY", "NISSEI", "SBT", "UNILEVER", "OMNI FINANCEIRA"
+    "ADCOS", "BANESE CARD", "CAIXA CONSÓRCIO", "CLARO - ENDOMARKETING", "CLUBE DO PADEIRO", "CONDOR",
+    "COOP", "DAVÓ", "DROGA LESTE", "DALBEN", "ATACDÃO DIA  A DIA", "ELC-BRASIL - LAMER",
+    "ELC-BRASIL - MAC", "ELC-BRASIL - TOOFACED", "ELC-BRASIL CLINIQUE", "ELC-BRASIL ESTÉE LAUDER",
+    "ELC-BRASIL JO MALONE", "ELC-CHILE CLINIQUE", "ELC-CHILE ESTÉE LAUDER", "ELC-CHILE MAC", "EMBRATEL",
+    "FEMSA", "GRUPO PEREIRA", "INTER SUPERMERCADOS", "MADERO", "MULVI PAY", "NISSEI", "SBT",
+    "UNILEVER", "OMNI FINANCEIRA"
 ]
 
 # --- LOG ---
@@ -36,39 +32,36 @@ def registrar_log(msg):
     hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     st.session_state.log.append(f"[{hora}] {msg}")
 
-# --- FUNÇÕES AUXILIARES ---
+# --- FUNÇÕES ---
 def eh_dia_util(d): return d.weekday() < 5 and d not in feriados_br
-
 def proximo_dia_util(d): return d + timedelta(days=1) if not eh_dia_util(d) else d
-
 def retroceder_dias_uteis(d, dias):
     while dias > 0:
         d -= timedelta(days=1)
         if eh_dia_util(d): dias -= 1
     return d
 
-
 def github_file_url(projeto, ano, mes):
     return f"data/{projeto}/tarefas_{ano}_{mes}.json"
 
-
-def listar_arquivos_json(projeto):
+def listar_arquivos_json_por_projeto(projeto):
     pasta = f"data/{projeto}"
     url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{pasta}"
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
     r = requests.get(url, headers=headers)
-    return [f["name"] for f in r.json() if f["name"].endswith(".json")] if r.status_code == 200 else []
-
+    if r.status_code == 200:
+        return [f["name"] for f in r.json() if f["name"].endswith(".json")]
+    return []
 
 def carregar_json_github(projeto, ano, mes):
-    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{github_file_url(projeto, ano, mes)}"
+    path = github_file_url(projeto, ano, mes)
+    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{path}"
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
     r = requests.get(url, headers=headers)
     if r.status_code == 200:
         content = base64.b64decode(r.json()["content"])
         return json.loads(content), r.json()["sha"]
     return [], None
-
 
 def salvar_arquivo_github(projeto, ano, mes, data):
     try:
@@ -79,12 +72,11 @@ def salvar_arquivo_github(projeto, ano, mes, data):
 
         try:
             arquivo = repo.get_contents(path, ref=BRANCH)
-            sha = arquivo.sha
             repo.update_file(
                 path=path,
                 message=f"Atualizando tarefas {ano}/{mes} ({projeto})",
                 content=conteudo,
-                sha=sha,
+                sha=arquivo.sha,
                 branch=BRANCH
             )
             registrar_log(f"✅ Arquivo atualizado: {path}")
@@ -92,7 +84,7 @@ def salvar_arquivo_github(projeto, ano, mes, data):
             if "404" in str(e):
                 repo.create_file(
                     path=path,
-                    message=f"Criando novo arquivo tarefas_{ano}_{mes}.json ({projeto})",
+                    message=f"Criando novo arquivo tarefas_{ano}_{mes}.json",
                     content=conteudo,
                     branch=BRANCH
                 )
@@ -108,7 +100,6 @@ def salvar_arquivo_github(projeto, ano, mes, data):
         registrar_log(erro_msg)
         return False
 
-
 def encontrar_data_disponivel(data_base, subtipo, dados):
     while True:
         if eh_dia_util(data_base):
@@ -117,89 +108,85 @@ def encontrar_data_disponivel(data_base, subtipo, dados):
                 return data_base
         data_base -= timedelta(days=1)
 
-
 def gerar_proximo_id():
     ids = []
     for projeto in PROJETOS:
-        arquivos = listar_arquivos_json(projeto)
+        arquivos = listar_arquivos_json_por_projeto(projeto)
         for arq in arquivos:
-            ano, mes = arq.replace("tarefas_", "").replace(".json", "").split("_")
-            dados, _ = carregar_json_github(projeto, ano, mes)
-            ids += [int(d["ID Tarefa"]) for d in dados if d["ID Tarefa"].isdigit()]
+            try:
+                ano, mes = arq.replace("tarefas_", "").replace(".json", "").split("_")
+                dados, _ = carregar_json_github(projeto, ano, mes)
+                ids += [int(d["ID Tarefa"]) for d in dados if d["ID Tarefa"].isdigit()]
+            except:
+                continue
     return max(ids) + 1 if ids else 1
 
 # INÍCIO DAS ABAS
 abas = st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📜 LOG"])
 
-# PARTE 2: CADASTRO
+# --- ABA CADASTRO ---
 with abas[0]:
-    st.title("📋 Cadastro de Tarefa")
-
-    projeto = st.selectbox("Selecione o Projeto", PROJETOS)
+    st.header("📋 Cadastro de Tarefa")
     novo_id = gerar_proximo_id()
 
-    titulo = st.text_input("Título da Tarefa")
-    chamado = st.text_input("Chamado (número do Hike)")
+    with st.form("form_cadastro"):
+        col1, col2, col3 = st.columns([1, 4, 1])
+        with col2:
+            projeto = st.selectbox("Projeto", PROJETOS, index=0)
+            titulo = st.text_input("Título da Tarefa")
+            chamado = st.text_input("Chamado (número do Hike)")
+            st.markdown("**Subtarefas:**")
+            t = st.checkbox("📝 Texto", value=True)
+            l = st.checkbox("🎨 Layout", value=True)
+            h = st.checkbox("💻 HTML", value=True)
+            hoje = date.today()
+            data_entrega = st.date_input("Data Final", value=proximo_dia_util(hoje), min_value=hoje)
+            cadastrar = st.form_submit_button("💾 Cadastrar")
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        t1 = st.checkbox("📝 Texto")
-    with col2:
-        t2 = st.checkbox("🎨 Layout")
-    with col3:
-        t3 = st.checkbox("💻 HTML")
-
-    data_final = st.date_input("Data Final de Entrega", value=datetime.today())
-
-    if st.button("✅ Cadastrar Tarefa"):
-        if not titulo or not chamado:
-            st.error("Preencha o título e o chamado.")
-        elif not any([t1, t2, t3]):
-            st.error("Selecione pelo menos um tipo de subtarefa.")
-        elif data_final < datetime.today().date():
-            st.error("A data final não pode ser anterior à data de hoje.")
+    if cadastrar:
+        if not (t or l or h):
+            st.warning("⚠️ Marque pelo menos uma subtarefa.")
         else:
-            try:
-                ano = str(datetime.today().year)
-                mes = f"{datetime.today().month:02d}"
-                dados_existentes, _ = carregar_json_github(projeto, ano, mes)
+            tipos = []
+            if t: tipos.append("Texto")
+            if l: tipos.append("Layout")
+            if h: tipos.append("HTML")
 
-                novas = []
-                tipos = {"Texto": t1, "Layout": t2, "HTML": t3}
-                tipos_selecionados = [k for k, v in tipos.items() if v]
-                dias_ajuste = len(tipos_selecionados) - 1
+            tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
+            ano, mes = data_entrega.year, f"{data_entrega.month:02}"
+            dados, _ = carregar_json_github(projeto, ano, mes)
 
-                for i, tipo in enumerate(sorted(tipos_selecionados, key=lambda x: ["Texto", "Layout", "HTML"].index(x))):
-                    base = retroceder_dias_uteis(data_final, dias_ajuste - i)
-                    entrega = encontrar_data_disponivel(base, tipo, dados_existentes)
-                    novas.append({
-                        "ID Tarefa": str(novo_id),
-                        "Título Tarefa": titulo,
-                        "Subtarefa": str(i+1),
-                        "Título Subtarefa": f"{tipo}_{titulo}",
-                        "Tipo Subtarefa": tipo,
-                        "Chamado": chamado,
-                        "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
-                        "Data Entrega": str(entrega),
-                        "Status": "Pendente"
-                    })
+            novas = []
+            dias = len(tipos) - 1
+            for i, tipo in enumerate(tipos):
+                base = retroceder_dias_uteis(data_entrega, dias - i) if dias > 0 else data_entrega
+                data_final = encontrar_data_disponivel(base, tipo, dados)
+                novas.append({
+                    "ID Tarefa": str(novo_id),
+                    "Título Tarefa": titulo,
+                    "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
+                    "Título Subtarefa": f"{tipo}_{titulo}",
+                    "Tipo Subtarefa": tipo,
+                    "Chamado": chamado,
+                    "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
+                    "Data Entrega": str(data_final),
+                    "Projeto": projeto
+                })
 
-                dados_existentes.extend(novas)
-                sucesso = salvar_arquivo_github(projeto, ano, mes, dados_existentes)
+            dados.extend(novas)
+            if salvar_arquivo_github(projeto, ano, mes, dados):
+                st.success("✅ Tarefa cadastrada com sucesso!")
+                registrar_log(f"✅ Cadastro tarefa {novo_id} em {projeto}/tarefas_{ano}_{mes}.json")
 
-                if sucesso:
-                    st.success(f"Tarefa {novo_id} cadastrada com sucesso.")
-            except Exception as e:
-                st.error(f"Erro ao cadastrar: {e}")
-                registrar_log(f"❌ Erro ao cadastrar tarefa {novo_id}: {e}")
-
-# PARTE 3: TAREFAS CADASTRADAS
+# --- ABA TAREFAS CADASTRADAS ---
 with abas[1]:
-    st.title("📋 Tarefas Cadastradas")
+    st.header("📋 Tarefas Cadastradas")
 
-    projeto_sel = st.selectbox("Selecione o Projeto para Consulta", PROJETOS, key="projeto_consulta")
+    col_filtros = st.columns([1, 4, 1])
+    with col_filtros[1]:
+        projeto_selecionado = st.selectbox("Projeto", PROJETOS, key="projeto_selecionado")
 
-    arquivos = listar_arquivos_json(projeto_sel)
+    arquivos = listar_arquivos_json_por_projeto(projeto_selecionado)
     periodos = sorted([a.replace("tarefas_", "").replace(".json", "") for a in arquivos])
 
     if not periodos:
@@ -208,47 +195,168 @@ with abas[1]:
         if "ultimo_periodo" not in st.session_state:
             st.session_state.ultimo_periodo = None
 
-        col_top = st.columns([1, 4, 1])
-        with col_top[1]:
-            periodo = st.selectbox("📂 Selecione o Período", periodos, key="periodo_consulta")
+        col_periodo = st.columns([1, 4, 1])
+        with col_periodo[1]:
+            st.markdown("### 📂 Selecione o Período")
+            periodo = st.selectbox(
+                "", periodos,
+                format_func=lambda x: f"{x[:4]}/{x[5:]}",
+                key="periodo_selecionado"
+            )
 
-        if st.session_state.ultimo_periodo != st.session_state.periodo_consulta:
-            st.session_state.ultimo_periodo = st.session_state.periodo_consulta
-            st.session_state.pop("modo_edicao", None)
-            st.session_state.pop("id_em_edicao", None)
+        if st.session_state.ultimo_periodo is not None and st.session_state.ultimo_periodo != st.session_state.periodo_selecionado:
+            st.session_state.ultimo_periodo = st.session_state.periodo_selecionado
+            st.session_state["modo_edicao"] = False
+            st.session_state["id_em_edicao"] = None
             st.rerun()
+        else:
+            st.session_state.ultimo_periodo = st.session_state.periodo_selecionado
 
-        ano, mes = st.session_state.periodo_consulta.split("_")
-        dados_json, _ = carregar_json_github(projeto_sel, ano, mes)
+        ano, mes = st.session_state.periodo_selecionado.split("_")
+        dados_json, _ = carregar_json_github(projeto_selecionado, ano, mes)
 
         if "modo_edicao" not in st.session_state:
-            st.session_state.modo_edicao = False
+            st.session_state["modo_edicao"] = False
+        if "id_em_edicao" not in st.session_state:
+            st.session_state["id_em_edicao"] = None
 
         col_main = st.columns([1, 4, 1])
         with col_main[1]:
-            id_input = st.text_input("🔍 Digite o ID da Tarefa que deseja editar:")
+            st.markdown("### ✏️ Digite o ID da Tarefa para editar")
+
+            if st.session_state.get("tarefa_atualizada"):
+                st.success(f"✅ {st.session_state['tarefa_atualizada']}")
+                del st.session_state["tarefa_atualizada"]
+
+            id_input = st.text_input("ID da Tarefa", value="")
 
             if not st.session_state.modo_edicao:
                 if id_input:
                     tarefas = [t for t in dados_json if t["ID Tarefa"] == id_input]
                     if not tarefas:
                         st.warning(f"❌ Nenhuma tarefa encontrada com ID {id_input}.")
-                        registrar_log(f"⚠️ ID {id_input} não localizado em {projeto_sel}/tarefas_{ano}_{mes}.json")
+                        registrar_log(f"⚠️ ID {id_input} não localizado em {projeto_selecionado}/tarefas_{ano}_{mes}.json")
                     else:
                         st.session_state.modo_edicao = True
                         st.session_state.id_em_edicao = id_input
                         st.rerun()
                 else:
-                    st.markdown("### 📄 Tarefas no Período Selecionado")
-                    st.dataframe(pd.DataFrame(dados_json), use_container_width=True)
+                    if dados_json:
+                        st.markdown("### 📄 Tarefas no Período Selecionado")
+                        st.dataframe(pd.DataFrame(dados_json), use_container_width=True)
+                    else:
+                        st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
 
-# PARTE 4: LOG
+                 else:
+                    tarefas = [t for t in dados_json if t["ID Tarefa"] == st.session_state.id_em_edicao]
+                    if not tarefas:
+                        st.session_state["modo_edicao"] = False
+                        st.session_state["id_em_edicao"] = None
+                        st.rerun()
+
+                    ref = tarefas[0]
+                    titulo_antigo = ref["Título Tarefa"]
+                    chamado_antigo = ref.get("Chamado", "")
+                    tipos_atuais = {t["Tipo Subtarefa"] for t in tarefas}
+                    datas_atuais = [datetime.strptime(t["Data Entrega"], "%Y-%m-%d").date() for t in tarefas]
+
+                    st.markdown("### 🛠️ Editar Tarefa")
+                    novo_titulo = st.text_input("Novo Título", value=titulo_antigo)
+                    novo_chamado = st.text_area("Novo Chamado (número do Hike)", value=chamado_antigo, height=80)
+
+                    st.markdown("**Subtarefas e Status:**")
+                    tipos = ["Texto", "Layout", "HTML"]
+                    checkboxes_tipos = {}
+                    checkboxes_status = {}
+
+                    for tipo in tipos:
+                        col_sub, col_stat = st.columns([1, 1])
+                        with col_sub:
+                            existe = tipo in tipos_atuais
+                            checkboxes_tipos[tipo] = st.checkbox(f"✅ {tipo}", value=existe, key=f"tipo_{tipo}")
+                        with col_stat:
+                            if existe:
+                                concluido = any(t["Tipo Subtarefa"] == tipo and t.get("Status") == "Concluído" for t in tarefas)
+                                checkboxes_status[tipo] = st.checkbox(f"✔️ Concluído", value=concluido, key=f"stat_{tipo}")
+
+                    nova_data = st.date_input("Nova Data de Entrega", value=max(datas_atuais))
+
+                    col_btn = col_main
+                    with col_btn[1]:
+                        if st.button("💾 Atualizar Tarefa"):
+                            try:
+                                tipos_selecionados = [k for k, v in checkboxes_tipos.items() if v]
+                                if not tipos_selecionados:
+                                    st.error("❌ Nenhuma subtarefa foi selecionada.")
+                                    registrar_log(f"❌ Cancelado: nenhuma subtarefa marcada para ID {st.session_state.id_em_edicao}")
+                                else:
+                                    registrar_log(f"🔄 Atualizando tarefa {st.session_state.id_em_edicao} em {projeto_selecionado}/tarefas_{ano}_{mes}.json")
+
+                                    dados_filtrados = [d for d in dados_json if d["ID Tarefa"] != st.session_state.id_em_edicao]
+
+                                    novas_subs = []
+                                    dias_ajuste = len(tipos_selecionados) - 1
+                                    for i, tipo in enumerate(sorted(tipos_selecionados, key=lambda x: ["Texto", "Layout", "HTML"].index(x))):
+                                        base = retroceder_dias_uteis(nova_data, dias_ajuste - i) if dias_ajuste else nova_data
+                                        entrega = encontrar_data_disponivel(base, tipo, dados_filtrados)
+                                        status = "Concluído" if checkboxes_status.get(tipo) else "Pendente"
+                                        novas_subs.append({
+                                            "ID Tarefa": st.session_state.id_em_edicao,
+                                            "Título Tarefa": novo_titulo,
+                                            "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
+                                            "Título Subtarefa": f"{tipo}_{novo_titulo}",
+                                            "Tipo Subtarefa": tipo,
+                                            "Chamado": novo_chamado,
+                                            "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
+                                            "Data Entrega": str(entrega),
+                                            "Status": status,
+                                            "Projeto": projeto_selecionado
+                                        })
+
+                                    dados_filtrados.extend(novas_subs)
+
+                                    g = Github(GITHUB_TOKEN)
+                                    repo = g.get_user().get_repo(GITHUB_REPO)
+                                    caminho = github_file_url(projeto_selecionado, ano, mes)
+                                    arquivo = repo.get_contents(caminho, ref=BRANCH)
+                                    repo.update_file(
+                                        path=caminho,
+                                        message=f"Atualização da tarefa {st.session_state.id_em_edicao}",
+                                        content=json.dumps(dados_filtrados, ensure_ascii=False, indent=4),
+                                        sha=arquivo.sha,
+                                        branch=BRANCH
+                                    )
+
+                                registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada.")
+                                st.session_state["tarefa_atualizada"] = f"Tarefa {st.session_state.id_em_edicao} atualizada com sucesso!"
+                                    
+                                # Corrige o estado da aba para retornar à visualização da tabela
+                                st.session_state["modo_edicao"] = False
+                                st.session_state["id_em_edicao"] = None
+                                
+                                # Exibição da tabela novamente se não estiver em modo de edição
+                                if not st.session_state.modo_edicao:
+                                    if dados_json:
+                                        st.markdown("### 📄 Tarefas no Período Selecionado")
+                                        st.dataframe(pd.DataFrame(dados_json), use_container_width=True)
+                                    else:
+                                        st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
+                                else:
+                                    # Garante limpeza do ID se for None
+                                    if st.session_state.get("id_em_edicao") is None:
+                                        st.session_state.pop("id_em_edicao", None)
+
+                        except Exception as e:
+                            st.error(f"❌ Erro: {e}")
+                            registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
+
+
+# --- ABA LOG ---
 with abas[2]:
-    st.title("📜 LOG DE ATIVIDADES")
+    st.header("📜 LOG do Sistema")
 
-    if st.session_state.log:
-        st.markdown("### 🧾 Histórico de ações executadas nesta sessão:")
-        for linha in reversed(st.session_state.log):
-            st.markdown(f"- {linha}")
+    if not st.session_state.log:
+        st.info("ℹ️ Nenhuma ação registrada nesta sessão.")
     else:
-        st.info("ℹ️ Nenhuma atividade registrada ainda.")
+        for linha in reversed(st.session_state.log):
+            st.code(linha)
