@@ -336,19 +336,20 @@ with abas[1]:
                             
                             # Exibição da tabela novamente se não estiver em modo de edição
                             if not st.session_state.modo_edicao:
-                                if dados_json:
-                                    st.markdown("### 📄 Tarefas no Período Selecionado")
-                                    st.dataframe(pd.DataFrame(dados_json), use_container_width=True)
+                                    if dados_json:
+                                        st.markdown("### 📄 Tarefas no Período Selecionado")
+                                        st.dataframe(pd.DataFrame(dados_json), use_container_width=True)
+                                    else:
+                                        st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
                                 else:
-                                    st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
-                            else:
-                                # Garante limpeza do ID se for None
-                                if st.session_state.get("id_em_edicao") is None:
-                                    st.session_state.pop("id_em_edicao", None)
+                                    # Garante limpeza do ID se for None
+                                    if st.session_state.get("id_em_edicao") is None:
+                                        st.session_state.pop("id_em_edicao", None)
+                                #st.rerun()
 
-                    except Exception as e:
-                        st.error(f"❌ Erro: {e}")
-                        registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
+                        except Exception as e:
+                            st.error(f"❌ Erro: {e}")
+                            registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
 
 
 # --- ABA LOG ---
