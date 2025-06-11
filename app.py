@@ -181,20 +181,20 @@ with abas[1]:
 
         if "modo_edicao" not in st.session_state:
             st.session_state.modo_edicao = False
-            st.session_state.id_editar = ""
 
         col_main = st.columns([1, 4, 1])
         with col_main[1]:
-            st.text_input("🔍 Digite o ID da Tarefa que deseja editar:", key="id_editar")
+            id_input = st.text_input("🔍 Digite o ID da Tarefa que deseja editar:")
 
             if not st.session_state.modo_edicao:
-                if st.session_state.id_editar:
-                    tarefas = [t for t in dados_json if t["ID Tarefa"] == st.session_state.id_editar]
+                if id_input:
+                    tarefas = [t for t in dados_json if t["ID Tarefa"] == id_input]
                     if not tarefas:
-                        st.warning(f"❌ Nenhuma tarefa encontrada com ID {st.session_state.id_editar}.")
-                        registrar_log(f"⚠️ ID {st.session_state.id_editar} não localizado em tarefas_{ano}_{mes}.json")
+                        st.warning(f"❌ Nenhuma tarefa encontrada com ID {id_input}.")
+                        registrar_log(f"⚠️ ID {id_input} não localizado em tarefas_{ano}_{mes}.json")
                     else:
                         st.session_state.modo_edicao = True
+                        st.session_state.id_em_edicao = id_input
                         st.rerun()
                 else:
                     if dados_json:
@@ -204,7 +204,7 @@ with abas[1]:
                         st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
 
             else:
-                tarefas = [t for t in dados_json if t["ID Tarefa"] == st.session_state.id_editar]
+                tarefas = [t for t in dados_json if t["ID Tarefa"] == st.session_state.id_em_edicao]
                 ref = tarefas[0]
                 titulo_antigo = ref["Título Tarefa"]
                 chamado_antigo = ref.get("Chamado", "")
@@ -237,12 +237,12 @@ with abas[1]:
                         tipos_selecionados = [k for k, v in checkboxes_tipos.items() if v]
                         if not tipos_selecionados:
                             st.error("❌ Nenhuma subtarefa foi selecionada.")
-                            registrar_log(f"❌ Cancelado: nenhuma subtarefa marcada para ID {st.session_state.id_editar}")
+                            registrar_log(f"❌ Cancelado: nenhuma subtarefa marcada para ID {st.session_state.id_em_edicao}")
                         else:
-                            registrar_log(f"🔄 Atualizando tarefa {st.session_state.id_editar} no arquivo tarefas_{ano}_{mes}.json")
+                            registrar_log(f"🔄 Atualizando tarefa {st.session_state.id_em_edicao} no arquivo tarefas_{ano}_{mes}.json")
 
-                            dados_filtrados = [d for d in dados_json if d["ID Tarefa"] != st.session_state.id_editar]
-                            registrar_log(f"🗑️ Tarefa {st.session_state.id_editar} removida.")
+                            dados_filtrados = [d for d in dados_json if d["ID Tarefa"] != st.session_state.id_em_edicao]
+                            registrar_log(f"🗑️ Tarefa {st.session_state.id_em_edicao} removida.")
 
                             novas_subs = []
                             dias_ajuste = len(tipos_selecionados) - 1
@@ -251,7 +251,7 @@ with abas[1]:
                                 entrega = encontrar_data_disponivel(base, tipo, dados_filtrados)
                                 status = "Concluído" if checkboxes_status.get(tipo) else "Pendente"
                                 novas_subs.append({
-                                    "ID Tarefa": st.session_state.id_editar,
+                                    "ID Tarefa": st.session_state.id_em_edicao,
                                     "Título Tarefa": novo_titulo,
                                     "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
                                     "Título Subtarefa": f"{tipo}_{novo_titulo}",
@@ -271,23 +271,23 @@ with abas[1]:
                             sha_arquivo = arquivo.sha
                             repo.update_file(
                                 path=caminho,
-                                message=f"Atualização da tarefa {st.session_state.id_editar}",
+                                message=f"Atualização da tarefa {st.session_state.id_em_edicao}",
                                 content=json.dumps(dados_filtrados, ensure_ascii=False, indent=4),
                                 sha=sha_arquivo,
                                 branch=BRANCH
                             )
 
-                            st.success(f"✅ Tarefa {st.session_state.id_editar} atualizada com sucesso!")
-                            registrar_log(f"✅ Tarefa {st.session_state.id_editar} atualizada com SHA {sha_arquivo}.")
+                            st.success(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com sucesso!")
+                            registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com SHA {sha_arquivo}.")
 
-                            # Limpa a edição
-                            st.session_state.modo_edicao = False
-                            st.session_state.id_editar = ""
+                            # Limpa e volta para a tabela
+                            del st.session_state["modo_edicao"]
+                            del st.session_state["id_em_edicao"]
                             st.rerun()
 
                     except Exception as e:
                         st.error(f"❌ Erro: {e}")
-                        registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.id_editar}: {e}")
+                        registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.id_em_edicao}: {e}")
 
 
 # --- ABA LOG ---
