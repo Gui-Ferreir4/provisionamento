@@ -345,11 +345,11 @@ with abas[1]:
                                 # Garante limpeza do ID se for None
                                 if st.session_state.get("id_em_edicao") is None:
                                     st.session_state.pop("id_em_edicao", None)
-                            #st.rerun()
+                                    st.rerun()
 
-                    except Exception as e:
-                        st.error(f"❌ Erro: {e}")
-                        registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
+                            except Exception as e:
+                                st.error(f"❌ Erro: {e}")
+                                registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
 
 
 # --- ABA LOG ---
