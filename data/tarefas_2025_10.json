@@ -1,9 +1,9 @@
 [
     {
         "ID Tarefa": "52",
-        "Título Tarefa": "Casa da vó",
+        "Título Tarefa": "Casa ",
         "Subtarefa": "1",
-        "Título Subtarefa": "Texto_Casa da vó",
+        "Título Subtarefa": "Texto_Casa ",
         "Tipo Subtarefa": "Texto",
         "Chamado": "",
         "Data Cadastro": "2025-06-11",
@@ -12,20 +12,20 @@
     },
     {
         "ID Tarefa": "52",
-        "Título Tarefa": "Casa da vó",
+        "Título Tarefa": "Casa ",
         "Subtarefa": "2",
-        "Título Subtarefa": "Layout_Casa da vó",
+        "Título Subtarefa": "Layout_Casa ",
         "Tipo Subtarefa": "Layout",
         "Chamado": "",
         "Data Cadastro": "2025-06-11",
         "Data Entrega": "2025-10-15",
-        "Status": "Pendente"
+        "Status": "Concluído"
     },
     {
         "ID Tarefa": "52",
-        "Título Tarefa": "Casa da vó",
+        "Título Tarefa": "Casa ",
         "Subtarefa": "3",
-        "Título Subtarefa": "HTML_Casa da vó",
+        "Título Subtarefa": "HTML_Casa ",
         "Tipo Subtarefa": "HTML",
         "Chamado": "",
         "Data Cadastro": "2025-06-11",
