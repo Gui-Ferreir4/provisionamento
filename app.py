@@ -173,11 +173,29 @@ with abas[1]:
     if not periodos:
         st.warning("⚠️ Nenhum arquivo encontrado.")
     else:
+        # Inicializa controle de último período selecionado
+        if "ultimo_periodo" not in st.session_state:
+            st.session_state.ultimo_periodo = None
+
         st.markdown("### 📂 Selecione o Período")
         col_top = st.columns([1, 4, 1])
         with col_top[1]:
-            periodo = st.selectbox("", periodos, format_func=lambda x: f"{x[:4]}/{x[5:]}")
-        ano, mes = periodo.split("_")
+            periodo = st.selectbox(
+                "", periodos,
+                format_func=lambda x: f"{x[:4]}/{x[5:]}",
+                key="periodo_selecionado"
+            )
+
+        # Resetar modo edição se mudou ou reafirmou a seleção
+        if st.session_state.ultimo_periodo != st.session_state.periodo_selecionado:
+            st.session_state.ultimo_periodo = st.session_state.periodo_selecionado
+            if "modo_edicao" in st.session_state:
+                del st.session_state["modo_edicao"]
+            if "id_em_edicao" in st.session_state:
+                del st.session_state["id_em_edicao"]
+            st.experimental_rerun()
+
+        ano, mes = st.session_state.periodo_selecionado.split("_")
         dados_json, _ = carregar_json_github(ano, mes)
 
         if "modo_edicao" not in st.session_state:
@@ -286,16 +304,16 @@ with abas[1]:
                             st.success(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com sucesso!")
                             registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com SHA {sha_arquivo}.")
 
-                            # Limpa e volta à tela principal
+                            # Espera 1s antes de retornar à tela original
+                            import time
                             time.sleep(1)
                             del st.session_state["modo_edicao"]
                             del st.session_state["id_em_edicao"]
-                            st.rerun()
+                            st.experimental_rerun()
 
                     except Exception as e:
                         st.error(f"❌ Erro: {e}")
                         registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.id_em_edicao}: {e}")
-
 
 
 
