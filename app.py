@@ -231,12 +231,29 @@ with abas[1]:
                         st.session_state.id_em_edicao = id_input
                         st.rerun()
 
-            else:
+            elif st.session_state.modo_edicao == True:
                 tarefas = [t for t in dados_json if t["ID Tarefa"] == st.session_state.id_em_edicao]
                 if not tarefas:
                     st.session_state["modo_edicao"] = False
                     st.session_state["id_em_edicao"] = None
                     st.rerun()
+
+                elif st.session_state.modo_edicao == "final":
+                    if st.session_state.get("tarefa_atualizada"):
+                        st.success(f"✅ {st.session_state['tarefa_atualizada']}")
+                        del st.session_state["tarefa_atualizada"]
+                
+                    if dados_json:
+                        st.markdown("### 📄 Tarefas no Período Selecionado")
+                        st.dataframe(pd.DataFrame(dados_json), use_container_width=True)
+                    else:
+                        st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
+                
+                    # Botão para voltar ao estado inicial
+                    if st.button("🔄 Nova edição"):
+                        st.session_state["modo_edicao"] = False
+                        st.session_state["id_em_edicao"] = None
+                        st.rerun()
 
                 ref = tarefas[0]
                 titulo_antigo = ref["Título Tarefa"]
@@ -312,9 +329,7 @@ with abas[1]:
 
                                 registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada.")
                                 st.session_state["tarefa_atualizada"] = f"Tarefa {st.session_state.id_em_edicao} atualizada com sucesso!"
-                                st.session_state["modo_edicao"] = False
-                                st.session_state["id_em_edicao"] = None
-                                st.rerun()
+                                st.session_state["modo_edicao"] = "final"
 
                         except Exception as e:
                             st.error(f"❌ Erro: {e}")
