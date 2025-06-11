@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import time
 import json
 import base64
 import requests
@@ -286,6 +287,7 @@ with abas[1]:
                             registrar_log(f"✅ Tarefa {st.session_state.id_em_edicao} atualizada com SHA {sha_arquivo}.")
 
                             # Limpa e volta à tela principal
+                            time.sleep(1)
                             del st.session_state["modo_edicao"]
                             del st.session_state["id_em_edicao"]
                             st.rerun()
