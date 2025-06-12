@@ -130,7 +130,7 @@ with abas[0]:
     novo_id = gerar_proximo_id()
 
     with st.form("form_cadastro"):
-        col1, col2, col3 = st.columns([4])
+        col1, col2, col3 = st.columns([1])
         with col1:
             projeto = st.selectbox("Projeto", PROJETOS, index=0)
             titulo = st.text_input("Título da Tarefa")
