@@ -176,10 +176,10 @@ with abas[0]:
                 data_final = encontrar_data_disponivel(base, tipo, dados)
     
                 if data_final < data_hoje:
-                    erros.append(f"❌ A subtarefa '{tipo}' esta para uma data inválida: {data_final.strftime('%d/%m/%Y')}.\nAjuste a data de entrega.")
+                    erros.append(f"❌ A subtarefa '{tipo}' esta para uma data inválida: {data_final.strftime('%d/%m/%Y')}.\nAjuste a data final da tarefa.")
     
                 if data_final.month < mes_final:
-                    erros.append(f"❌ A subtarefa '{tipo}' não pode ser cadastrada em um mês diferente do mês selecionada na data de entrega. ({data_final.strftime('%m/%Y')}). \nAjuste a data de entrega.")
+                    erros.append(f"❌ A subtarefa '{tipo}' não pode ser cadastrada em um mês diferente do selecionado na data final. ({data_final.strftime('%d/%m/%Y')}). \nAjuste a data final da tarefa.")
     
                 novas.append({
                     "ID Tarefa": str(novo_id),
