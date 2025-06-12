@@ -67,5 +67,38 @@
         "Data Entrega": "2025-06-13",
         "Status": "Concluído",
         "Projeto": "ADCOS"
+    },
+    {
+        "ID Tarefa": "3",
+        "Título Tarefa": "Jornada_adcosPro",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Jornada_adcosPro",
+        "Tipo Subtarefa": "Texto",
+        "Chamado": "234",
+        "Data Cadastro": "2025-06-12",
+        "Data Entrega": "2025-06-12",
+        "Projeto": "ADCOS"
+    },
+    {
+        "ID Tarefa": "3",
+        "Título Tarefa": "Jornada_adcosPro",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Jornada_adcosPro",
+        "Tipo Subtarefa": "Layout",
+        "Chamado": "234",
+        "Data Cadastro": "2025-06-12",
+        "Data Entrega": "2025-06-13",
+        "Projeto": "ADCOS"
+    },
+    {
+        "ID Tarefa": "3",
+        "Título Tarefa": "Jornada_adcosPro",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Jornada_adcosPro",
+        "Tipo Subtarefa": "HTML",
+        "Chamado": "234",
+        "Data Cadastro": "2025-06-12",
+        "Data Entrega": "2025-06-16",
+        "Projeto": "ADCOS"
     }
 ]
