@@ -8,6 +8,7 @@
         "Chamado": "123",
         "Data Cadastro": "2025-06-12",
         "Data Entrega": "2025-06-12",
+        "Status": "Concluído",
         "Projeto": "AB Mauri"
     },
     {
@@ -19,6 +20,7 @@
         "Chamado": "123",
         "Data Cadastro": "2025-06-12",
         "Data Entrega": "2025-06-13",
+        "Status": "Concluído",
         "Projeto": "AB Mauri"
     },
     {
@@ -30,6 +32,7 @@
         "Chamado": "123",
         "Data Cadastro": "2025-06-12",
         "Data Entrega": "2025-06-16",
+        "Status": "Pendente",
         "Projeto": "AB Mauri"
     }
 ]
