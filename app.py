@@ -129,78 +129,78 @@ with abas[0]:
     st.header("📋 Cadastro de Tarefa")
     novo_id = gerar_proximo_id()
 
-with st.form("form_cadastro"):
-    col1, col2, col3 = st.columns([1, 4, 1])
-    with col2:
-        projeto = st.selectbox("Projeto", PROJETOS, index=0)
-        titulo = st.text_input("Título da Tarefa")
-        chamado = st.text_input("Chamado (número do Hike)")
-
-        with st.expander("📌 Subtarefas", expanded=True):
-            t = st.checkbox("📝 Texto", value=True)
-            l = st.checkbox("🎨 Layout", value=True)
-            h = st.checkbox("💻 HTML", value=True)
-
-        hoje = date.today()
-        data_entrega = st.date_input("Data Final", value=proximo_dia_util(hoje), min_value=hoje)
-
-        cadastrar = st.form_submit_button("💾 Cadastrar")
-
-if cadastrar:
-    with st.spinner("Salvando tarefa..."):
-        erros = []
-
-        if not titulo.strip():
-            erros.append("❌ O campo título é obrigatório.")
-
-        if not (t or l or h):
-            erros.append("⚠️ Marque pelo menos uma subtarefa.")
-
-        tipos = []
-        if t: tipos.append("Texto")
-        if l: tipos.append("Layout")
-        if h: tipos.append("HTML")
-
-        tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
-        ano, mes = data_entrega.year, f"{data_entrega.month:02}"
-        dados, _ = carregar_json_github(projeto, ano, mes)
-
-        novas = []
-        dias = len(tipos) - 1
-        data_hoje = date.today()
-        mes_final = data_entrega.month
-
-        for i, tipo in enumerate(tipos):
-            base = retroceder_dias_uteis(data_entrega, dias - i) if dias > 0 else data_entrega
-            data_final = encontrar_data_disponivel(base, tipo, dados)
-
-            if data_final < data_hoje:
-                erros.append(f"❌ A subtarefa '{tipo}' caiu em uma data retroativa: {data_final.strftime('%d/%m/%Y')}.")
-
-            if data_final.month < mes_final:
-                erros.append(f"❌ A subtarefa '{tipo}' cairia no mês anterior ({data_final.strftime('%m/%Y')}). Cadastro bloqueado.")
-
-            novas.append({
-                "ID Tarefa": str(novo_id),
-                "Título Tarefa": titulo,
-                "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
-                "Título Subtarefa": f"{tipo}_{titulo}",
-                "Tipo Subtarefa": tipo,
-                "Chamado": chamado,
-                "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
-                "Data Entrega": str(data_final),
-                "Projeto": projeto
-            })
-
-        if erros:
-            for erro in erros:
-                st.error(erro)
-            registrar_log(f"❌ Erro(s) no cadastro da tarefa {novo_id}: {' | '.join(erros)}")
-        else:
-            dados.extend(novas)
-            if salvar_arquivo_github(projeto, ano, mes, dados):
-                st.success("✅ Tarefa cadastrada com sucesso!")
-                registrar_log(f"✅ Cadastro tarefa {novo_id} em {projeto}/tarefas_{ano}_{mes}.json")
+    with st.form("form_cadastro"):
+        col1, col2, col3 = st.columns([1, 4, 1])
+        with col1:
+            projeto = st.selectbox("Projeto", PROJETOS, index=0)
+            titulo = st.text_input("Título da Tarefa")
+            chamado = st.text_input("Chamado (número do Hike)")
+    
+            with st.expander("📌 Subtarefas", expanded=True):
+                t = st.checkbox("📝 Texto", value=True)
+                l = st.checkbox("🎨 Layout", value=True)
+                h = st.checkbox("💻 HTML", value=True)
+    
+            hoje = date.today()
+            data_entrega = st.date_input("Data Final", value=proximo_dia_util(hoje), min_value=hoje)
+    
+            cadastrar = st.form_submit_button("💾 Cadastrar")
+    
+    if cadastrar:
+        with st.spinner("Salvando tarefa..."):
+            erros = []
+    
+            if not titulo.strip():
+                erros.append("❌ O campo título é obrigatório.")
+    
+            if not (t or l or h):
+                erros.append("⚠️ Marque pelo menos uma subtarefa.")
+    
+            tipos = []
+            if t: tipos.append("Texto")
+            if l: tipos.append("Layout")
+            if h: tipos.append("HTML")
+    
+            tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
+            ano, mes = data_entrega.year, f"{data_entrega.month:02}"
+            dados, _ = carregar_json_github(projeto, ano, mes)
+    
+            novas = []
+            dias = len(tipos) - 1
+            data_hoje = date.today()
+            mes_final = data_entrega.month
+    
+            for i, tipo in enumerate(tipos):
+                base = retroceder_dias_uteis(data_entrega, dias - i) if dias > 0 else data_entrega
+                data_final = encontrar_data_disponivel(base, tipo, dados)
+    
+                if data_final < data_hoje:
+                    erros.append(f"❌ A subtarefa '{tipo}' caiu em uma data retroativa: {data_final.strftime('%d/%m/%Y')}.")
+    
+                if data_final.month < mes_final:
+                    erros.append(f"❌ A subtarefa '{tipo}' cairia no mês anterior ({data_final.strftime('%m/%Y')}). Cadastro bloqueado.")
+    
+                novas.append({
+                    "ID Tarefa": str(novo_id),
+                    "Título Tarefa": titulo,
+                    "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
+                    "Título Subtarefa": f"{tipo}_{titulo}",
+                    "Tipo Subtarefa": tipo,
+                    "Chamado": chamado,
+                    "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
+                    "Data Entrega": str(data_final),
+                    "Projeto": projeto
+                })
+    
+            if erros:
+                for erro in erros:
+                    st.error(erro)
+                registrar_log(f"❌ Erro(s) no cadastro da tarefa {novo_id}: {' | '.join(erros)}")
+            else:
+                dados.extend(novas)
+                if salvar_arquivo_github(projeto, ano, mes, dados):
+                    st.success("✅ Tarefa cadastrada com sucesso!")
+                    registrar_log(f"✅ Cadastro tarefa {novo_id} em {projeto}/tarefas_{ano}_{mes}.json")
 
 # --- ABA TAREFAS CADASTRADAS ---
 with abas[1]:
