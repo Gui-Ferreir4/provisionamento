@@ -16,12 +16,15 @@ BRANCH = st.secrets["github"]["branch"]
 feriados_br = holidays.Brazil()
 
 PROJETOS = [
-    "ADCOS", "BANESE CARD", "CAIXA CONSÓRCIO", "CLARO - ENDOMARKETING", "CLUBE DO PADEIRO", "CONDOR",
-    "COOP", "DAVÓ", "DROGA LESTE", "DALBEN", "ATACDÃO DIA  A DIA", "ELC-BRASIL - LAMER",
-    "ELC-BRASIL - MAC", "ELC-BRASIL - TOOFACED", "ELC-BRASIL CLINIQUE", "ELC-BRASIL ESTÉE LAUDER",
-    "ELC-BRASIL JO MALONE", "ELC-CHILE CLINIQUE", "ELC-CHILE ESTÉE LAUDER", "ELC-CHILE MAC", "EMBRATEL",
-    "FEMSA", "GRUPO PEREIRA", "INTER SUPERMERCADOS", "MADERO", "MULVI PAY", "NISSEI", "SBT",
-    "UNILEVER", "OMNI FINANCEIRA"
+    'AB Mauri',
+    'Adcos',
+    'Coop',
+    'Davo',
+    'Nissei',
+    'Pague menos',
+    'Tenda',
+    'Unilever',
+    'Zona sul'    
 ]
 
 # --- LOG ---
