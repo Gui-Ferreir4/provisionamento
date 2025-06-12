@@ -1,0 +1,35 @@
+[
+    {
+        "ID Tarefa": "1",
+        "Título Tarefa": "Teste01",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Teste01",
+        "Tipo Subtarefa": "Texto",
+        "Chamado": "123",
+        "Data Cadastro": "2025-06-12",
+        "Data Entrega": "2025-06-12",
+        "Projeto": "AB Mauri"
+    },
+    {
+        "ID Tarefa": "1",
+        "Título Tarefa": "Teste01",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Teste01",
+        "Tipo Subtarefa": "Layout",
+        "Chamado": "123",
+        "Data Cadastro": "2025-06-12",
+        "Data Entrega": "2025-06-13",
+        "Projeto": "AB Mauri"
+    },
+    {
+        "ID Tarefa": "1",
+        "Título Tarefa": "Teste01",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Teste01",
+        "Tipo Subtarefa": "HTML",
+        "Chamado": "123",
+        "Data Cadastro": "2025-06-12",
+        "Data Entrega": "2025-06-16",
+        "Projeto": "AB Mauri"
+    }
+]
