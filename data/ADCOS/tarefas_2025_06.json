@@ -1,38 +1,5 @@
 [
     {
-        "ID Tarefa": "1",
-        "Título Tarefa": "ola",
-        "Subtarefa": "1",
-        "Título Subtarefa": "Texto_ola",
-        "Tipo Subtarefa": "Texto",
-        "Chamado": "12",
-        "Data Cadastro": "2025-06-11",
-        "Data Entrega": "2025-06-09",
-        "Status": "Pendente"
-    },
-    {
-        "ID Tarefa": "1",
-        "Título Tarefa": "ola",
-        "Subtarefa": "2",
-        "Título Subtarefa": "Layout_ola",
-        "Tipo Subtarefa": "Layout",
-        "Chamado": "12",
-        "Data Cadastro": "2025-06-11",
-        "Data Entrega": "2025-06-10",
-        "Status": "Pendente"
-    },
-    {
-        "ID Tarefa": "1",
-        "Título Tarefa": "ola",
-        "Subtarefa": "3",
-        "Título Subtarefa": "HTML_ola",
-        "Tipo Subtarefa": "HTML",
-        "Chamado": "12",
-        "Data Cadastro": "2025-06-11",
-        "Data Entrega": "2025-06-11",
-        "Status": "Pendente"
-    },
-    {
         "ID Tarefa": "2",
         "Título Tarefa": "validação",
         "Subtarefa": "1",
@@ -102,6 +69,42 @@
         "Data Cadastro": "2025-06-12",
         "Data Entrega": "2025-06-16",
         "Status": "Concluído",
+        "Projeto": "ADCOS"
+    },
+    {
+        "ID Tarefa": "1",
+        "Título Tarefa": "ola",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_ola",
+        "Tipo Subtarefa": "Texto",
+        "Chamado": "1666",
+        "Data Cadastro": "2025-06-12",
+        "Data Entrega": "2025-06-09",
+        "Status": "Pendente",
+        "Projeto": "ADCOS"
+    },
+    {
+        "ID Tarefa": "1",
+        "Título Tarefa": "ola",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_ola",
+        "Tipo Subtarefa": "Layout",
+        "Chamado": "1666",
+        "Data Cadastro": "2025-06-12",
+        "Data Entrega": "2025-06-10",
+        "Status": "Pendente",
+        "Projeto": "ADCOS"
+    },
+    {
+        "ID Tarefa": "1",
+        "Título Tarefa": "ola",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_ola",
+        "Tipo Subtarefa": "HTML",
+        "Chamado": "1666",
+        "Data Cadastro": "2025-06-12",
+        "Data Entrega": "2025-06-11",
+        "Status": "Pendente",
         "Projeto": "ADCOS"
     }
 ]
