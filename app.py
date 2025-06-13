@@ -9,6 +9,15 @@ from datetime import datetime, date, timedelta
 from github import Github
 import holidays
 
+st.markdown("""
+    <style>
+    .main .block-container {
+        padding-left: 0rem;
+        padding-right: 0rem;
+        max-width: 100%;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # --- CONFIGS ---
 GITHUB_USER = st.secrets["github"]["user"]
