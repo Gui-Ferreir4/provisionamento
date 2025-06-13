@@ -363,21 +363,24 @@ with abas[1]:
                         st.error(f"❌ Erro: {e}")
                         registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
 
-# --- ABA KANBAN ---
+# Aba 2: Kanban (full-width)
 with abas[2]:
     st.markdown("## 📌 Visualização Kanban")
 
+    # Link para abrir o HTML em nova aba (modo tela cheia)
+    url_raw = f"https://raw.githubusercontent.com/{GITHUB_USER}/{GITHUB_REPO}/{BRANCH}/kanban.html"
+    st.markdown(f"[🔗 Abrir Kanban em nova aba]({url_raw})", unsafe_allow_html=True)
+
+    # Renderização do Kanban em tela ampla (embed na página)
     try:
         url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/kanban.html"
         headers = {"Authorization": f"token {GITHUB_TOKEN}"}
         r = requests.get(url, headers=headers)
-
         if r.status_code == 200:
-            content = base64.b64decode(r.json()["content"]).decode("utf-8")
+            content = base64.b64decode(r.json().get("content", "")).decode("utf-8")
             components.html(content, height=1000, scrolling=True)
         else:
             st.error("❌ Não foi possível carregar o arquivo kanban.html.")
-
     except Exception as e:
         st.error(f"Erro ao exibir o Kanban: {e}")
 
