@@ -138,10 +138,10 @@ def gerar_proximo_id():
                 continue
     return max(ids) + 1 if ids else 1
     
-col_main = st.columns([1, 4, 1])
-with col_main[1]:
-    # --- INÍCIO DAS ABAS ---
-    abas = st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📌 Kanban", "📜 LOG"])
+    col_main = st.columns([1, 4, 1])
+    with col_main[1]:
+        # --- INÍCIO DAS ABAS ---
+        abas = st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📌 Kanban", "📜 LOG"])
 
 
     # --- ABA CADASTRO ---
@@ -396,10 +396,11 @@ with abas[2]:
 
 # --- ABA LOG ---
 with abas[3]:
-    st.header("📜 LOG do Sistema")
-
-    if not st.session_state.log:
-        st.info("ℹ️ Nenhuma ação registrada nesta sessão.")
-    else:
-        for linha in reversed(st.session_state.log):
-            st.code(linha)
+    with col_main[1]:
+        st.header("📜 LOG do Sistema")
+    
+        if not st.session_state.log:
+            st.info("ℹ️ Nenhuma ação registrada nesta sessão.")
+        else:
+            for linha in reversed(st.session_state.log):
+                st.code(linha)
