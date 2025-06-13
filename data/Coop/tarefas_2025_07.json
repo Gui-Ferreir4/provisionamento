@@ -34,5 +34,38 @@
         "Data Entrega": "2025-07-04",
         "Status": "Pendente",
         "Projeto": "Coop"
+    },
+    {
+        "ID Tarefa": "3",
+        "Título Tarefa": "Aniversario",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Aniversario",
+        "Tipo Subtarefa": "Texto",
+        "Chamado": "323",
+        "Data Cadastro": "2025-06-13",
+        "Data Entrega": "2025-07-02",
+        "Projeto": "Coop"
+    },
+    {
+        "ID Tarefa": "3",
+        "Título Tarefa": "Aniversario",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Aniversario",
+        "Tipo Subtarefa": "Layout",
+        "Chamado": "323",
+        "Data Cadastro": "2025-06-13",
+        "Data Entrega": "2025-07-03",
+        "Projeto": "Coop"
+    },
+    {
+        "ID Tarefa": "3",
+        "Título Tarefa": "Aniversario",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Aniversario",
+        "Tipo Subtarefa": "HTML",
+        "Chamado": "323",
+        "Data Cadastro": "2025-06-13",
+        "Data Entrega": "2025-07-04",
+        "Projeto": "Coop"
     }
 ]
