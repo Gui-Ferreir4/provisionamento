@@ -359,7 +359,7 @@ with abas[1]:
                     registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
 
 # --- ABA KANBAN ---
-with abas[3]:
+with abas[2]:
     st.header("📌 Visualização Kanban")
 
     try:
@@ -380,7 +380,7 @@ with abas[3]:
         registrar_log(f"❌ Erro ao exibir o Kanban: {e}")
 
 # --- ABA LOG ---
-with abas[2]:
+with abas[3]:
     st.header("📜 LOG do Sistema")
 
     if not st.session_state.log:
