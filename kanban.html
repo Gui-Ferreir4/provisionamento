@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Provisionamento de Tarefas - Kanban</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
+
+    .GridCalendario {
+      display: flex;
+      overflow: auto;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-start;
+    }
+    .day {
+      border: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      width: 280px;
+      min-height: 200px;
+      background: #fafafa;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .day-header {
+      background: #444;
+      color: #fff;
+      padding: 0.5rem;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    .day-body {
+      flex: 1;
+      padding: 8px;
+      overflow-y: auto;
+    }
+    .label-total {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #666;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+    }
+    .card {
+	  padding: 0.5rem;
+	  background: #fff;
+	  border: 1px solid #ccc;
+	  border-radius: 6px;
+	  margin-bottom: 10px;
+	  font-size: 0.85rem;
+	  display: flex;
+	  flex-direction: column;
+	  gap: 6px;
+	  transition: all 0.2s ease;
+	}
+
+	.card:hover {
+	  background: #f9f9f9;
+	  border-color: #999;
+	  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+	}
+
+	.badge-texto {
+	  background: #0084ff;
+	  color: #fff;
+	  border-radius: 4px;
+	  padding: 2px 6px;
+	  font-size: 0.75rem;
+	  display: inline-block;
+	  width: fit-content;
+	}
+	.badge-layout {
+	  background: #ffae00;
+	  color: #000;
+	  border-radius: 4px;
+	  padding: 2px 6px;
+	  font-size: 0.75rem;
+	  display: inline-block;
+	  width: fit-content;
+	}
+	.badge-html {
+	  background: #00d33f;
+	  color: #000;
+	  border-radius: 4px;
+	  padding: 2px 6px;
+	  font-size: 0.75rem;
+	  display: inline-block;
+	  width: fit-content;
+	}
+
+	.card p {
+	  margin: 0;
+	  line-height: 1.2em;
+	  overflow: hidden;
+	  text-overflow: ellipsis;
+	  white-space: nowrap;
+	}
+
+	.card .descricao {
+	  font-size: 0.75rem;
+	  color: #555;
+	  max-height: 3em;
+	  overflow: hidden;
+	  text-overflow: ellipsis;
+	  white-space: normal;
+	}
+  </style>
+</head>
+<body class="p-4">
+  <div class="container-fluid">
+    <div class="row mb-3">
+      <div class="col-md-8">
+        <h3>📅 Kanban de Tarefas</h3>
+      </div>
+      <div class="col-md-4 text-end">
+        <div class="d-flex gap-2">
+          <select id="ano" class="form-select">
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+          </select>
+          <select id="mes" class="form-select">
+            <option value="1">Janeiro</option>
+            <option value="2">Fevereiro</option>
+            <option value="3">Março</option>
+            <option value="4">Abril</option>
+            <option value="5">Maio</option>
+            <option value="6">Junho</option>
+            <option value="7">Julho</option>
+            <option value="8">Agosto</option>
+            <option value="9">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
+          </select>
+          <button id="gerarBtn" class="btn btn-primary">Buscar</button>
+        </div>
+      </div>
+    </div>
+    <div id="totais" class="mb-3 text-end text-muted small"></div>
+    <div id="calendario" class="GridCalendario"></div>
+  </div>
+
+<script>
+const usuario = "Gui-Ferreir4";
+const repo = "provisionamento";
+
+const gerarBtn = document.getElementById("gerarBtn");
+const anoInput = document.getElementById("ano");
+const mesSelect = document.getElementById("mes");
+const calendario = document.getElementById("calendario");
+const tabelaDiv = document.getElementById("tabela");
+const btnCalendario = document.getElementById("btnCalendario");
+const btnTabela = document.getElementById("btnTabela");
+const totaisDiv = document.getElementById("totais");
+
+let tarefas = [];
+
+const diasSemana = ['DOM','SEG','TER','QUA','QUI','SEX','SAB'];
+
+async function carregarDadosDoGitHub(ano, mes) {
+  const caminho = `data/tarefas_${ano}_${String(mes).padStart(2, '0')}.json`;
+  try {
+    const resposta = await fetch(`https://raw.githubusercontent.com/${usuario}/${repo}/main/${caminho}`);
+    if (!resposta.ok) throw new Error("Não foi possível carregar os dados do GitHub");
+    const dados = await resposta.json();
+    return dados;
+  } catch (erro) {
+    console.error("Erro ao carregar JSON do GitHub:", erro);
+    return [];
+  }
+}
+
+function extrairDiaDataLocal(dataStr) {
+  const [ano, mes, dia] = dataStr.split("-").map(Number);
+  return new Date(ano, mes - 1, dia).getDate();
+}
+
+function transformarTarefas(dados) {
+  return dados.map(d => ({
+    id: d["ID Tarefa"] + "_" + d["Subtarefa"],
+    titulo: d["Título Tarefa"],
+    chamado: d["Chamado"] || "",
+    concluido: false,
+    dia: extrairDiaDataLocal(d["Data Entrega"]),
+    tipo: (d["Tipo Subtarefa"] || "").toLowerCase(),
+    ano: new Date(d["Data Entrega"]).getFullYear(),
+    mes: new Date(d["Data Entrega"]).getMonth() + 1
+  }));
+}
+
+function gerarCalendario() {
+  const ano = parseInt(document.getElementById("ano").value);
+  const mes = parseInt(document.getElementById("mes").value);
+  const diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
+  const calendario = document.getElementById("calendario");
+
+  const tarefasDoPeriodo = tarefas.filter(t => t.ano === ano && t.mes === mes);
+  const diasNoMes = new Date(ano, mes, 0).getDate();
+
+  const diasUteis = Array.from({ length: diasNoMes }, (_, i) => i + 1).filter(d => {
+    const dow = new Date(ano, mes - 1, d).getDay();
+    return dow >= 1 && dow <= 5;
+  });
+
+  calendario.innerHTML = "";
+  const fragment = document.createDocumentFragment();
+
+  diasUteis.forEach(dia => {
+    const cell = document.createElement("div");
+    cell.className = "day";
+
+    const date = new Date(ano, mes - 1, dia);
+    const diaSemana = diasSemana[date.getDay()];
+
+    cell.innerHTML = `
+      <div class="day-header">${dia} (${diaSemana})</div>
+      <div class="day-body"></div>
+    `;
+
+    const body = cell.querySelector(".day-body");
+
+    tarefasDoPeriodo
+      .filter(t => t.dia === dia)
+      .sort((a, b) => ["texto", "layout", "html"].indexOf(a.tipo) - ["texto", "layout", "html"].indexOf(b.tipo))
+      .forEach(tarefa => {
+        const card = document.createElement("div");
+		card.className = "card";
+
+		const badge = document.createElement("div");
+		badge.className = `badge badge-${tarefa.tipo}`;
+		badge.textContent = tarefa.tipo;
+		card.appendChild(badge);
+
+		const id = document.createElement("p");
+		id.textContent = `ID: ${tarefa.id.split('_')[0]}`;
+		card.appendChild(id);
+
+		const titulo = document.createElement("p");
+		titulo.textContent = tarefa.titulo;
+		titulo.style.fontWeight = "bold";
+		card.appendChild(titulo);
+
+		if (tarefa.chamado) {
+		  const chamado = document.createElement("p");
+		  chamado.className = "descricao";
+		  chamado.textContent = `Chamado: ${tarefa.chamado}`;
+		  chamado.title = tarefa.chamado;
+		  card.appendChild(chamado);
+		}
+
+        body.appendChild(card);
+      });
+
+    const total = tarefasDoPeriodo.filter(t => t.dia === dia).length;
+    if (total > 0) {
+      const totalBadge = document.createElement("span");
+      totalBadge.className = "label-total";
+      totalBadge.textContent = total;
+      cell.appendChild(totalBadge);
+    }
+
+    fragment.appendChild(cell);
+  });
+
+  calendario.appendChild(fragment);
+}
+
+function gerarTabela() {
+  const ano = parseInt(anoInput.value);
+  const mes = parseInt(mesSelect.value);
+  const tarefasDoPeriodo = tarefas.filter(t => t.ano === ano && t.mes === mes)
+    .sort((a,b) => a.dia - b.dia || ["texto","layout","html"].indexOf(a.tipo) - ["texto","layout","html"].indexOf(b.tipo));
+
+  let html = `<table class="table table-striped-columns sortable">`;
+  html += `<thead><tr>
+    <th>#</th>
+    <th>Data</th>
+    <th>Etapa</th>
+    <th>Título</th>
+  </tr></thead><tbody>`;
+
+  tarefasDoPeriodo.forEach((t, i) => {
+    const dia = (`0${t.dia}`).slice(-2);
+    const mesNum = (`0${t.mes}`).slice(-2);
+    html += `<tr>
+      <td>${i+1}</td>
+      <td>${dia}/${mesNum}/${t.ano}</td>
+      <td><div class="badge badge-${t.tipo}">${t.tipo}</div></td>
+      <td>${t.titulo}</td>
+    </tr>`;
+  });
+
+  html += "</tbody></table>";
+  tabelaDiv.innerHTML = html;
+}
+
+function updateTotals(tarefasDoPeriodo) {
+  const counts = { texto: 0, layout: 0, html: 0 };
+  tarefasDoPeriodo.forEach(t => { if (counts[t.tipo] !== undefined) counts[t.tipo]++; });
+  totaisDiv.innerHTML = `
+    <span class="badge text-bg-secondary">Textos: ${counts.texto}</span>
+    <span class="badge text-bg-secondary">Layouts: ${counts.layout}</span>
+    <span class="badge text-bg-secondary">HTMLs: ${counts.html}</span>
+  `;
+}
+
+gerarBtn.addEventListener("click", async () => {
+  const ano = parseInt(anoInput.value);
+  const mes = parseInt(mesSelect.value);
+  const dadosBrutos = await carregarDadosDoGitHub(ano, mes);
+  tarefas = transformarTarefas(dadosBrutos);
+  gerarCalendario();
+  gerarTabela();
+});
+
+btnCalendario.addEventListener("click", () => {
+  btnCalendario.classList.add("active");
+  btnTabela.classList.remove("active");
+  calendario.style.display = "";
+  tabelaDiv.style.display = "none";
+});
+
+btnTabela.addEventListener("click", () => {
+  btnTabela.classList.add("active");
+  btnCalendario.classList.remove("active");
+  calendario.style.display = "none";
+  tabelaDiv.style.display = "";
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  gerarCalendario();
+  gerarTabela();
+});
+</script>
+</body>
+</html>
