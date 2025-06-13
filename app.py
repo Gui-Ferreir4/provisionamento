@@ -11,11 +11,14 @@ import holidays
 
 st.markdown("""
     <style>
-    .main .block-container {
-        padding-left: 0rem;
-        padding-right: 0rem;
-        max-width: 100%;
-    }
+        .block-container {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+        iframe {
+            width: 100% !important;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -369,7 +372,7 @@ with abas[1]:
 
 # --- ABA KANBAN ---
 with abas[2]:
-    st.header("📌 Visualização Kanban")
+    st.markdown("## 📌 Visualização Kanban")
 
     try:
         url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/kanban.html"
@@ -378,15 +381,12 @@ with abas[2]:
 
         if r.status_code == 200:
             content = base64.b64decode(r.json()["content"]).decode("utf-8")
-            components.html(content, height=800, scrolling=True)
-            registrar_log("✅ Kanban carregado com sucesso.")
+            components.html(content, height=1000, scrolling=True)
         else:
             st.error("❌ Não foi possível carregar o arquivo kanban.html.")
-            registrar_log(f"❌ Erro ao carregar kanban.html: Status {r.status_code}")
 
     except Exception as e:
         st.error(f"Erro ao exibir o Kanban: {e}")
-        registrar_log(f"❌ Erro ao exibir o Kanban: {e}")
 
 # --- ABA LOG ---
 with abas[3]:
