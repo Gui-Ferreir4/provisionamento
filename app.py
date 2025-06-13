@@ -11,8 +11,19 @@ import holidays
 
 st.markdown("""
     <style>
+        /* Alinha o iframe do Kanban à largura total */
         iframe {
             width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: block;
+        }
+
+        /* Remove margem do contêiner pai apenas do iframe */
+        .element-container:has(iframe) {
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100vw !important;
         }
     </style>
 """, unsafe_allow_html=True)
