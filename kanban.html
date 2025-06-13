@@ -128,23 +128,11 @@
             <option value="">Selecione o Projeto</option>
           </select>
           <select id="ano" class="form-select">
-            <option value="2025">2025</option>
-            <option value="2026">2026</option>
-          </select>
-          <select id="mes" class="form-select">
-            <option value="1">Janeiro</option>
-            <option value="2">Fevereiro</option>
-            <option value="3">Março</option>
-            <option value="4">Abril</option>
-            <option value="5">Maio</option>
-            <option value="6">Junho</option>
-            <option value="7">Julho</option>
-            <option value="8">Agosto</option>
-            <option value="9">Setembro</option>
-            <option value="10">Outubro</option>
-            <option value="11">Novembro</option>
-            <option value="12">Dezembro</option>
-          </select>
+			  <option value="">Ano</option>
+			</select>
+			<select id="mes" class="form-select">
+			  <option value="">Mês</option>
+			</select>
           <button id="gerarBtn" class="btn btn-primary">Buscar</button>
         </div>
       </div>
@@ -187,6 +175,49 @@ async function carregarProjetos() {
   }
 }
 
+async function atualizarPeriodos(projeto) {
+  const url = `https://api.github.com/repos/${usuario}/${repo}/contents/data/${projeto}`;
+  try {
+    const resposta = await fetch(url);
+    const arquivos = await resposta.json();
+
+    const periodos = arquivos
+      .filter(arq => arq.name.startsWith("tarefas_") && arq.name.endsWith(".json"))
+      .map(arq => {
+        const partes = arq.name.match(/tarefas_(\d{4})_(\d{2})\.json/);
+        return partes ? { ano: partes[1], mes: partes[2] } : null;
+      })
+      .filter(Boolean);
+
+    // Preencher ANO
+    const anosUnicos = [...new Set(periodos.map(p => p.ano))];
+    anoInput.innerHTML = '<option value="">Ano</option>';
+    anosUnicos.sort().forEach(ano => {
+      const opt = document.createElement("option");
+      opt.value = ano;
+      opt.textContent = ano;
+      anoInput.appendChild(opt);
+    });
+
+    // Preencher MÊS
+    mesSelect.innerHTML = '<option value="">Mês</option>';
+    const mesesUnicos = [...new Set(periodos.map(p => p.mes))];
+    const nomesMeses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+
+    mesesUnicos.sort().forEach(mesNum => {
+      const opt = document.createElement("option");
+      opt.value = parseInt(mesNum, 10);
+      opt.textContent = nomesMeses[parseInt(mesNum, 10) - 1];
+      mesSelect.appendChild(opt);
+    });
+
+  } catch (erro) {
+    console.error("Erro ao buscar períodos:", erro);
+    anoInput.innerHTML = '<option value="">Ano</option>';
+    mesSelect.innerHTML = '<option value="">Mês</option>';
+  }
+}
+
 async function carregarDadosDoGitHub(projeto, ano, mes) {
   const caminho = `data/${projeto}/tarefas_${ano}_${String(mes).padStart(2, '0')}.json`;
   try {
@@ -217,6 +248,17 @@ function transformarTarefas(dados) {
     mes: new Date(d["Data Entrega"]).getMonth() + 1
   }));
 }
+
+projetoSelect.addEventListener("change", () => {
+  const projeto = projetoSelect.value;
+  if (projeto) {
+    atualizarPeriodos(projeto);
+  } else {
+    anoInput.innerHTML = '<option value="">Ano</option>';
+    mesSelect.innerHTML = '<option value="">Mês</option>';
+  }
+});
+
 function gerarCalendario() {
   const ano = parseInt(anoInput.value);
   const mes = parseInt(mesSelect.value);
