@@ -8,6 +8,7 @@
         "Chamado": "992",
         "Data Cadastro": "2025-06-13",
         "Data Entrega": "2025-07-02",
+        "Status": "Concluído",
         "Projeto": "Coop"
     },
     {
@@ -19,6 +20,7 @@
         "Chamado": "992",
         "Data Cadastro": "2025-06-13",
         "Data Entrega": "2025-07-03",
+        "Status": "Pendente",
         "Projeto": "Coop"
     },
     {
@@ -30,6 +32,7 @@
         "Chamado": "992",
         "Data Cadastro": "2025-06-13",
         "Data Entrega": "2025-07-04",
+        "Status": "Pendente",
         "Projeto": "Coop"
     }
 ]
