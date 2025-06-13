@@ -1,0 +1,35 @@
+[
+    {
+        "ID Tarefa": "2",
+        "Título Tarefa": "Bolo de aniversario",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Bolo de aniversario",
+        "Tipo Subtarefa": "Texto",
+        "Chamado": "992",
+        "Data Cadastro": "2025-06-13",
+        "Data Entrega": "2025-07-02",
+        "Projeto": "Coop"
+    },
+    {
+        "ID Tarefa": "2",
+        "Título Tarefa": "Bolo de aniversario",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Bolo de aniversario",
+        "Tipo Subtarefa": "Layout",
+        "Chamado": "992",
+        "Data Cadastro": "2025-06-13",
+        "Data Entrega": "2025-07-03",
+        "Projeto": "Coop"
+    },
+    {
+        "ID Tarefa": "2",
+        "Título Tarefa": "Bolo de aniversario",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Bolo de aniversario",
+        "Tipo Subtarefa": "HTML",
+        "Chamado": "992",
+        "Data Cadastro": "2025-06-13",
+        "Data Entrega": "2025-07-04",
+        "Projeto": "Coop"
+    }
+]
