@@ -22,13 +22,13 @@
       flex-direction: column;
       position: relative;
       width: 280px;
-      min-height: 400px;
+      min-height: 500px;
       background: #fafafa;
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       overflow: hidden;
-	min-width: 260px;
-	flex: 0 0 auto;
+	  min-width: 260px;
+	  flex: 0 0 auto;
     }
     .day-header {
       background: #444;
@@ -72,33 +72,33 @@
       box-shadow: 0 0 4px rgba(0,0,0,0.1);
     }
 
-    .badge-texto {
-      background: #0084ff;
-      color: #fff;
-      border-radius: 4px;
-      padding: 2px 6px;
-      font-size: 0.75rem;
-      display: inline-block;
-      width: fit-content;
-    }
-    .badge-layout {
-      background: #ffae00;
-      color: #000;
-      border-radius: 4px;
-      padding: 2px 6px;
-      font-size: 0.75rem;
-      display: inline-block;
-      width: fit-content;
-    }
-    .badge-html {
-      background: #00d33f;
-      color: #000;
-      border-radius: 4px;
-      padding: 2px 6px;
-      font-size: 0.75rem;
-      display: inline-block;
-      width: fit-content;
-    }
+    .badge-texto,
+	.badge-layout,
+	.badge-html {
+	  font-size: 0.9rem;           /* Aumenta o tamanho da fonte */
+	  font-weight: 600;            /* Deixa mais destacado */
+	  padding: 4px 25px;            /* Maior espaço interno */
+	  border-radius: 6px;
+	  display: inline-block;
+	  width: fit-content;
+	  margin: 0 auto;              /* Centraliza horizontalmente */
+	  text-align: center;
+	}
+
+	.badge-texto {
+	  background: #0084ff;
+	  color: #fff;
+	}
+
+	.badge-layout {
+	  background: #ffae00;
+	  color: #000;
+	}
+
+	.badge-html {
+	  background: #00d33f;
+	  color: #000;
+	}
 
     .card p {
       margin: 0;
@@ -300,6 +300,10 @@ function gerarCalendario() {
 		  card.style.border = "2px solid #28a745";
 		  card.style.backgroundColor = "#eafbe7";
 		  card.innerHTML += `<div style="font-size: 1rem; color: #28a745;">✅ Concluído</div>`;
+		} else if (tarefa.status.toLowerCase() === "pendente") {
+		  card.style.border = "2px solid #ffeeba";
+		  card.style.backgroundColor = "#fff3cd";
+		  card.innerHTML += `<div style="font-size: 1rem; color: #856404;">⏳ Pendente</div>`;
 		}
 
 		const badge = document.createElement("div");
@@ -308,7 +312,7 @@ function gerarCalendario() {
 		card.appendChild(badge);
 
 		const id = document.createElement("p");
-		id.innerHTML = `<strong>🆔 ID Tarefa:</strong> ${tarefa.id.split('_')[0]}`;
+		id.innerHTML = `<strong>🆔 ID:</strong> ${tarefa.id.split('_')[0]}`;
 		card.appendChild(id);
 
 		const titulo = document.createElement("p");
