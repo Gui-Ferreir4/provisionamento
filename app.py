@@ -11,20 +11,27 @@ import holidays
 
 st.markdown("""
     <style>
-        /* Alinha o iframe do Kanban à largura total */
-        iframe {
-            width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            display: block;
-        }
+    /* Só afeta o iframe do Kanban */
+    iframe[title="streamlit.components.v1.html"] {
+        width: 100vw !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none;
+        display: block;
+    }
 
-        /* Remove margem do contêiner pai apenas do iframe */
-        .element-container:has(iframe) {
-            padding: 0 !important;
-            margin: 0 !important;
-            max-width: 100vw !important;
-        }
+    /* Remove limites do bloco apenas quando estiver com body do kanban */
+    iframe[title="streamlit.components.v1.html"] + div:has(#kanban-body) {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Reforço de remoção de centralização do container */
+    .block-container {
+        max-width: 100%;
+    }
     </style>
 """, unsafe_allow_html=True)
 
