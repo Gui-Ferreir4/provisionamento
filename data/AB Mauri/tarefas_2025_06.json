@@ -34,5 +34,38 @@
         "Data Entrega": "2025-06-16",
         "Status": "Pendente",
         "Projeto": "AB Mauri"
+    },
+    {
+        "ID Tarefa": "4",
+        "Título Tarefa": "Exemplo - 01 (Texto longo para validação de quebra no kanban)",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Exemplo - 01 (Texto longo para validação de quebra no kanban)",
+        "Tipo Subtarefa": "Texto",
+        "Chamado": "CRIA-241",
+        "Data Cadastro": "2025-06-13",
+        "Data Entrega": "2025-06-13",
+        "Projeto": "AB Mauri"
+    },
+    {
+        "ID Tarefa": "4",
+        "Título Tarefa": "Exemplo - 01 (Texto longo para validação de quebra no kanban)",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Exemplo - 01 (Texto longo para validação de quebra no kanban)",
+        "Tipo Subtarefa": "Layout",
+        "Chamado": "CRIA-241",
+        "Data Cadastro": "2025-06-13",
+        "Data Entrega": "2025-06-16",
+        "Projeto": "AB Mauri"
+    },
+    {
+        "ID Tarefa": "4",
+        "Título Tarefa": "Exemplo - 01 (Texto longo para validação de quebra no kanban)",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Exemplo - 01 (Texto longo para validação de quebra no kanban)",
+        "Tipo Subtarefa": "HTML",
+        "Chamado": "CRIA-241",
+        "Data Cadastro": "2025-06-13",
+        "Data Entrega": "2025-06-17",
+        "Projeto": "AB Mauri"
     }
 ]
