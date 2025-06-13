@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import time
 import json
@@ -7,6 +8,7 @@ import requests
 from datetime import datetime, date, timedelta
 from github import Github
 import holidays
+
 
 # --- CONFIGS ---
 GITHUB_USER = st.secrets["github"]["user"]
@@ -125,7 +127,7 @@ def gerar_proximo_id():
     return max(ids) + 1 if ids else 1
 
 # --- INÍCIO DAS ABAS ---
-abas = st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📜 LOG"])
+abas = st.tabs(["📋 Cadastro", "📋 Tarefas Cadastradas", "📌 Kanban", "📜 LOG"])
 
 # --- ABA CADASTRO ---
 with abas[0]:
@@ -356,6 +358,26 @@ with abas[1]:
                     st.error(f"❌ Erro: {e}")
                     registrar_log(f"❌ Erro na atualização da tarefa {st.session_state.get('id_em_edicao')}: {e}")
 
+# --- ABA KANBAN ---
+with abas[3]:
+    st.header("📌 Visualização Kanban")
+
+    try:
+        url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/kanban.html"
+        headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+        r = requests.get(url, headers=headers)
+
+        if r.status_code == 200:
+            content = base64.b64decode(r.json()["content"]).decode("utf-8")
+            components.html(content, height=800, scrolling=True)
+            registrar_log("✅ Kanban carregado com sucesso.")
+        else:
+            st.error("❌ Não foi possível carregar o arquivo kanban.html.")
+            registrar_log(f"❌ Erro ao carregar kanban.html: Status {r.status_code}")
+
+    except Exception as e:
+        st.error(f"Erro ao exibir o Kanban: {e}")
+        registrar_log(f"❌ Erro ao exibir o Kanban: {e}")
 
 # --- ABA LOG ---
 with abas[2]:
