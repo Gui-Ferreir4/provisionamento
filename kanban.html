@@ -9,24 +9,26 @@
     @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
 
     .GridCalendario {
-      display: flex;
-      overflow: auto;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 12px;
-      justify-content: flex-start;
-    }
+	  display: flex;
+	  flex-direction: row;
+	  flex-wrap: nowrap;
+	  overflow-x: auto;
+	  gap: 12px;
+	  padding-bottom: 8px;
+	}
     .day {
       border: 1px solid #ccc;
       display: flex;
       flex-direction: column;
       position: relative;
       width: 280px;
-      min-height: 200px;
+      min-height: 500px;
       background: #fafafa;
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       overflow: hidden;
+	  min-width: 260px;
+	  flex: 0 0 auto;
     }
     .day-header {
       background: #444;
@@ -241,7 +243,7 @@ function transformarTarefas(dados) {
     id: d["ID Tarefa"] + "_" + d["Subtarefa"],
     titulo: d["Título Tarefa"],
     chamado: d["Chamado"] || "",
-    concluido: false,
+    status: d["Status"] || "Pendente",
     dia: extrairDiaDataLocal(d["Data Entrega"]),
     tipo: (d["Tipo Subtarefa"] || "").toLowerCase(),
     ano: new Date(d["Data Entrega"]).getFullYear(),
@@ -292,29 +294,34 @@ function gerarCalendario() {
       .sort((a, b) => ["texto", "layout", "html"].indexOf(a.tipo) - ["texto", "layout", "html"].indexOf(b.tipo))
       .forEach(tarefa => {
         const card = document.createElement("div");
-        card.className = "card";
+		card.className = "card";
 
-        const badge = document.createElement("div");
-        badge.className = `badge badge-${tarefa.tipo}`;
-        badge.textContent = tarefa.tipo;
-        card.appendChild(badge);
+		if (tarefa.status.toLowerCase() === "concluído") {
+		  card.style.border = "2px solid #28a745";
+		  card.style.backgroundColor = "#eafbe7";
+		  card.innerHTML += `<div style="font-size: 1rem; color: #28a745;">✅ Concluído</div>`;
+		}
 
-        const id = document.createElement("p");
-        id.textContent = `ID: ${tarefa.id.split('_')[0]}`;
-        card.appendChild(id);
+		const badge = document.createElement("div");
+		badge.className = `badge badge-${tarefa.tipo}`;
+		badge.textContent = tarefa.tipo;
+		card.appendChild(badge);
 
-        const titulo = document.createElement("p");
-        titulo.textContent = tarefa.titulo;
-        titulo.style.fontWeight = "bold";
-        card.appendChild(titulo);
+		const id = document.createElement("p");
+		id.innerHTML = `<strong>🆔 ID Tarefa:</strong> ${tarefa.id.split('_')[0]}`;
+		card.appendChild(id);
 
-        if (tarefa.chamado) {
-          const chamado = document.createElement("p");
-          chamado.className = "descricao";
-          chamado.textContent = `Chamado: ${tarefa.chamado}`;
-          chamado.title = tarefa.chamado;
-          card.appendChild(chamado);
-        }
+		const titulo = document.createElement("p");
+		titulo.innerHTML = `<strong>📝 Título:</strong> ${tarefa.titulo}`;
+		card.appendChild(titulo);
+
+		if (tarefa.chamado) {
+		  const chamado = document.createElement("p");
+		  chamado.className = "descricao";
+		  chamado.innerHTML = `<strong>🎟️ Chamado:</strong> ${tarefa.chamado}`;
+		  chamado.title = tarefa.chamado;
+		  card.appendChild(chamado);
+		}
 
         body.appendChild(card);
       });
