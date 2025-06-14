@@ -9,26 +9,26 @@
     @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
 
     .GridCalendario {
-	  display: flex;
-	  flex-direction: row;
-	  flex-wrap: nowrap;
-	  overflow-x: auto;
-	  gap: 12px;
-	  padding-bottom: 8px;
-	}
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 12px;
+      padding-bottom: 8px;
+    } 
     .day {
       border: 1px solid #ccc;
       display: flex;
       flex-direction: column;
       position: relative;
-      width: 280px;
+      width: 320px;
       min-height: 500px;
       background: #fafafa;
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       overflow: hidden;
-	  min-width: 260px;
-	  flex: 0 0 auto;
+      min-width: 260px;
+      flex: 0 0 auto;
     }
     .day-header {
       background: #444;
@@ -65,7 +65,6 @@
       gap: 6px;
       transition: all 0.2s ease;
     }
-
     .card:hover {
       background: #f9f9f9;
       border-color: #999;
@@ -73,32 +72,32 @@
     }
 
     .badge-texto,
-	.badge-layout,
-	.badge-html {
-	  font-size: 0.9rem;           /* Aumenta o tamanho da fonte */
-	  font-weight: 600;            /* Deixa mais destacado */
-	  padding: 4px 25px;            /* Maior espaço interno */
-	  border-radius: 6px;
-	  display: inline-block;
-	  width: fit-content;
-	  margin: 0 auto;              /* Centraliza horizontalmente */
-	  text-align: center;
-	}
+    .badge-layout,
+    .badge-html {
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 4px 25px;
+      border-radius: 6px;
+      display: inline-block;
+      width: fit-content;
+      margin: 0 auto;
+      text-align: center;
+    }
 
-	.badge-texto {
-	  background: #0084ff;
-	  color: #fff;
-	}
+    .badge-texto {
+      background: #0084ff;
+      color: #fff;
+    }
 
-	.badge-layout {
-	  background: #ffae00;
-	  color: #000;
-	}
+    .badge-layout {
+      background: #ffae00;
+      color: #000;
+    }
 
-	.badge-html {
-	  background: #00d33f;
-	  color: #000;
-	}
+    .badge-html {
+      background: #00d33f;
+      color: #000;
+    }
 
     .card p {
       margin: 0;
@@ -116,6 +115,18 @@
       text-overflow: ellipsis;
       white-space: normal;
     }
+
+    .filtros-container {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .form-control, .form-select {
+      min-width: 160px;
+    }
   </style>
 </head>
 <body class="p-4">
@@ -130,20 +141,34 @@
             <option value="">Selecione o Projeto</option>
           </select>
           <select id="ano" class="form-select">
-			  <option value="">Ano</option>
-			</select>
-			<select id="mes" class="form-select">
-			  <option value="">Mês</option>
-			</select>
+            <option value="">Ano</option>
+          </select>
+          <select id="mes" class="form-select">
+            <option value="">Mês</option>
+          </select>
           <button id="gerarBtn" class="btn btn-primary">Buscar</button>
         </div>
+      </div>
+    </div>
+
+    <div class="filtros-container">
+      <select id="filtroStatus" class="form-select">
+        <option value="">📌 Todos os Status</option>
+        <option value="pendente">⏳ Pendentes</option>
+        <option value="concluído">✅ Concluídas</option>
+      </select>
+      <input type="text" id="buscaTitulo" class="form-control" placeholder="🔍 Buscar por título da tarefa">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="ocultarVazios">
+        <label class="form-check-label" for="ocultarVazios">
+          Ocultar dias sem tarefas
+        </label>
       </div>
     </div>
 
     <div id="totais" class="mb-3 text-end text-muted small"></div>
     <div id="calendario" class="GridCalendario"></div>
     <div id="tabela" style="display: none;"></div>
-  </div>
 <script>
 const usuario = "Gui-Ferreir4";
 const repo = "provisionamento";
@@ -152,6 +177,10 @@ const gerarBtn = document.getElementById("gerarBtn");
 const anoInput = document.getElementById("ano");
 const mesSelect = document.getElementById("mes");
 const projetoSelect = document.getElementById("projeto");
+const filtroStatus = document.getElementById("filtroStatus");
+const buscaTitulo = document.getElementById("buscaTitulo");
+const ocultarVazios = document.getElementById("ocultarVazios");
+
 const calendario = document.getElementById("calendario");
 const tabelaDiv = document.getElementById("tabela");
 const totaisDiv = document.getElementById("totais");
@@ -191,7 +220,6 @@ async function atualizarPeriodos(projeto) {
       })
       .filter(Boolean);
 
-    // Preencher ANO
     const anosUnicos = [...new Set(periodos.map(p => p.ano))];
     anoInput.innerHTML = '<option value="">Ano</option>';
     anosUnicos.sort().forEach(ano => {
@@ -201,7 +229,6 @@ async function atualizarPeriodos(projeto) {
       anoInput.appendChild(opt);
     });
 
-    // Preencher MÊS
     mesSelect.innerHTML = '<option value="">Mês</option>';
     const mesesUnicos = [...new Set(periodos.map(p => p.mes))];
     const nomesMeses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
@@ -243,28 +270,26 @@ function transformarTarefas(dados) {
     id: d["ID Tarefa"] + "_" + d["Subtarefa"],
     titulo: d["Título Tarefa"],
     chamado: d["Chamado"] || "",
-    status: d["Status"] || "Pendente",
+    status: (d["Status"] || "Pendente").toLowerCase(),
     dia: extrairDiaDataLocal(d["Data Entrega"]),
     tipo: (d["Tipo Subtarefa"] || "").toLowerCase(),
     ano: new Date(d["Data Entrega"]).getFullYear(),
     mes: new Date(d["Data Entrega"]).getMonth() + 1
   }));
 }
-
-projetoSelect.addEventListener("change", () => {
-  const projeto = projetoSelect.value;
-  if (projeto) {
-    atualizarPeriodos(projeto);
-  } else {
-    anoInput.innerHTML = '<option value="">Ano</option>';
-    mesSelect.innerHTML = '<option value="">Mês</option>';
-  }
-});
-
 function gerarCalendario() {
   const ano = parseInt(anoInput.value);
   const mes = parseInt(mesSelect.value);
-  const tarefasDoPeriodo = tarefas.filter(t => t.ano === ano && t.mes === mes);
+  const statusFiltro = filtroStatus.value.toLowerCase();
+  const busca = buscaTitulo.value.trim().toLowerCase();
+  const ocultar = ocultarVazios.checked;
+
+  const tarefasDoPeriodo = tarefas.filter(t => {
+    const correspondeStatus = !statusFiltro || t.status === statusFiltro;
+    const correspondeBusca = !busca || t.titulo.toLowerCase().includes(busca);
+    return t.ano === ano && t.mes === mes && correspondeStatus && correspondeBusca;
+  });
+
   const diasNoMes = new Date(ano, mes, 0).getDate();
 
   const diasUteis = Array.from({ length: diasNoMes }, (_, i) => i + 1).filter(d => {
@@ -276,6 +301,10 @@ function gerarCalendario() {
   const fragment = document.createDocumentFragment();
 
   diasUteis.forEach(dia => {
+    const tarefasDoDia = tarefasDoPeriodo.filter(t => t.dia === dia);
+
+    if (ocultar && tarefasDoDia.length === 0) return;
+
     const cell = document.createElement("div");
     cell.className = "day";
 
@@ -289,52 +318,59 @@ function gerarCalendario() {
 
     const body = cell.querySelector(".day-body");
 
-    tarefasDoPeriodo
-      .filter(t => t.dia === dia)
-      .sort((a, b) => ["texto", "layout", "html"].indexOf(a.tipo) - ["texto", "layout", "html"].indexOf(b.tipo))
+    tarefasDoDia
+      .sort((a, b) => {
+        const statusOrder = ["pendente", "concluído"];
+        const tipoOrder = ["texto", "layout", "html"];
+        return statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status) ||
+               tipoOrder.indexOf(a.tipo) - tipoOrder.indexOf(b.tipo);
+      })
       .forEach(tarefa => {
         const card = document.createElement("div");
-		card.className = "card";
+        card.className = "card";
 
-		if (tarefa.status.toLowerCase() === "concluído") {
-		  card.style.border = "2px solid #28a745";
-		  card.style.backgroundColor = "#eafbe7";
-		  card.innerHTML += `<div style="font-size: 1rem; color: #28a745;">✅ Concluído</div>`;
-		} else if (tarefa.status.toLowerCase() === "pendente") {
-		  card.style.border = "2px solid #ffeeba";
-		  card.style.backgroundColor = "#fff3cd";
-		  card.innerHTML += `<div style="font-size: 1rem; color: #856404;">⏳ Pendente</div>`;
-		}
+        // Estilo visual por status
+        if (tarefa.status === "concluído") {
+          card.style.border = "2px solid #28a745";
+          card.style.backgroundColor = "#eafbe7";
+          card.innerHTML += `<div style="font-size: 1rem; color: #28a745;">✅ Concluído</div>`;
+        } else if (tarefa.status === "pendente") {
+          card.style.border = "2px solid #ffeeba";
+          card.style.backgroundColor = "#fff3cd";
+          card.innerHTML += `<div style="font-size: 1rem; color: #856404;">⏳ Pendente</div>`;
+        }
 
-		const badge = document.createElement("div");
-		badge.className = `badge badge-${tarefa.tipo}`;
-		badge.textContent = tarefa.tipo;
-		card.appendChild(badge);
+        // Tooltip com detalhes completos
+        card.title = `ID: ${tarefa.id.split("_")[0]}\nTítulo: ${tarefa.titulo}\nStatus: ${tarefa.status}\nChamado: ${tarefa.chamado || '—'}`;
 
-		const id = document.createElement("p");
-		id.innerHTML = `<strong>🆔 ID:</strong> ${tarefa.id.split('_')[0]}`;
-		card.appendChild(id);
+        const badge = document.createElement("div");
+        badge.className = `badge badge-${tarefa.tipo}`;
+        badge.textContent = tarefa.tipo;
+        card.appendChild(badge);
 
-		const titulo = document.createElement("p");
-		titulo.innerHTML = `<strong>📝 Título:</strong> ${tarefa.titulo}`;
-		card.appendChild(titulo);
+        const id = document.createElement("p");
+        id.innerHTML = `<strong>🆔 ID:</strong> ${tarefa.id.split('_')[0]}`;
+        card.appendChild(id);
 
-		if (tarefa.chamado) {
-		  const chamado = document.createElement("p");
-		  chamado.className = "descricao";
-		  chamado.innerHTML = `<strong>🎟️ Chamado:</strong> ${tarefa.chamado}`;
-		  chamado.title = tarefa.chamado;
-		  card.appendChild(chamado);
-		}
+        const titulo = document.createElement("p");
+        titulo.innerHTML = `<strong>📝 Título:</strong> ${tarefa.titulo}`;
+        card.appendChild(titulo);
+
+        if (tarefa.chamado) {
+          const chamado = document.createElement("p");
+          chamado.className = "descricao";
+          chamado.innerHTML = `<strong>🎟️ Chamado:</strong> ${tarefa.chamado}`;
+          chamado.title = tarefa.chamado;
+          card.appendChild(chamado);
+        }
 
         body.appendChild(card);
       });
 
-    const total = tarefasDoPeriodo.filter(t => t.dia === dia).length;
-    if (total > 0) {
+    if (tarefasDoDia.length > 0) {
       const totalBadge = document.createElement("span");
       totalBadge.className = "label-total";
-      totalBadge.textContent = total;
+      totalBadge.textContent = tarefasDoDia.length;
       cell.appendChild(totalBadge);
     }
 
@@ -346,8 +382,17 @@ function gerarCalendario() {
 function gerarTabela() {
   const ano = parseInt(anoInput.value);
   const mes = parseInt(mesSelect.value);
-  const tarefasDoPeriodo = tarefas.filter(t => t.ano === ano && t.mes === mes)
-    .sort((a,b) => a.dia - b.dia || ["texto","layout","html"].indexOf(a.tipo) - ["texto","layout","html"].indexOf(b.tipo));
+  const statusFiltro = filtroStatus.value.toLowerCase();
+  const busca = buscaTitulo.value.trim().toLowerCase();
+
+  const tarefasDoPeriodo = tarefas.filter(t => {
+    const correspondeStatus = !statusFiltro || t.status === statusFiltro;
+    const correspondeBusca = !busca || t.titulo.toLowerCase().includes(busca);
+    return t.ano === ano && t.mes === mes && correspondeStatus && correspondeBusca;
+  }).sort((a, b) => {
+    return a.dia - b.dia ||
+      ["texto", "layout", "html"].indexOf(a.tipo) - ["texto", "layout", "html"].indexOf(b.tipo);
+  });
 
   let html = `<table class="table table-striped-columns sortable">`;
   html += `<thead><tr>
@@ -355,16 +400,18 @@ function gerarTabela() {
     <th>Data</th>
     <th>Etapa</th>
     <th>Título</th>
+    <th>Status</th>
   </tr></thead><tbody>`;
 
   tarefasDoPeriodo.forEach((t, i) => {
     const dia = (`0${t.dia}`).slice(-2);
     const mesNum = (`0${t.mes}`).slice(-2);
     html += `<tr>
-      <td>${i+1}</td>
+      <td>${i + 1}</td>
       <td>${dia}/${mesNum}/${t.ano}</td>
       <td><div class="badge badge-${t.tipo}">${t.tipo}</div></td>
       <td>${t.titulo}</td>
+      <td>${t.status}</td>
     </tr>`;
   });
 
@@ -373,12 +420,20 @@ function gerarTabela() {
 }
 
 function updateTotals(tarefasDoPeriodo) {
-  const counts = { texto: 0, layout: 0, html: 0 };
-  tarefasDoPeriodo.forEach(t => { if (counts[t.tipo] !== undefined) counts[t.tipo]++; });
+  const countsTipo = { texto: 0, layout: 0, html: 0 };
+  const countsStatus = { pendente: 0, concluído: 0 };
+
+  tarefasDoPeriodo.forEach(t => {
+    if (countsTipo[t.tipo] !== undefined) countsTipo[t.tipo]++;
+    if (countsStatus[t.status] !== undefined) countsStatus[t.status]++;
+  });
+
   totaisDiv.innerHTML = `
-    <span class="badge text-bg-secondary">Textos: ${counts.texto}</span>
-    <span class="badge text-bg-secondary">Layouts: ${counts.layout}</span>
-    <span class="badge text-bg-secondary">HTMLs: ${counts.html}</span>
+    <span class="badge text-bg-secondary">Textos: ${countsTipo.texto}</span>
+    <span class="badge text-bg-secondary">Layouts: ${countsTipo.layout}</span>
+    <span class="badge text-bg-secondary">HTMLs: ${countsTipo.html}</span>
+    <span class="badge text-bg-warning">⏳ Pendentes: ${countsStatus.pendente}</span>
+    <span class="badge text-bg-success">✅ Concluídas: ${countsStatus.concluído}</span>
   `;
 }
 
@@ -399,10 +454,32 @@ gerarBtn.addEventListener("click", async () => {
   updateTotals(tarefas);
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  carregarProjetos();
-  gerarCalendario();
-  gerarTabela();
+// Regenerar ao mudar filtros
+[filtroStatus, buscaTitulo, ocultarVazios].forEach(el => {
+  el.addEventListener("input", () => {
+    gerarCalendario();
+    gerarTabela();
+    updateTotals(tarefas);
+  });
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await carregarProjetos();
+
+  const projetoInicial = projetoSelect.value;
+  if (projetoInicial) {
+    atualizarPeriodos(projetoInicial);
+  }
+});
+
+projetoSelect.addEventListener("change", () => {
+  const projeto = projetoSelect.value;
+  if (projeto) {
+    atualizarPeriodos(projeto);
+  } else {
+    anoInput.innerHTML = '<option value="">Ano</option>';
+    mesSelect.innerHTML = '<option value="">Mês</option>';
+  }
 });
 </script>
 </body>
