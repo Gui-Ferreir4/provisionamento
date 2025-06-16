@@ -131,39 +131,59 @@
 </head>
 <body class="p-4">
   <div class="container-fluid">
-    <div class="row mb-3">
-      <div class="col-md-8">
-        <h3>📅 Kanban de Tarefas</h3>
-      </div>
-      <div class="col-md-4 text-end">
-        <div class="d-flex gap-2">
-          <select id="projeto" class="form-select">
-            <option value="">Selecione o Projeto</option>
-          </select>
-          <select id="ano" class="form-select">
-            <option value="">Ano</option>
-          </select>
-          <select id="mes" class="form-select">
-            <option value="">Mês</option>
-          </select>
-          <button id="gerarBtn" class="btn btn-primary">Buscar</button>
-        </div>
-      </div>
-    </div>
+	<div class="row mb-2">
+	  <div class="col-12">
+		<h3>📅 Kanban de Tarefas</h3>
+	  </div>
+	</div>
 
-    <div class="filtros-container">
-      <select id="filtroStatus" class="form-select">
-        <option value="">📌 Todos os Status</option>
-        <option value="pendente">⏳ Pendentes</option>
-        <option value="concluído">✅ Concluídas</option>
-      </select>
-      <input type="text" id="buscaTitulo" class="form-control" placeholder="🔍 Buscar por título da tarefa">
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="ocultarVazios">
-        <label class="form-check-label" for="ocultarVazios">
-          Ocultar dias sem tarefas
-        </label>
-      </div>
+	<div class="row align-items-end g-2 mb-2">
+	  <div class="col-sm-3 col-md-2">
+		<label for="projeto" class="form-label">Projeto</label>
+		<select id="projeto" class="form-select">
+		  <option value="">Selecione o Projeto</option>
+		</select>
+	  </div>
+	  <div class="col-sm-3 col-md-2">
+		<label for="ano" class="form-label">Ano</label>
+		<select id="ano" class="form-select">
+		  <option value="">Ano</option>
+		</select>
+	  </div>
+	  <div class="col-sm-3 col-md-2">
+		<label for="mes" class="form-label">Mês</label>
+		<select id="mes" class="form-select">
+		  <option value="">Mês</option>
+		</select>
+	  </div>
+	  <div class="col-sm-3 col-md-2">
+		<label class="form-label d-none d-sm-block">&nbsp;</label>
+		<button id="gerarBtn" class="btn btn-primary w-100">Buscar</button>
+	  </div>
+	</div>
+
+	<div class="row g-2 align-items-end mb-3">
+	  <div class="col-sm-4 col-md-4">
+		<label for="buscaTitulo" class="form-label">Filtrar</label>
+		<input type="text" id="buscaTitulo" class="form-control" placeholder="🔍 Título ou Chamado">
+	  </div>
+		<div class="col-sm-4 col-md-3">
+			<label for="filtroStatus" class="form-label">Status</label>
+			<select id="filtroStatus" class="form-select">
+			  <option value="">📌 Todos os Status</option>
+			  <option value="pendente">⏳ Pendentes</option>
+			  <option value="concluído">✅ Concluídas</option>
+			</select>
+		  </div>
+	  <div class="col-sm-4 col-md-3">
+		<div class="form-check mt-4">
+		  <input class="form-check-input" type="checkbox" id="ocultarVazios">
+		  <label class="form-check-label" for="ocultarVazios">
+			Ocultar dias sem tarefas
+		  </label>
+		</div>
+	  </div>
+	</div>
     </div>
 
     <div id="totais" class="mb-3 text-end text-muted small"></div>
@@ -249,34 +269,63 @@ async function atualizarPeriodos(projeto) {
 
 async function carregarDadosDoGitHub(projeto, ano, mes) {
   const caminho = `data/${projeto}/tarefas_${ano}_${String(mes).padStart(2, '0')}.json`;
+  const url = `https://api.github.com/repos/${usuario}/${repo}/contents/${caminho}`;
+
   try {
-    const resposta = await fetch(`https://raw.githubusercontent.com/${usuario}/${repo}/main/${caminho}`);
-    if (!resposta.ok) throw new Error("Não foi possível carregar os dados do GitHub");
-    const dados = await resposta.json();
+    const resposta = await fetch(url);
+    if (!resposta.ok) throw new Error("Não foi possível acessar o arquivo via Content API");
+
+    const conteudo = await resposta.json();
+
+    // Decodificação correta com UTF-8
+    const base64str = conteudo.content.replace(/\n/g, '');
+    const binStr = Uint8Array.from(atob(base64str), c => c.charCodeAt(0));
+    const jsonText = new TextDecoder("utf-8").decode(binStr);
+    const dados = JSON.parse(jsonText);
+
     return dados;
   } catch (erro) {
-    console.error("Erro ao carregar JSON do GitHub:", erro);
+    console.error("Erro ao carregar JSON do GitHub via Content API:", erro);
     return [];
   }
 }
 
 function extrairDiaDataLocal(dataStr) {
   const [ano, mes, dia] = dataStr.split("-").map(Number);
-  return new Date(ano, mes - 1, dia).getDate();
+  const data = new Date(Date.UTC(ano, mes - 1, dia)); // força UTC
+  return data.getUTCDate(); // evita conversão para local
 }
 
 function transformarTarefas(dados) {
-  return dados.map(d => ({
-    id: d["ID Tarefa"] + "_" + d["Subtarefa"],
-    titulo: d["Título Tarefa"],
-    chamado: d["Chamado"] || "",
-    status: (d["Status"] || "Pendente").toLowerCase(),
-    dia: extrairDiaDataLocal(d["Data Entrega"]),
-    tipo: (d["Tipo Subtarefa"] || "").toLowerCase(),
-    ano: new Date(d["Data Entrega"]).getFullYear(),
-    mes: new Date(d["Data Entrega"]).getMonth() + 1
-  }));
+  return dados
+    .filter(d => d["Data Entrega"] && d["ID Tarefa"] && d["Subtarefa"]) // dados mínimos obrigatórios
+    .map(d => {
+      const [yy, mm, dd] = d["Data Entrega"].split("-").map(Number);
+	  const dataEntrega = new Date(Date.UTC(yy, mm - 1, dd));
+      const dia = dataEntrega.getDate();
+      const mes = dataEntrega.getMonth() + 1;
+      const ano = dataEntrega.getFullYear();
+
+      if (isNaN(dataEntrega.getTime())) {
+        console.warn("⚠️ Data Entrega inválida:", d["Data Entrega"], d);
+        return null;
+      }
+
+      return {
+        id: `${d["ID Tarefa"]}_${d["Subtarefa"]}`,
+        titulo: d["Título Tarefa"] || "(Sem título)",
+        chamado: String(d["Chamado"] || ""),
+        status: (d["Status"] || "Pendente").toLowerCase(),
+        dia: dataEntrega.getUTCDate(),
+	    mes: dataEntrega.getUTCMonth() + 1,
+		ano: dataEntrega.getUTCFullYear(),
+        tipo: (d["Tipo Subtarefa"] || "").toLowerCase()
+      };
+    })
+    .filter(Boolean); // remove entradas nulas (ex: data inválida)
 }
+
+
 function gerarCalendario() {
   const ano = parseInt(anoInput.value);
   const mes = parseInt(mesSelect.value);
@@ -284,18 +333,25 @@ function gerarCalendario() {
   const busca = buscaTitulo.value.trim().toLowerCase();
   const ocultar = ocultarVazios.checked;
 
+  // Filtro das tarefas do período selecionado
   const tarefasDoPeriodo = tarefas.filter(t => {
     const correspondeStatus = !statusFiltro || t.status === statusFiltro;
-    const correspondeBusca = !busca || t.titulo.toLowerCase().includes(busca);
+    const correspondeBusca = !busca || t.titulo.toLowerCase().includes(busca) || t.chamado.toLowerCase().includes(busca);
     return t.ano === ano && t.mes === mes && correspondeStatus && correspondeBusca;
   });
 
+  // Obter total de dias no mês
   const diasNoMes = new Date(ano, mes, 0).getDate();
 
-  const diasUteis = Array.from({ length: diasNoMes }, (_, i) => i + 1).filter(d => {
-    const dow = new Date(ano, mes - 1, d).getDay();
-    return dow >= 1 && dow <= 5;
-  });
+  // Gerar os dias úteis (Segunda a Sexta)
+  const diasUteis = [];
+  for (let dia = 1; dia <= diasNoMes; dia++) {
+    const date = new Date(ano, mes - 1, dia);
+    const dayOfWeek = date.getDay(); // 0 = domingo, 1 = segunda, ..., 6 = sábado
+    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+      diasUteis.push(dia);
+    }
+  }
 
   calendario.innerHTML = "";
   const fragment = document.createDocumentFragment();
@@ -329,18 +385,16 @@ function gerarCalendario() {
         const card = document.createElement("div");
         card.className = "card";
 
-        // Estilo visual por status
         if (tarefa.status === "concluído") {
           card.style.border = "2px solid #28a745";
           card.style.backgroundColor = "#eafbe7";
           card.innerHTML += `<div style="font-size: 1rem; color: #28a745;">✅ Concluído</div>`;
-        } else if (tarefa.status === "pendente") {
+        } else {
           card.style.border = "2px solid #ffeeba";
           card.style.backgroundColor = "#fff3cd";
           card.innerHTML += `<div style="font-size: 1rem; color: #856404;">⏳ Pendente</div>`;
         }
 
-        // Tooltip com detalhes completos
         card.title = `ID: ${tarefa.id.split("_")[0]}\nTítulo: ${tarefa.titulo}\nStatus: ${tarefa.status}\nChamado: ${tarefa.chamado || '—'}`;
 
         const badge = document.createElement("div");
@@ -379,6 +433,7 @@ function gerarCalendario() {
 
   calendario.appendChild(fragment);
 }
+
 function gerarTabela() {
   const ano = parseInt(anoInput.value);
   const mes = parseInt(mesSelect.value);
@@ -387,7 +442,7 @@ function gerarTabela() {
 
   const tarefasDoPeriodo = tarefas.filter(t => {
     const correspondeStatus = !statusFiltro || t.status === statusFiltro;
-    const correspondeBusca = !busca || t.titulo.toLowerCase().includes(busca);
+    const correspondeBusca = !busca || t.titulo.toLowerCase().includes(busca) || t.chamado.toLowerCase().includes(busca);
     return t.ano === ano && t.mes === mes && correspondeStatus && correspondeBusca;
   }).sort((a, b) => {
     return a.dia - b.dia ||
