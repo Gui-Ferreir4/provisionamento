@@ -243,5 +243,16 @@
         "Data Cadastro": "2025-06-16",
         "Data Entrega": "2025-07-01",
         "Projeto": "Coop"
+    },
+    {
+        "ID Tarefa": "11",
+        "Título Tarefa": "Campanha teste 09",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Campanha teste 09",
+        "Tipo Subtarefa": "Texto",
+        "Chamado": "23",
+        "Data Cadastro": "2025-06-16",
+        "Data Entrega": "2025-07-07",
+        "Projeto": "Coop"
     }
 ]
