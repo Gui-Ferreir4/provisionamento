@@ -72,17 +72,16 @@
     }
 
     .badge-texto,
-    .badge-layout,
-    .badge-html {
-      font-size: 0.9rem;
-      font-weight: 600;
-      padding: 4px 25px;
-      border-radius: 6px;
-      display: inline-block;
-      width: fit-content;
-      margin: 0 auto;
-      text-align: center;
-    }
+	.badge-layout,
+	.badge-html {
+	  font-size: 1rem;
+	  font-weight: 500;
+	  padding: 6px 12px;
+	  border-radius: 8px;
+	  display: inline-block;
+	  margin-right: 8px;
+	  text-align: left;
+	}
 
     .badge-texto {
       background: #0084ff;
@@ -98,6 +97,24 @@
       background: #00d33f;
       color: #000;
     }
+
+	.badge-status-pendente {
+	  background-color: #fff3cd;
+	  color: #856404;
+	  font-size: 1rem;
+	  font-weight: 500;
+	  padding: 6px 12px;
+	  border-radius: 8px;
+	}
+
+	.badge-status-concluido {
+	  background-color: #eafbe7;
+	  color: #1e7e34;
+	  font-size: 1rem;
+	  font-weight: 500;
+	  padding: 6px 12px;
+	  border-radius: 8px;
+	}
 
     .card p {
       margin: 0;
@@ -141,25 +158,25 @@
 	  <div class="col-sm-3 col-md-2">
 		<label for="projeto" class="form-label">Projeto</label>
 		<select id="projeto" class="form-select">
-		  <option value="">Selecione o Projeto</option>
+		  <option value="">Selecione</option>
 		</select>
 	  </div>
 	  <div class="col-sm-3 col-md-2">
 		<label for="ano" class="form-label">Ano</label>
 		<select id="ano" class="form-select">
-		  <option value="">Ano</option>
+		  <option value="">Selecione</option>
 		</select>
 	  </div>
 	  <div class="col-sm-3 col-md-2">
 		<label for="mes" class="form-label">Mês</label>
 		<select id="mes" class="form-select">
-		  <option value="">Mês</option>
+		  <option value="">Selecione</option>
 		</select>
 	  </div>
-	  <div class="col-sm-3 col-md-2">
-		<label class="form-label d-none d-sm-block">&nbsp;</label>
-		<button id="gerarBtn" class="btn btn-primary w-100">Buscar</button>
-	  </div>
+	  <div class="col-sm-3 col-md-2 d-flex align-items-end gap-2">
+		  <button id="gerarBtn" class="btn btn-primary" style="min-width: 150px;">Buscar</button>
+			<button id="atualizarBtn" class="btn btn-outline-secondary" style="min-width: 150px;" title="Atualizar dados do GitHub">🔄 Atualizar</button>
+		</div>
 	</div>
 
 	<div class="row g-2 align-items-end mb-3">
@@ -483,13 +500,16 @@ function updateTotals(tarefasDoPeriodo) {
     if (countsStatus[t.status] !== undefined) countsStatus[t.status]++;
   });
 
-  totaisDiv.innerHTML = `
-    <span class="badge text-bg-secondary">Textos: ${countsTipo.texto}</span>
-    <span class="badge text-bg-secondary">Layouts: ${countsTipo.layout}</span>
-    <span class="badge text-bg-secondary">HTMLs: ${countsTipo.html}</span>
-    <span class="badge text-bg-warning">⏳ Pendentes: ${countsStatus.pendente}</span>
-    <span class="badge text-bg-success">✅ Concluídas: ${countsStatus.concluído}</span>
-  `;
+	totaisDiv.classList.remove("text-end");
+	totaisDiv.classList.add("text-start", "mb-3", "d-flex", "flex-wrap", "gap-2", "align-items-center");
+
+	totaisDiv.innerHTML = `
+	  <span class="badge badge-texto">📝 Textos: ${countsTipo.texto}</span>
+	  <span class="badge badge-layout">🎨 Layouts: ${countsTipo.layout}</span>
+	  <span class="badge badge-html">💻 HTMLs: ${countsTipo.html}</span>
+	  <span class="badge badge-status-pendente">⏳ Pendentes: ${countsStatus.pendente}</span>
+	  <span class="badge badge-status-concluido">✅ Concluídas: ${countsStatus.concluído}</span>
+	`;
 }
 
 gerarBtn.addEventListener("click", async () => {
@@ -507,6 +527,36 @@ gerarBtn.addEventListener("click", async () => {
   gerarCalendario();
   gerarTabela();
   updateTotals(tarefas);
+});
+
+const atualizarBtn = document.getElementById("atualizarBtn");
+
+atualizarBtn.addEventListener("click", async () => {
+  const projeto = projetoSelect.value;
+  const ano = parseInt(anoInput.value);
+  const mes = parseInt(mesSelect.value);
+
+  if (!projeto || isNaN(ano) || isNaN(mes)) {
+    alert("Selecione Projeto, Ano e Mês antes de atualizar.");
+    return;
+  }
+
+  atualizarBtn.disabled = true;
+  atualizarBtn.innerText = "🔄 Atualizando...";
+
+  try {
+    const dadosBrutos = await carregarDadosDoGitHub(projeto, ano, mes);
+    tarefas = transformarTarefas(dadosBrutos);
+    gerarCalendario();
+    gerarTabela();
+    updateTotals(tarefas);
+  } catch (e) {
+    alert("Erro ao atualizar dados.");
+    console.error(e);
+  } finally {
+    atualizarBtn.disabled = false;
+    atualizarBtn.innerText = "🔄 Atualizar";
+  }
 });
 
 // Regenerar ao mudar filtros
