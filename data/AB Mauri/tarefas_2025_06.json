@@ -1,41 +1,5 @@
 [
     {
-        "ID Tarefa": "1",
-        "Título Tarefa": "Teste01",
-        "Subtarefa": "1",
-        "Título Subtarefa": "Texto_Teste01",
-        "Tipo Subtarefa": "Texto",
-        "Chamado": "123",
-        "Data Cadastro": "2025-06-12",
-        "Data Entrega": "2025-06-12",
-        "Status": "Concluído",
-        "Projeto": "AB Mauri"
-    },
-    {
-        "ID Tarefa": "1",
-        "Título Tarefa": "Teste01",
-        "Subtarefa": "2",
-        "Título Subtarefa": "Layout_Teste01",
-        "Tipo Subtarefa": "Layout",
-        "Chamado": "123",
-        "Data Cadastro": "2025-06-12",
-        "Data Entrega": "2025-06-13",
-        "Status": "Concluído",
-        "Projeto": "AB Mauri"
-    },
-    {
-        "ID Tarefa": "1",
-        "Título Tarefa": "Teste01",
-        "Subtarefa": "3",
-        "Título Subtarefa": "HTML_Teste01",
-        "Tipo Subtarefa": "HTML",
-        "Chamado": "123",
-        "Data Cadastro": "2025-06-12",
-        "Data Entrega": "2025-06-16",
-        "Status": "Pendente",
-        "Projeto": "AB Mauri"
-    },
-    {
         "ID Tarefa": "4",
         "Título Tarefa": "Exemplo - 01 (Texto longo para validação de quebra no kanban)",
         "Subtarefa": "1",
@@ -66,6 +30,42 @@
         "Chamado": "CRIA-241",
         "Data Cadastro": "2025-06-13",
         "Data Entrega": "2025-06-17",
+        "Projeto": "AB Mauri"
+    },
+    {
+        "ID Tarefa": "1",
+        "Título Tarefa": "Teste01",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Teste01",
+        "Tipo Subtarefa": "Texto",
+        "Chamado": "123",
+        "Data Cadastro": "2025-06-17",
+        "Data Entrega": "2025-06-12",
+        "Status": "Concluído",
+        "Projeto": "AB Mauri"
+    },
+    {
+        "ID Tarefa": "1",
+        "Título Tarefa": "Teste01",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Teste01",
+        "Tipo Subtarefa": "Layout",
+        "Chamado": "123",
+        "Data Cadastro": "2025-06-17",
+        "Data Entrega": "2025-06-13",
+        "Status": "Concluído",
+        "Projeto": "AB Mauri"
+    },
+    {
+        "ID Tarefa": "1",
+        "Título Tarefa": "Teste01",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Teste01",
+        "Tipo Subtarefa": "HTML",
+        "Chamado": "123",
+        "Data Cadastro": "2025-06-17",
+        "Data Entrega": "2025-06-16",
+        "Status": "Concluído",
         "Projeto": "AB Mauri"
     }
 ]
