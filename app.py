@@ -378,7 +378,7 @@ with abas[2]:
         r = requests.get(url, headers=headers)
         if r.status_code == 200:
             content = base64.b64decode(r.json().get("content", "")).decode("utf-8")
-            components.html(content, height=1000, scrolling=True)
+            components.html(content, height=100%, scrolling=True)
         else:
             st.error("❌ Não foi possível carregar o arquivo kanban.html.")
     except Exception as e:
