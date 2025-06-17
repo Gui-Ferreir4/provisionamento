@@ -15,7 +15,8 @@
       overflow-x: auto;
       gap: 12px;
       padding-bottom: 8px;
-    } 
+    }
+
     .day {
       border: 1px solid #ccc;
       display: flex;
@@ -30,6 +31,7 @@
       min-width: 260px;
       flex: 0 0 auto;
     }
+
     .day-header {
       background: #444;
       color: #fff;
@@ -38,11 +40,13 @@
       font-weight: bold;
       font-size: 1rem;
     }
+
     .day-body {
       flex: 1;
       padding: 8px;
       overflow-y: auto;
     }
+
     .label-total {
       position: absolute;
       top: 8px;
@@ -53,6 +57,7 @@
       border-radius: 8px;
       font-size: 0.75rem;
     }
+
     .card {
       padding: 0.5rem;
       background: #fff;
@@ -65,13 +70,14 @@
       gap: 6px;
       transition: all 0.2s ease;
     }
+
     .card:hover {
       background: #f9f9f9;
       border-color: #999;
       box-shadow: 0 0 4px rgba(0,0,0,0.1);
     }
 
-    .badge-texto,
+	.badge-texto,
 	.badge-layout,
 	.badge-html {
 	  font-size: 1rem;
@@ -81,8 +87,9 @@
 	  display: inline-block;
 	  margin-right: 8px;
 	  text-align: left;
+	  text-transform: uppercase;
+	  width: 150px;
 	}
-
     .badge-texto {
       background: #0084ff;
       color: #fff;
@@ -98,23 +105,23 @@
       color: #000;
     }
 
-	.badge-status-pendente {
-	  background-color: #fff3cd;
-	  color: #856404;
-	  font-size: 1rem;
-	  font-weight: 500;
-	  padding: 6px 12px;
-	  border-radius: 8px;
-	}
+    .badge-status-pendente {
+      background-color: #fff3cd;
+      color: #856404;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
 
-	.badge-status-concluido {
-	  background-color: #eafbe7;
-	  color: #1e7e34;
-	  font-size: 1rem;
-	  font-weight: 500;
-	  padding: 6px 12px;
-	  border-radius: 8px;
-	}
+    .badge-status-concluido {
+      background-color: #eafbe7;
+      color: #1e7e34;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
 
     .card p {
       margin: 0;
@@ -144,63 +151,71 @@
     .form-control, .form-select {
       min-width: 160px;
     }
+
+    /* NOVO: estilo de botões toggle de filtro */
+    .filtro-toggle {
+      opacity: 1;
+      transition: all 0.2s ease;
+    }
+
+    .filtro-toggle.inativo {
+      opacity: 0.4;
+      text-decoration: line-through;
+    }
+
+    .filtro-toggle:hover {
+      filter: brightness(1.2);
+      cursor: pointer;
+    }
   </style>
 </head>
+
 <body class="p-4">
   <div class="container-fluid">
-	<div class="row mb-2">
-	  <div class="col-12">
-		<h3>📅 Kanban de Tarefas</h3>
-	  </div>
-	</div>
+    <div class="row mb-2">
+      <div class="col-12">
+        <h3>📅 Kanban de Tarefas</h3>
+      </div>
+    </div>
 
-	<div class="row align-items-end g-2 mb-2">
-	  <div class="col-sm-3 col-md-2">
-		<label for="projeto" class="form-label">Projeto</label>
-		<select id="projeto" class="form-select">
-		  <option value="">Selecione</option>
-		</select>
-	  </div>
-	  <div class="col-sm-3 col-md-2">
-		<label for="ano" class="form-label">Ano</label>
-		<select id="ano" class="form-select">
-		  <option value="">Selecione</option>
-		</select>
-	  </div>
-	  <div class="col-sm-3 col-md-2">
-		<label for="mes" class="form-label">Mês</label>
-		<select id="mes" class="form-select">
-		  <option value="">Selecione</option>
-		</select>
-	  </div>
-	  <div class="col-sm-3 col-md-2 d-flex align-items-end gap-2">
-		  <button id="gerarBtn" class="btn btn-primary" style="min-width: 150px;">Buscar</button>
-			<button id="atualizarBtn" class="btn btn-outline-secondary" style="min-width: 150px;" title="Atualizar dados do GitHub">🔄 Atualizar</button>
-		</div>
-	</div>
+    <div class="row align-items-end g-2 mb-2">
+      <div class="col-sm-3 col-md-2">
+        <label for="projeto" class="form-label">Projeto</label>
+        <select id="projeto" class="form-select">
+          <option value="">Selecione</option>
+        </select>
+      </div>
+      <div class="col-sm-3 col-md-2">
+        <label for="ano" class="form-label">Ano</label>
+        <select id="ano" class="form-select">
+          <option value="">Selecione</option>
+        </select>
+      </div>
+      <div class="col-sm-3 col-md-2">
+        <label for="mes" class="form-label">Mês</label>
+        <select id="mes" class="form-select">
+          <option value="">Selecione</option>
+        </select>
+      </div>
+      <div class="col-sm-3 col-md-2 d-flex align-items-end gap-2">
+        <button id="gerarBtn" class="btn btn-primary" style="min-width: 150px;">Buscar</button>
+        <button id="atualizarBtn" class="btn btn-outline-secondary" style="min-width: 150px;" title="Atualizar dados do GitHub">🔄 Atualizar</button>
+      </div>
+    </div>
 
-	<div class="row g-2 align-items-end mb-3">
-	  <div class="col-sm-4 col-md-4">
-		<label for="buscaTitulo" class="form-label">Filtrar</label>
-		<input type="text" id="buscaTitulo" class="form-control" placeholder="🔍 Título ou Chamado">
-	  </div>
-		<div class="col-sm-4 col-md-3">
-			<label for="filtroStatus" class="form-label">Status</label>
-			<select id="filtroStatus" class="form-select">
-			  <option value="">📌 Todos os Status</option>
-			  <option value="pendente">⏳ Pendentes</option>
-			  <option value="concluído">✅ Concluídas</option>
-			</select>
-		  </div>
-	  <div class="col-sm-4 col-md-3">
-		<div class="form-check mt-4">
-		  <input class="form-check-input" type="checkbox" id="ocultarVazios">
-		  <label class="form-check-label" for="ocultarVazios">
-			Ocultar dias sem tarefas
-		  </label>
-		</div>
-	  </div>
-	</div>
+    <div class="row g-2 align-items-end mb-3">
+      <div class="col-sm-4 col-md-4">
+        <label for="buscaTitulo" class="form-label">Filtrar</label>
+        <input type="text" id="buscaTitulo" class="form-control" placeholder="🔍 Título ou Chamado">
+      </div>
+      <div class="col-sm-4 col-md-3">
+        <div class="form-check mt-4">
+          <input class="form-check-input" type="checkbox" id="ocultarVazios">
+          <label class="form-check-label" for="ocultarVazios">
+            Ocultar dias sem tarefas
+          </label>
+        </div>
+      </div>
     </div>
 
     <div id="totais" class="mb-3 text-end text-muted small"></div>
@@ -214,7 +229,6 @@ const gerarBtn = document.getElementById("gerarBtn");
 const anoInput = document.getElementById("ano");
 const mesSelect = document.getElementById("mes");
 const projetoSelect = document.getElementById("projeto");
-const filtroStatus = document.getElementById("filtroStatus");
 const buscaTitulo = document.getElementById("buscaTitulo");
 const ocultarVazios = document.getElementById("ocultarVazios");
 
@@ -223,226 +237,108 @@ const tabelaDiv = document.getElementById("tabela");
 const totaisDiv = document.getElementById("totais");
 
 let tarefas = [];
+const filtrosOcultos = new Set(); // ← filtros toggle ativos
 
-const diasSemana = ['DOM','SEG','TER','QUA','QUI','SEX','SAB'];
+function updateTotals(tarefasDoPeriodo) {
+  const countsTipo = { texto: 0, layout: 0, html: 0 };
+  const countsStatus = { pendente: 0, concluído: 0 };
 
-async function carregarProjetos() {
-  const url = `https://api.github.com/repos/${usuario}/${repo}/contents/data`;
-  try {
-    const resposta = await fetch(url);
-    const lista = await resposta.json();
-    const projetos = lista.filter(item => item.type === "dir").map(item => item.name);
-    projetos.forEach(p => {
-      const opt = document.createElement("option");
-      opt.value = p;
-      opt.textContent = p;
-      projetoSelect.appendChild(opt);
+  tarefasDoPeriodo.forEach(t => {
+    if (countsTipo[t.tipo] !== undefined) countsTipo[t.tipo]++;
+    if (countsStatus[t.status] !== undefined) countsStatus[t.status]++;
+  });
+
+  totaisDiv.className = "text-start mb-3 d-flex flex-wrap gap-2 align-items-center";
+
+  totaisDiv.innerHTML = `
+    <span class="badge badge-texto filtro-toggle ${filtrosOcultos.has('texto') ? 'inativo' : ''}" data-filtro="texto">📝 Textos: ${countsTipo.texto}</span>
+    <span class="badge badge-layout filtro-toggle ${filtrosOcultos.has('layout') ? 'inativo' : ''}" data-filtro="layout">🎨 Layouts: ${countsTipo.layout}</span>
+    <span class="badge badge-html filtro-toggle ${filtrosOcultos.has('html') ? 'inativo' : ''}" data-filtro="html">💻 HTMLs: ${countsTipo.html}</span>
+    <span class="badge badge-status-pendente filtro-toggle ${filtrosOcultos.has('pendente') ? 'inativo' : ''}" data-filtro="pendente">⏳ Pendentes: ${countsStatus.pendente}</span>
+    <span class="badge badge-status-concluido filtro-toggle ${filtrosOcultos.has('concluído') ? 'inativo' : ''}" data-filtro="concluído">✅ Concluídas: ${countsStatus.concluído}</span>
+  `;
+
+  document.querySelectorAll(".filtro-toggle").forEach(el => {
+    el.addEventListener("click", () => {
+      const tipo = el.dataset.filtro;
+      filtrosOcultos.has(tipo) ? filtrosOcultos.delete(tipo) : filtrosOcultos.add(tipo);
+      gerarCalendario();
+      gerarTabela();
+      updateTotals(tarefas);
     });
-  } catch (erro) {
-    console.error("Erro ao listar projetos:", erro);
-  }
+  });
 }
-
-async function atualizarPeriodos(projeto) {
-  const url = `https://api.github.com/repos/${usuario}/${repo}/contents/data/${projeto}`;
-  try {
-    const resposta = await fetch(url);
-    const arquivos = await resposta.json();
-
-    const periodos = arquivos
-      .filter(arq => arq.name.startsWith("tarefas_") && arq.name.endsWith(".json"))
-      .map(arq => {
-        const partes = arq.name.match(/tarefas_(\d{4})_(\d{2})\.json/);
-        return partes ? { ano: partes[1], mes: partes[2] } : null;
-      })
-      .filter(Boolean);
-
-    const anosUnicos = [...new Set(periodos.map(p => p.ano))];
-    anoInput.innerHTML = '<option value="">Ano</option>';
-    anosUnicos.sort().forEach(ano => {
-      const opt = document.createElement("option");
-      opt.value = ano;
-      opt.textContent = ano;
-      anoInput.appendChild(opt);
-    });
-
-    mesSelect.innerHTML = '<option value="">Mês</option>';
-    const mesesUnicos = [...new Set(periodos.map(p => p.mes))];
-    const nomesMeses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-
-    mesesUnicos.sort().forEach(mesNum => {
-      const opt = document.createElement("option");
-      opt.value = parseInt(mesNum, 10);
-      opt.textContent = nomesMeses[parseInt(mesNum, 10) - 1];
-      mesSelect.appendChild(opt);
-    });
-
-  } catch (erro) {
-    console.error("Erro ao buscar períodos:", erro);
-    anoInput.innerHTML = '<option value="">Ano</option>';
-    mesSelect.innerHTML = '<option value="">Mês</option>';
-  }
-}
-
-async function carregarDadosDoGitHub(projeto, ano, mes) {
-  const caminho = `data/${projeto}/tarefas_${ano}_${String(mes).padStart(2, '0')}.json`;
-  const url = `https://api.github.com/repos/${usuario}/${repo}/contents/${caminho}`;
-
-  try {
-    const resposta = await fetch(url);
-    if (!resposta.ok) throw new Error("Não foi possível acessar o arquivo via Content API");
-
-    const conteudo = await resposta.json();
-
-    // Decodificação correta com UTF-8
-    const base64str = conteudo.content.replace(/\n/g, '');
-    const binStr = Uint8Array.from(atob(base64str), c => c.charCodeAt(0));
-    const jsonText = new TextDecoder("utf-8").decode(binStr);
-    const dados = JSON.parse(jsonText);
-
-    return dados;
-  } catch (erro) {
-    console.error("Erro ao carregar JSON do GitHub via Content API:", erro);
-    return [];
-  }
-}
-
-function extrairDiaDataLocal(dataStr) {
-  const [ano, mes, dia] = dataStr.split("-").map(Number);
-  const data = new Date(Date.UTC(ano, mes - 1, dia)); // força UTC
-  return data.getUTCDate(); // evita conversão para local
-}
-
-function transformarTarefas(dados) {
-  return dados
-    .filter(d => d["Data Entrega"] && d["ID Tarefa"] && d["Subtarefa"]) // dados mínimos obrigatórios
-    .map(d => {
-      const [yy, mm, dd] = d["Data Entrega"].split("-").map(Number);
-	  const dataEntrega = new Date(Date.UTC(yy, mm - 1, dd));
-      const dia = dataEntrega.getDate();
-      const mes = dataEntrega.getMonth() + 1;
-      const ano = dataEntrega.getFullYear();
-
-      if (isNaN(dataEntrega.getTime())) {
-        console.warn("⚠️ Data Entrega inválida:", d["Data Entrega"], d);
-        return null;
-      }
-
-      return {
-        id: `${d["ID Tarefa"]}_${d["Subtarefa"]}`,
-        titulo: d["Título Tarefa"] || "(Sem título)",
-        chamado: String(d["Chamado"] || ""),
-        status: (d["Status"] || "Pendente").toLowerCase(),
-        dia: dataEntrega.getUTCDate(),
-	    mes: dataEntrega.getUTCMonth() + 1,
-		ano: dataEntrega.getUTCFullYear(),
-        tipo: (d["Tipo Subtarefa"] || "").toLowerCase()
-      };
-    })
-    .filter(Boolean); // remove entradas nulas (ex: data inválida)
-}
-
 
 function gerarCalendario() {
   const ano = parseInt(anoInput.value);
   const mes = parseInt(mesSelect.value);
-  const statusFiltro = filtroStatus.value.toLowerCase();
   const busca = buscaTitulo.value.trim().toLowerCase();
   const ocultar = ocultarVazios.checked;
 
-  // Filtro das tarefas do período selecionado
   const tarefasDoPeriodo = tarefas.filter(t => {
-    const correspondeStatus = !statusFiltro || t.status === statusFiltro;
-    const correspondeBusca = !busca || t.titulo.toLowerCase().includes(busca) || t.chamado.toLowerCase().includes(busca);
-    return t.ano === ano && t.mes === mes && correspondeStatus && correspondeBusca;
+    const matchBusca = !busca || t.titulo.toLowerCase().includes(busca) || t.chamado.toLowerCase().includes(busca);
+    const matchStatus = !filtrosOcultos.has(t.status);
+    return t.ano === ano && t.mes === mes && matchBusca && matchStatus;
   });
 
-  // Obter total de dias no mês
   const diasNoMes = new Date(ano, mes, 0).getDate();
-
-  // Gerar os dias úteis (Segunda a Sexta)
   const diasUteis = [];
   for (let dia = 1; dia <= diasNoMes; dia++) {
-    const date = new Date(ano, mes - 1, dia);
-    const dayOfWeek = date.getDay(); // 0 = domingo, 1 = segunda, ..., 6 = sábado
-    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-      diasUteis.push(dia);
-    }
+    const data = new Date(ano, mes - 1, dia);
+    if (data.getDay() >= 1 && data.getDay() <= 5) diasUteis.push(dia);
   }
 
   calendario.innerHTML = "";
   const fragment = document.createDocumentFragment();
+  const diasSemana = ['DOM','SEG','TER','QUA','QUI','SEX','SAB'];
 
   diasUteis.forEach(dia => {
-    const tarefasDoDia = tarefasDoPeriodo.filter(t => t.dia === dia);
+    const tarefasDoDia = tarefasDoPeriodo.filter(t =>
+      t.dia === dia &&
+      !filtrosOcultos.has(t.tipo) &&
+      !filtrosOcultos.has(t.status)
+    );
 
     if (ocultar && tarefasDoDia.length === 0) return;
 
-    const cell = document.createElement("div");
-    cell.className = "day";
-
     const date = new Date(ano, mes - 1, dia);
     const diaSemana = diasSemana[date.getDay()];
-
-    cell.innerHTML = `
-      <div class="day-header">${dia} (${diaSemana})</div>
-      <div class="day-body"></div>
-    `;
-
+    const cell = document.createElement("div");
+    cell.className = "day";
+    cell.innerHTML = `<div class="day-header">${dia} (${diaSemana})</div><div class="day-body"></div>`;
     const body = cell.querySelector(".day-body");
 
-    tarefasDoDia
-      .sort((a, b) => {
-        const statusOrder = ["pendente", "concluído"];
-        const tipoOrder = ["texto", "layout", "html"];
-        return statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status) ||
-               tipoOrder.indexOf(a.tipo) - tipoOrder.indexOf(b.tipo);
-      })
-      .forEach(tarefa => {
-        const card = document.createElement("div");
-        card.className = "card";
+    tarefasDoDia.forEach(t => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.title = `ID: ${t.id}\nTítulo: ${t.titulo}\nStatus: ${t.status}\nChamado: ${t.chamado || '—'}`;
 
-        if (tarefa.status === "concluído") {
-          card.style.border = "2px solid #28a745";
-          card.style.backgroundColor = "#eafbe7";
-          card.innerHTML += `<div style="font-size: 1rem; color: #28a745;">✅ Concluído</div>`;
-        } else {
-          card.style.border = "2px solid #ffeeba";
-          card.style.backgroundColor = "#fff3cd";
-          card.innerHTML += `<div style="font-size: 1rem; color: #856404;">⏳ Pendente</div>`;
-        }
+      card.innerHTML = `
+        <div class="badge badge-${t.tipo}">${t.tipo}</div>
+        <p><strong>🆔 ID:</strong> ${t.id.split("_")[0]}</p>
+        <p><strong>📝 Título:</strong> ${t.titulo}</p>
+        ${t.chamado ? `<p class="descricao"><strong>🎟️ Chamado:</strong> ${t.chamado}</p>` : ""}
+        <div style="font-size: 1rem; color: ${t.status === 'concluído' ? '#28a745' : '#856404'};">
+          ${t.status === 'concluído' ? '✅ Concluído' : '⏳ Pendente'}
+        </div>
+      `;
 
-        card.title = `ID: ${tarefa.id.split("_")[0]}\nTítulo: ${tarefa.titulo}\nStatus: ${tarefa.status}\nChamado: ${tarefa.chamado || '—'}`;
+      if (t.status === "concluído") {
+        card.style.border = "2px solid #28a745";
+        card.style.backgroundColor = "#eafbe7";
+      } else {
+        card.style.border = "2px solid #ffeeba";
+        card.style.backgroundColor = "#fff3cd";
+      }
 
-        const badge = document.createElement("div");
-        badge.className = `badge badge-${tarefa.tipo}`;
-        badge.textContent = tarefa.tipo;
-        card.appendChild(badge);
-
-        const id = document.createElement("p");
-        id.innerHTML = `<strong>🆔 ID:</strong> ${tarefa.id.split('_')[0]}`;
-        card.appendChild(id);
-
-        const titulo = document.createElement("p");
-        titulo.innerHTML = `<strong>📝 Título:</strong> ${tarefa.titulo}`;
-        card.appendChild(titulo);
-
-        if (tarefa.chamado) {
-          const chamado = document.createElement("p");
-          chamado.className = "descricao";
-          chamado.innerHTML = `<strong>🎟️ Chamado:</strong> ${tarefa.chamado}`;
-          chamado.title = tarefa.chamado;
-          card.appendChild(chamado);
-        }
-
-        body.appendChild(card);
-      });
+      body.appendChild(card);
+    });
 
     if (tarefasDoDia.length > 0) {
-      const totalBadge = document.createElement("span");
-      totalBadge.className = "label-total";
-      totalBadge.textContent = tarefasDoDia.length;
-      cell.appendChild(totalBadge);
+      const badge = document.createElement("span");
+      badge.className = "label-total";
+      badge.textContent = tarefasDoDia.length;
+      cell.appendChild(badge);
     }
 
     fragment.appendChild(cell);
@@ -454,33 +350,24 @@ function gerarCalendario() {
 function gerarTabela() {
   const ano = parseInt(anoInput.value);
   const mes = parseInt(mesSelect.value);
-  const statusFiltro = filtroStatus.value.toLowerCase();
   const busca = buscaTitulo.value.trim().toLowerCase();
 
   const tarefasDoPeriodo = tarefas.filter(t => {
-    const correspondeStatus = !statusFiltro || t.status === statusFiltro;
-    const correspondeBusca = !busca || t.titulo.toLowerCase().includes(busca) || t.chamado.toLowerCase().includes(busca);
-    return t.ano === ano && t.mes === mes && correspondeStatus && correspondeBusca;
-  }).sort((a, b) => {
-    return a.dia - b.dia ||
-      ["texto", "layout", "html"].indexOf(a.tipo) - ["texto", "layout", "html"].indexOf(b.tipo);
+    const matchBusca = !busca || t.titulo.toLowerCase().includes(busca) || t.chamado.toLowerCase().includes(busca);
+    const matchStatus = !filtrosOcultos.has(t.status);
+    const visivel = !filtrosOcultos.has(t.tipo) && !filtrosOcultos.has(t.status);
+    return t.ano === ano && t.mes === mes && matchBusca && matchStatus && visivel;
   });
 
-  let html = `<table class="table table-striped-columns sortable">`;
-  html += `<thead><tr>
-    <th>#</th>
-    <th>Data</th>
-    <th>Etapa</th>
-    <th>Título</th>
-    <th>Status</th>
+  let html = `<table class="table table-striped-columns"><thead><tr>
+    <th>#</th><th>Data</th><th>Etapa</th><th>Título</th><th>Status</th>
   </tr></thead><tbody>`;
 
   tarefasDoPeriodo.forEach((t, i) => {
-    const dia = (`0${t.dia}`).slice(-2);
-    const mesNum = (`0${t.mes}`).slice(-2);
+    const data = `${String(t.dia).padStart(2, '0')}/${String(t.mes).padStart(2, '0')}/${t.ano}`;
     html += `<tr>
       <td>${i + 1}</td>
-      <td>${dia}/${mesNum}/${t.ano}</td>
+      <td>${data}</td>
       <td><div class="badge badge-${t.tipo}">${t.tipo}</div></td>
       <td>${t.titulo}</td>
       <td>${t.status}</td>
@@ -491,76 +378,76 @@ function gerarTabela() {
   tabelaDiv.innerHTML = html;
 }
 
-function updateTotals(tarefasDoPeriodo) {
-  const countsTipo = { texto: 0, layout: 0, html: 0 };
-  const countsStatus = { pendente: 0, concluído: 0 };
-
-  tarefasDoPeriodo.forEach(t => {
-    if (countsTipo[t.tipo] !== undefined) countsTipo[t.tipo]++;
-    if (countsStatus[t.status] !== undefined) countsStatus[t.status]++;
-  });
-
-	totaisDiv.classList.remove("text-end");
-	totaisDiv.classList.add("text-start", "mb-3", "d-flex", "flex-wrap", "gap-2", "align-items-center");
-
-	totaisDiv.innerHTML = `
-	  <span class="badge badge-texto">📝 Textos: ${countsTipo.texto}</span>
-	  <span class="badge badge-layout">🎨 Layouts: ${countsTipo.layout}</span>
-	  <span class="badge badge-html">💻 HTMLs: ${countsTipo.html}</span>
-	  <span class="badge badge-status-pendente">⏳ Pendentes: ${countsStatus.pendente}</span>
-	  <span class="badge badge-status-concluido">✅ Concluídas: ${countsStatus.concluído}</span>
-	`;
+// Funções auxiliares
+function transformarTarefas(dados) {
+  return dados
+    .filter(d => d["Data Entrega"] && d["ID Tarefa"] && d["Subtarefa"])
+    .map(d => {
+      const [yy, mm, dd] = d["Data Entrega"].split("-").map(Number);
+      return {
+        id: `${d["ID Tarefa"]}_${d["Subtarefa"]}`,
+        titulo: d["Título Tarefa"] || "(Sem título)",
+        chamado: String(d["Chamado"] || ""),
+        status: (d["Status"] || "Pendente").toLowerCase(),
+        tipo: (d["Tipo Subtarefa"] || "").toLowerCase(),
+        dia: dd, mes: mm, ano: yy
+      };
+    });
 }
 
-gerarBtn.addEventListener("click", async () => {
-  const projeto = projetoSelect.value;
-  const ano = parseInt(anoInput.value);
-  const mes = parseInt(mesSelect.value);
-
-  if (!projeto) {
-    alert("Selecione um projeto.");
-    return;
+async function carregarDadosDoGitHub(projeto, ano, mes) {
+  const url = `https://api.github.com/repos/${usuario}/${repo}/contents/data/${projeto}/tarefas_${ano}_${String(mes).padStart(2, "0")}.json`;
+  try {
+    const resposta = await fetch(url);
+    const conteudo = await resposta.json();
+    const bin = atob(conteudo.content.replace(/\n/g, ""));
+    const str = new TextDecoder("utf-8").decode(Uint8Array.from(bin, c => c.charCodeAt(0)));
+    return JSON.parse(str);
+  } catch (e) {
+    console.error("Erro ao carregar JSON:", e);
+    return [];
   }
+}
 
-  const dadosBrutos = await carregarDadosDoGitHub(projeto, ano, mes);
-  tarefas = transformarTarefas(dadosBrutos);
-  gerarCalendario();
-  gerarTabela();
-  updateTotals(tarefas);
-});
-
-const atualizarBtn = document.getElementById("atualizarBtn");
-
-atualizarBtn.addEventListener("click", async () => {
+// Eventos
+document.getElementById("atualizarBtn").addEventListener("click", async () => {
   const projeto = projetoSelect.value;
   const ano = parseInt(anoInput.value);
   const mes = parseInt(mesSelect.value);
-
   if (!projeto || isNaN(ano) || isNaN(mes)) {
     alert("Selecione Projeto, Ano e Mês antes de atualizar.");
     return;
   }
-
   atualizarBtn.disabled = true;
   atualizarBtn.innerText = "🔄 Atualizando...";
-
   try {
-    const dadosBrutos = await carregarDadosDoGitHub(projeto, ano, mes);
-    tarefas = transformarTarefas(dadosBrutos);
+    const dados = await carregarDadosDoGitHub(projeto, ano, mes);
+    tarefas = transformarTarefas(dados);
     gerarCalendario();
     gerarTabela();
     updateTotals(tarefas);
-  } catch (e) {
-    alert("Erro ao atualizar dados.");
-    console.error(e);
   } finally {
     atualizarBtn.disabled = false;
     atualizarBtn.innerText = "🔄 Atualizar";
   }
 });
 
-// Regenerar ao mudar filtros
-[filtroStatus, buscaTitulo, ocultarVazios].forEach(el => {
+gerarBtn.addEventListener("click", async () => {
+  const projeto = projetoSelect.value;
+  const ano = parseInt(anoInput.value);
+  const mes = parseInt(mesSelect.value);
+  if (!projeto) {
+    alert("Selecione um projeto.");
+    return;
+  }
+  const dados = await carregarDadosDoGitHub(projeto, ano, mes);
+  tarefas = transformarTarefas(dados);
+  gerarCalendario();
+  gerarTabela();
+  updateTotals(tarefas);
+});
+
+[buscaTitulo, ocultarVazios].forEach(el => {
   el.addEventListener("input", () => {
     gerarCalendario();
     gerarTabela();
@@ -568,19 +455,61 @@ atualizarBtn.addEventListener("click", async () => {
   });
 });
 
+async function carregarProjetos() {
+  const url = `https://api.github.com/repos/${usuario}/${repo}/contents/data`;
+  try {
+    const resp = await fetch(url);
+    const projetos = (await resp.json()).filter(item => item.type === "dir").map(item => item.name);
+    projetos.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p;
+      opt.textContent = p;
+      projetoSelect.appendChild(opt);
+    });
+  } catch (e) {
+    console.error("Erro ao listar projetos:", e);
+  }
+}
+
+async function atualizarPeriodos(projeto) {
+  const url = `https://api.github.com/repos/${usuario}/${repo}/contents/data/${projeto}`;
+  try {
+    const arquivos = await (await fetch(url)).json();
+    const periodos = arquivos
+      .map(f => f.name.match(/tarefas_(\d{4})_(\d{2})\.json/))
+      .filter(Boolean)
+      .map(m => ({ ano: m[1], mes: m[2] }));
+
+    const anos = [...new Set(periodos.map(p => p.ano))];
+    anoInput.innerHTML = '<option value="">Ano</option>';
+    anos.sort().forEach(ano => {
+      const opt = document.createElement("option");
+      opt.value = ano;
+      opt.textContent = ano;
+      anoInput.appendChild(opt);
+    });
+
+    const meses = [...new Set(periodos.map(p => p.mes))];
+    mesSelect.innerHTML = '<option value="">Mês</option>';
+    const nomes = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+    meses.sort().forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = parseInt(m);
+      opt.textContent = nomes[parseInt(m)-1];
+      mesSelect.appendChild(opt);
+    });
+  } catch (e) {
+    console.error("Erro ao buscar períodos:", e);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   await carregarProjetos();
-
-  const projetoInicial = projetoSelect.value;
-  if (projetoInicial) {
-    atualizarPeriodos(projetoInicial);
-  }
+  if (projetoSelect.value) atualizarPeriodos(projetoSelect.value);
 });
-
 projetoSelect.addEventListener("change", () => {
-  const projeto = projetoSelect.value;
-  if (projeto) {
-    atualizarPeriodos(projeto);
+  if (projetoSelect.value) {
+    atualizarPeriodos(projetoSelect.value);
   } else {
     anoInput.innerHTML = '<option value="">Ano</option>';
     mesSelect.innerHTML = '<option value="">Mês</option>';
