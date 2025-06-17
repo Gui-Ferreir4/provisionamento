@@ -290,5 +290,38 @@
         "Data Cadastro": "2025-06-17",
         "Data Entrega": "2025-07-03",
         "Projeto": "Coop"
+    },
+    {
+        "ID Tarefa": "13",
+        "Título Tarefa": "Campanha teste 08",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Campanha teste 08",
+        "Tipo Subtarefa": "Texto",
+        "Chamado": "770",
+        "Data Cadastro": "2025-06-17",
+        "Data Entrega": "2025-07-01",
+        "Projeto": "Coop"
+    },
+    {
+        "ID Tarefa": "13",
+        "Título Tarefa": "Campanha teste 08",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Campanha teste 08",
+        "Tipo Subtarefa": "Layout",
+        "Chamado": "770",
+        "Data Cadastro": "2025-06-17",
+        "Data Entrega": "2025-07-02",
+        "Projeto": "Coop"
+    },
+    {
+        "ID Tarefa": "13",
+        "Título Tarefa": "Campanha teste 08",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Campanha teste 08",
+        "Tipo Subtarefa": "HTML",
+        "Chamado": "770",
+        "Data Cadastro": "2025-06-17",
+        "Data Entrega": "2025-07-03",
+        "Projeto": "Coop"
     }
 ]
