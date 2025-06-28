@@ -125,9 +125,9 @@ with abas[0]:
         st.header("📋 Cadastro de Tarefa")
     
         with st.form("form_cadastro"):
-        projeto = st.selectbox("Projeto", PROJETOS, index=0)
-        titulo = st.text_input("Título da Tarefa")
-        chamado = st.text_input("Chamado (CRIA-123)")
+            projeto = st.selectbox("Projeto", PROJETOS, index=0)
+            titulo = st.text_input("Título da Tarefa")
+            chamado = st.text_input("Chamado (CRIA-123)")
     
         with st.expander("📌 Subtarefas", expanded=True):
             t = st.checkbox("📝 Texto", value=True)
