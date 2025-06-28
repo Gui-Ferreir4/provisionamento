@@ -288,13 +288,13 @@ with abas[1]:
                 # Validação do novo chamado
                 if not novo_chamado.strip():
                     st.error("❌ O campo 'Chamado' é obrigatório.")
-                    return
+                    st.stop()
                 elif not novo_chamado.isdigit():
                     st.error("❌ O campo 'Chamado' deve conter apenas números.")
-                    return
+                    st.stop()
                 elif novo_chamado != chamado_antigo and any(t["Chamado"] == novo_chamado for t in dados_json):
                     st.error(f"❌ Já existe uma tarefa com o chamado {novo_chamado}.")
-                    return
+                    st.stop()
 
                 st.markdown("**Subtarefas e Status:**")
                 tipos = ["Texto", "Layout", "HTML"]
