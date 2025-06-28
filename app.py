@@ -128,16 +128,16 @@ with abas[0]:
             projeto = st.selectbox("Projeto", PROJETOS, index=0)
             titulo = st.text_input("Título da Tarefa")
             chamado = st.text_input("Chamado (CRIA-123)")
-    
-        with st.expander("📌 Subtarefas", expanded=True):
-            t = st.checkbox("📝 Texto", value=True)
-            l = st.checkbox("🎨 Layout", value=True)
-            h = st.checkbox("💻 HTML", value=True)
-    
-        hoje = date.today()
-        data_entrega = st.date_input("Data Final", value=proximo_dia_util(hoje), min_value=hoje)
-    
-        cadastrar = st.form_submit_button("💾 Cadastrar")
+        
+            with st.expander("📌 Subtarefas", expanded=True):
+                t = st.checkbox("📝 Texto", value=True)
+                l = st.checkbox("🎨 Layout", value=True)
+                h = st.checkbox("💻 HTML", value=True)
+        
+            hoje = date.today()
+            data_entrega = st.date_input("Data Final", value=proximo_dia_util(hoje), min_value=hoje)
+        
+            cadastrar = st.form_submit_button("💾 Cadastrar")
     
     if cadastrar:
         with st.spinner("Salvando tarefa..."):
