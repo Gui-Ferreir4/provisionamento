@@ -1,0 +1,35 @@
+[
+    {
+        "ID Tarefa": "992",
+        "Título Tarefa": "Campanha teste 09",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Campanha teste 09",
+        "Tipo Subtarefa": "Texto",
+        "Chamado": "992",
+        "Data Cadastro": "2025-06-30",
+        "Data Entrega": "2025-07-08",
+        "Projeto": "AB Mauri"
+    },
+    {
+        "ID Tarefa": "992",
+        "Título Tarefa": "Campanha teste 09",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Campanha teste 09",
+        "Tipo Subtarefa": "Layout",
+        "Chamado": "992",
+        "Data Cadastro": "2025-06-30",
+        "Data Entrega": "2025-07-09",
+        "Projeto": "AB Mauri"
+    },
+    {
+        "ID Tarefa": "992",
+        "Título Tarefa": "Campanha teste 09",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Campanha teste 09",
+        "Tipo Subtarefa": "HTML",
+        "Chamado": "992",
+        "Data Cadastro": "2025-06-30",
+        "Data Entrega": "2025-07-10",
+        "Projeto": "AB Mauri"
+    }
+]
