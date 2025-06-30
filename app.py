@@ -185,15 +185,16 @@ with abas[0]:
                     erros.append(f"❌ A subtarefa '{tipo}' não pode ser cadastrada em um mês diferente do selecionado na data final. ({data_final.strftime('%d/%m/%Y')}). \nAjuste a data final da tarefa.")
     
                 novas.append({
-                    "ID Tarefa": chamado,
-                    "Título Tarefa": titulo,
-                    "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
-                    "Título Subtarefa": f"{tipo}_{titulo}",
+                    "Chamado": novo_chamado,
+                    "Status": status,
+                    "Projeto": projeto_selecionad,
+                    #"ID Tarefa": novo_chamado,
+                    "Título Tarefa": novo_titulo,
+                    #"Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
+                    #"Título Subtarefa": f"{tipo}_{novo_titulo}",
                     "Tipo Subtarefa": tipo,
-                    "Chamado": chamado,
                     "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
-                    "Data Entrega": str(data_final),
-                    "Projeto": projeto
+                    "Data Entrega": str(entrega)
                 })
     
             if erros:
@@ -333,16 +334,16 @@ with abas[1]:
                                 entrega = encontrar_data_disponivel(base, tipo, dados_filtrados)
                                 status = "Concluído" if checkboxes_status.get(tipo) else "Pendente"
                                 novas_subs.append({
-                                    "ID Tarefa": novo_chamado,
-                                    "Título Tarefa": novo_titulo,
-                                    "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
-                                    "Título Subtarefa": f"{tipo}_{novo_titulo}",
-                                    "Tipo Subtarefa": tipo,
                                     "Chamado": novo_chamado,
-                                    "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
-                                    "Data Entrega": str(entrega),
                                     "Status": status,
-                                    "Projeto": projeto_selecionado
+                                    "Projeto": projeto_selecionad,
+                                    #"ID Tarefa": novo_chamado,
+                                    "Título Tarefa": novo_titulo,
+                                    #"Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
+                                    #"Título Subtarefa": f"{tipo}_{novo_titulo}",
+                                    "Tipo Subtarefa": tipo,
+                                    "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
+                                    "Data Entrega": str(entrega)
                                 })
 
                             dados_filtrados.extend(novas_subs)
