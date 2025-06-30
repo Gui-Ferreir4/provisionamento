@@ -185,16 +185,15 @@ with abas[0]:
                     erros.append(f"❌ A subtarefa '{tipo}' não pode ser cadastrada em um mês diferente do selecionado na data final. ({data_final.strftime('%d/%m/%Y')}). \nAjuste a data final da tarefa.")
     
                 novas.append({
-                    "Chamado": novo_chamado,
-                    "Status": status,
-                    "Projeto": projeto_selecionad,
-                    #"ID Tarefa": novo_chamado,
-                    "Título Tarefa": novo_titulo,
-                    #"Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
-                    #"Título Subtarefa": f"{tipo}_{novo_titulo}",
+                    "ID Tarefa": chamado,
+                    "Título Tarefa": titulo,
+                    "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
+                    "Título Subtarefa": f"{tipo}_{titulo}",
                     "Tipo Subtarefa": tipo,
+                    "Chamado": chamado,
                     "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
-                    "Data Entrega": str(entrega)
+                    "Data Entrega": str(data_final),
+                    "Projeto": projeto
                 })
     
             if erros:
@@ -266,7 +265,19 @@ with abas[1]:
                     if dados_json:
                         st.markdown("### 📄 Tarefas no Período Selecionado")
                         df = pd.DataFrame(dados_json)
-                        df = df.drop(columns=["ID Tarefa"], errors="ignore")  # oculta ID Tarefa, mantendo foco no Chamado
+
+                        # Reordena e filtra colunas desejadas
+                        ordem_colunas = [
+                            "Chamado",
+                            "Status",
+                            "Projeto",
+                            "Título Tarefa",
+                            "Tipo Subtarefa",
+                            "Data Cadastro",
+                            "Data Entrega"
+                        ]
+                        df = df[[col for col in ordem_colunas if col in df.columns]]
+                        
                         st.dataframe(df, use_container_width=True)
                     else:
                         st.info("ℹ️ Nenhuma tarefa cadastrada neste período.")
@@ -334,16 +345,15 @@ with abas[1]:
                                 entrega = encontrar_data_disponivel(base, tipo, dados_filtrados)
                                 status = "Concluído" if checkboxes_status.get(tipo) else "Pendente"
                                 novas_subs.append({
-                                    "Chamado": novo_chamado,
-                                    "Status": status,
-                                    "Projeto": projeto_selecionad,
-                                    #"ID Tarefa": novo_chamado,
-                                    "Título Tarefa": novo_titulo,
-                                    #"Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
-                                    #"Título Subtarefa": f"{tipo}_{novo_titulo}",
+                                    "ID Tarefa": chamado,
+                                    "Título Tarefa": titulo,
+                                    "Subtarefa": str(["Texto", "Layout", "HTML"].index(tipo)+1),
+                                    "Título Subtarefa": f"{tipo}_{titulo}",
                                     "Tipo Subtarefa": tipo,
+                                    "Chamado": chamado,
                                     "Data Cadastro": datetime.today().strftime("%Y-%m-%d"),
-                                    "Data Entrega": str(entrega)
+                                    "Data Entrega": str(data_final),
+                                    "Projeto": projeto
                                 })
 
                             dados_filtrados.extend(novas_subs)
