@@ -8,6 +8,7 @@
         "Chamado": "992",
         "Data Cadastro": "2025-06-30",
         "Data Entrega": "2025-07-08",
+        "Status": "Concluído",
         "Projeto": "AB Mauri"
     },
     {
@@ -19,6 +20,7 @@
         "Chamado": "992",
         "Data Cadastro": "2025-06-30",
         "Data Entrega": "2025-07-09",
+        "Status": "Concluído",
         "Projeto": "AB Mauri"
     },
     {
@@ -30,6 +32,7 @@
         "Chamado": "992",
         "Data Cadastro": "2025-06-30",
         "Data Entrega": "2025-07-10",
+        "Status": "Pendente",
         "Projeto": "AB Mauri"
     }
 ]
