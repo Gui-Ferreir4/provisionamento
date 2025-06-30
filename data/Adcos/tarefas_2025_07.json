@@ -1,0 +1,35 @@
+[
+    {
+        "ID Tarefa": "202",
+        "Título Tarefa": "Adcos 1",
+        "Subtarefa": "1",
+        "Título Subtarefa": "Texto_Adcos 1",
+        "Tipo Subtarefa": "Texto",
+        "Chamado": "202",
+        "Data Cadastro": "2025-06-30",
+        "Data Entrega": "2025-07-02",
+        "Projeto": "Adcos"
+    },
+    {
+        "ID Tarefa": "202",
+        "Título Tarefa": "Adcos 1",
+        "Subtarefa": "2",
+        "Título Subtarefa": "Layout_Adcos 1",
+        "Tipo Subtarefa": "Layout",
+        "Chamado": "202",
+        "Data Cadastro": "2025-06-30",
+        "Data Entrega": "2025-07-03",
+        "Projeto": "Adcos"
+    },
+    {
+        "ID Tarefa": "202",
+        "Título Tarefa": "Adcos 1",
+        "Subtarefa": "3",
+        "Título Subtarefa": "HTML_Adcos 1",
+        "Tipo Subtarefa": "HTML",
+        "Chamado": "202",
+        "Data Cadastro": "2025-06-30",
+        "Data Entrega": "2025-07-04",
+        "Projeto": "Adcos"
+    }
+]
