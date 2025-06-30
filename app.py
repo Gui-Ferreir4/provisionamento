@@ -142,6 +142,10 @@ with abas[0]:
     if cadastrar:
         with st.spinner("Salvando tarefa..."):
             erros = []
+
+            # carregar os dados antes de validar
+            ano, mes = data_entrega.year, f"{data_entrega.month:02}"
+            dados, _ = carregar_json_github(projeto, ano, mes)
     
             if not titulo.strip():
                 erros.append("❌ O campo título é obrigatório.")
@@ -162,8 +166,6 @@ with abas[0]:
             if h: tipos.append("HTML")
     
             tipos.sort(key=lambda x: ["Texto", "Layout", "HTML"].index(x))
-            ano, mes = data_entrega.year, f"{data_entrega.month:02}"
-            dados, _ = carregar_json_github(projeto, ano, mes)
             for t in dados:
                 t["ID Tarefa"] = t.get("Chamado", "")
     
